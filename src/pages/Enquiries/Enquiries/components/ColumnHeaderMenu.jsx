@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { ArrowUp, ArrowDown, Filter, EyeOff, Pin } from 'lucide-react';
+import React, { useRef, useEffect, useState } from "react";
+import { ArrowUp, ArrowDown, Filter, EyeOff, Pin } from "lucide-react";
 
 const ColumnHeaderMenu = ({
   show,
@@ -10,10 +10,10 @@ const ColumnHeaderMenu = ({
   onFilter,
   onHide,
   anchorRef,
-  canHide = true
+  canHide = true,
 }) => {
   const menuRef = useRef(null);
-  const [filterValue, setFilterValue] = useState('');
+  const [filterValue, setFilterValue] = useState("");
 
   useEffect(() => {
     if (!show) return;
@@ -29,8 +29,8 @@ const ColumnHeaderMenu = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [show, onClose, anchorRef]);
 
   if (!show) return null;
@@ -80,9 +80,9 @@ const ColumnHeaderMenu = ({
 
       <button
         className={`flex items-center w-full px-3 py-2 ${
-          canHide 
-            ? 'hover:bg-gray-100 text-red-600 cursor-pointer' 
-            : 'text-gray-400 cursor-not-allowed opacity-50'
+          canHide
+            ? "hover:bg-gray-100 text-red-600 cursor-pointer"
+            : "text-gray-400 cursor-not-allowed opacity-50"
         }`}
         onClick={canHide ? onHide : undefined}
         disabled={!canHide}
