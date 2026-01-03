@@ -10,6 +10,7 @@ const LeadDetail = () => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [showAllTabs, setShowAllTabs] = useState(false);
     const [activeTab, setActiveTab] = useState('activities');
+    const [isRightCollapsed, setIsRightCollapsed] = useState(false);
 
     const leadsData = [
         { id: 1, name: 'Rajesh Kumar', phone: '+91 98765 43210', email: 'rajesh.kumar@email.com', date: '28 Dec 2024, 10:30 AM', source: 'Website', status: 'Open', type: 'Hot Lead', avatar: 'RK', city: 'Mumbai', state: 'Maharashtra', pincode: '400001' },
@@ -52,258 +53,284 @@ const LeadDetail = () => {
         return <Lead />
     }
 
-    if (detailView) {
-        const lead = leadsData.find(l => l.id === detailView);
+    // if (detailView) {
+    //     const lead = leadsData.find(l => l.id === detailView);
 
-        return (
-            <div className="flex h-screen bg-gray-50">
-                {/* Left Sidebar - Lead List */}
-                <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-                    <div className="p-4 border-b border-gray-200">
-                        <div className="flex items-center justify-between mb-3">
-                            <h2 className="text-lg font-semibold text-gray-800">Leads</h2>
-                            <button
-                                onClick={() => setDetailView(null)}
-                                className="p-1 hover:bg-gray-100 rounded"
-                            >
-                                <X className="h-5 w-5 text-gray-500" />
-                            </button>
-                        </div>
-                        <div className="relative">
-                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-                            <input
-                                type="text"
-                                placeholder="Search leads..."
-                                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                    </div>
+    //     return (
+    //         <div className="flex h-screen bg-gray-50">
+    //             {/* Left Sidebar - Lead List */}
+    //             <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+    //                 <div className="p-4 border-b border-gray-200">
+    //                     <div className="flex items-center justify-between mb-3">
+    //                         <h2 className="text-lg font-semibold text-gray-800">Leads</h2>
+    //                         <button
+    //                             onClick={() => setDetailView(null)}
+    //                             className="p-1 hover:bg-gray-100 rounded"
+    //                         >
+    //                             <X className="h-5 w-5 text-gray-500" />
+    //                         </button>
+    //                     </div>
+    //                     <div className="relative">
+    //                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+    //                         <input
+    //                             type="text"
+    //                             placeholder="Search leads..."
+    //                             className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+    //                         />
+    //                     </div>
+    //                 </div>
 
-                    <div className="flex-1 overflow-y-auto">
-                        {leadsData.map(l => (
-                            <div
-                                key={l.id}
-                                onClick={() => setDetailView(l.id)}
-                                className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${detailView === l.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
-                                    }`}
-                            >
-                                <div className="flex items-start gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
-                                        {l.avatar}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-start mb-1">
-                                            <h3 className="font-medium text-gray-900 text-sm truncate">{l.name}</h3>
-                                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{l.date.split(',')[0]}</span>
-                                        </div>
-                                        <p className="text-xs text-gray-600 mb-2">{l.phone}</p>
-                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(l.status)}`}>
-                                            {l.status}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+    //                 <div className="flex-1 overflow-y-auto">
+    //                     {leadsData.map(l => (
+    //                         <div
+    //                             key={l.id}
+    //                             onClick={() => setDetailView(l.id)}
+    //                             className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${detailView === l.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
+    //                                 }`}
+    //                         >
+    //                             <div className="flex items-start gap-3">
+    //                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
+    //                                     {l.avatar}
+    //                                 </div>
+    //                                 <div className="flex-1 min-w-0">
+    //                                     <div className="flex justify-between items-start mb-1">
+    //                                         <h3 className="font-medium text-gray-900 text-sm truncate">{l.name}</h3>
+    //                                         <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{l.date.split(',')[0]}</span>
+    //                                     </div>
+    //                                     <p className="text-xs text-gray-600 mb-2">{l.phone}</p>
+    //                                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(l.status)}`}>
+    //                                         {l.status}
+    //                                     </span>
+    //                                 </div>
+    //                             </div>
+    //                         </div>
+    //                     ))}
+    //                 </div>
+    //             </div>
 
-                {/* Main Content Area */}
-                <div className="flex-1 overflow-y-auto">
-                    <div className="w-full h-full p-6">
-                        {/* Header Section */}
-                        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
-                            <div className="flex items-start justify-between">
-                                <div className="flex items-start gap-4">
-                                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-xl">
-                                        {lead.avatar}
-                                    </div>
-                                    <div>
-                                        <h1 className="text-2xl font-bold text-gray-900 mb-2">{lead.name}</h1>
-                                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                                            <div className="flex items-center gap-1.5">
-                                                <Phone className="h-4 w-4" />
-                                                <span>{lead.phone}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5">
-                                                <Mail className="h-4 w-4" />
-                                                <span>{lead.email}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium ${getStatusColor(lead.status)}`}>
-                                        {lead.status}
-                                    </span>
-                                    <p className="text-xs text-gray-500 mt-2">Created: {lead.date}</p>
-                                </div>
-                            </div>
-                        </div>
+    //             {/* Main Content Area */}
+    //             <div className="flex-1 overflow-y-auto">
+    //                 <div className="w-full h-full p-6">
+    //                     {/* Header Section */}
+    //                     <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
+    //                         <div className="flex items-start justify-between">
+    //                             <div className="flex items-start gap-4">
+    //                                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-xl">
+    //                                     {lead.avatar}
+    //                                 </div>
+    //                                 <div>
+    //                                     <h1 className="text-2xl font-bold text-gray-900 mb-2">{lead.name}</h1>
+    //                                     <div className="flex items-center gap-4 text-sm text-gray-600">
+    //                                         <div className="flex items-center gap-1.5">
+    //                                             <Phone className="h-4 w-4" />
+    //                                             <span>{lead.phone}</span>
+    //                                         </div>
+    //                                         <div className="flex items-center gap-1.5">
+    //                                             <Mail className="h-4 w-4" />
+    //                                             <span>{lead.email}</span>
+    //                                         </div>
+    //                                     </div>
+    //                                 </div>
+    //                             </div>
+    //                             <div className="text-right">
+    //                                 <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium ${getStatusColor(lead.status)}`}>
+    //                                     {lead.status}
+    //                                 </span>
+    //                                 <p className="text-xs text-gray-500 mt-2">Created: {lead.date}</p>
+    //                             </div>
+    //                         </div>
+    //                     </div>
 
-                        <div className="grid grid-cols-3 gap-6">
-                            {/* Lead Information Card */}
-                            <div className="col-span-2 space-y-6">
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                                    <div className="p-6 border-b border-gray-200">
-                                        <h2 className="text-lg font-semibold text-gray-900">Lead Information</h2>
-                                    </div>
-                                    <div className="p-6">
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-                                                <p className="mt-1 text-sm font-medium text-gray-900">{lead.phone}</p>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
-                                                <p className="mt-1 text-sm font-medium text-gray-900">{lead.email}</p>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Lead ID</label>
-                                                <p className="mt-1 text-sm font-medium text-gray-900">LD-2024-{lead.id.toString().padStart(4, '0')}</p>
-                                            </div>
-                                            <div>
-                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Created Date</label>
-                                                <p className="mt-1 text-sm font-medium text-gray-900">{lead.date}</p>
-                                            </div>
-                                            {showMoreDetails && (
-                                                <>
-                                                    <div>
-                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">City</label>
-                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.city}</p>
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">State</label>
-                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.state}</p>
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">Pincode</label>
-                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.pincode}</p>
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">Source</label>
-                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.source}</p>
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                        <button
-                                            onClick={() => setShowMoreDetails(!showMoreDetails)}
-                                            className="mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
-                                        >
-                                            {showMoreDetails ? 'Hide Details' : 'Show More Details'}
-                                            <ChevronDown className={`h-4 w-4 transition-transform ${showMoreDetails ? 'rotate-180' : ''}`} />
-                                        </button>
-                                    </div>
-                                </div>
+    //                     <div className={`grid gap-6 transition-all duration-300 ${isRightCollapsed ? 'grid-cols-1' : 'grid-cols-3'}`}>
+    //                         {/* Lead Information Card */}
+    //                         <div className={`space-y-6 transition-all duration-300 ${isRightCollapsed ? 'col-span-1' : 'col-span-2'}`}>
+    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    //                                 <div className="p-6 border-b border-gray-200">
+    //                                     <h2 className="text-lg font-semibold text-gray-900">Lead Information</h2>
+    //                                 </div>
+    //                                 <div className="p-6">
+    //                                     <div className="grid grid-cols-2 gap-6">
+    //                                         <div>
+    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
+    //                                             <p className="mt-1 text-sm font-medium text-gray-900">{lead.phone}</p>
+    //                                         </div>
+    //                                         <div>
+    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
+    //                                             <p className="mt-1 text-sm font-medium text-gray-900">{lead.email}</p>
+    //                                         </div>
+    //                                         <div>
+    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Lead ID</label>
+    //                                             <p className="mt-1 text-sm font-medium text-gray-900">LD-2024-{lead.id.toString().padStart(4, '0')}</p>
+    //                                         </div>
+    //                                         <div>
+    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Created Date</label>
+    //                                             <p className="mt-1 text-sm font-medium text-gray-900">{lead.date}</p>
+    //                                         </div>
+    //                                         {showMoreDetails && (
+    //                                             <>
+    //                                                 <div>
+    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">City</label>
+    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.city}</p>
+    //                                                 </div>
+    //                                                 <div>
+    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">State</label>
+    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.state}</p>
+    //                                                 </div>
+    //                                                 <div>
+    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">Pincode</label>
+    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.pincode}</p>
+    //                                                 </div>
+    //                                                 <div>
+    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">Source</label>
+    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.source}</p>
+    //                                                 </div>
+    //                                             </>
+    //                                         )}
+    //                                     </div>
+    //                                     <button
+    //                                         onClick={() => setShowMoreDetails(!showMoreDetails)}
+    //                                         className="mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+    //                                     >
+    //                                         {showMoreDetails ? 'Hide Details' : 'Show More Details'}
+    //                                         <ChevronDown className={`h-4 w-4 transition-transform ${showMoreDetails ? 'rotate-180' : ''}`} />
+    //                                     </button>
+    //                                 </div>
+    //                             </div>
 
-                                {/* Activity Tabs Section */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                                    <div className="border-b border-gray-200">
-                                        <div className="flex gap-6 px-6">
-                                            {[
-                                                'Activities',
-                                                'Calls',
-                                                'WhatsApp',
-                                                'Meetings',
-                                                ...(showAllTabs
-                                                    ? ['Physical Appointments', 'Chat', 'Webform']
-                                                    : [])
-                                            ].map(tab => (
-                                                <button
-                                                    key={tab}
-                                                    onClick={() => setActiveTab(tab.toLowerCase())}
-                                                    className={`py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.toLowerCase()
-                                                            ? 'border-blue-500 text-blue-600'
-                                                            : 'border-transparent text-gray-600 hover:text-gray-900'
-                                                        }`}
-                                                >
-                                                    {tab}
-                                                </button>
-                                            ))}
+    //                             {/* Activity Tabs Section */}
+    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    //                                 <div className="border-b border-gray-200">
+    //                                     <div className="flex gap-6 px-6">
+    //                                         {[
+    //                                             'Activities',
+    //                                             'Calls',
+    //                                             'WhatsApp',
+    //                                             'Meetings',
+    //                                             ...(showAllTabs
+    //                                                 ? ['Physical Appointments', 'Chat', 'Webform']
+    //                                                 : [])
+    //                                         ].map(tab => (
+    //                                             <button
+    //                                                 key={tab}
+    //                                                 onClick={() => setActiveTab(tab.toLowerCase())}
+    //                                                 className={`py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.toLowerCase()
+    //                                                         ? 'border-blue-500 text-blue-600'
+    //                                                         : 'border-transparent text-gray-600 hover:text-gray-900'
+    //                                                     }`}
+    //                                             >
+    //                                                 {tab}
+    //                                             </button>
+    //                                         ))}
 
-                                            <button
-                                                onClick={() => setShowAllTabs(prev => !prev)}
-                                                className="text-sm font-medium text-blue-600 hover:text-blue-700 whitespace-nowrap"
-                                            >
-                                                {showAllTabs ? 'Less' : 'More'}
-                                            </button>
-                                        </div>
-                                    </div>
+    //                                         <button
+    //                                             onClick={() => setShowAllTabs(prev => !prev)}
+    //                                             className="text-sm font-medium text-blue-600 hover:text-blue-700 whitespace-nowrap"
+    //                                         >
+    //                                             {showAllTabs ? 'Less' : 'More'}
+    //                                         </button>
+    //                                     </div>
+    //                                 </div>
 
-                                    <div className="p-6">
-                                        <div className="space-y-4">
-                                            {activities.map((activity, idx) => (
-                                                <div key={idx} className="flex gap-4">
-                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                        <activity.icon className="h-5 w-5 text-blue-600" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                                                        <p className="text-xs text-gray-500 mt-0.5">
-                                                            by {activity.user} • {activity.time}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+    //                                 <div className="p-6">
+    //                                     <div className="space-y-4">
+    //                                         {activities.map((activity, idx) => (
+    //                                             <div key={idx} className="flex gap-4">
+    //                                                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+    //                                                     <activity.icon className="h-5 w-5 text-blue-600" />
+    //                                                 </div>
+    //                                                 <div className="flex-1">
+    //                                                     <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+    //                                                     <p className="text-xs text-gray-500 mt-0.5">
+    //                                                         by {activity.user} • {activity.time}
+    //                                                     </p>
+    //                                                 </div>
+    //                                             </div>
+    //                                         ))}
+    //                                     </div>
+    //                                 </div>
+    //                             </div>
+    //                         </div>
 
-                            {/* Right Sidebar - Action Panel */}
-                            <div className="col-span-1 space-y-6">
-                                {/* Contact Options */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact Options</h3>
-                                    <div className="space-y-3">
-                                        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-                                            <Phone className="h-4 w-4" />
-                                            Call
-                                        </button>
-                                        <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-                                            <MessageSquare className="h-4 w-4" />
-                                            WhatsApp
-                                        </button>
-                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
-                                            <Mail className="h-4 w-4" />
-                                            Email
-                                        </button>
-                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
-                                            <MessageSquare className="h-4 w-4" />
-                                            SMS
-                                        </button>
-                                    </div>
-                                </div>
+    //                         {/* Right Sidebar - Action Panel */}
+    //                         <div className={`space-y-6 transition-all duration-300 relative ${isRightCollapsed ? 'w-0 overflow-hidden opacity-0' : 'col-span-1 w-auto opacity-100'}`}>
+    //                             {/* Contact Options */}
+    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    //                                 <div className="flex items-center justify-between mb-4">
+    //                                     <h3 className="text-sm font-semibold text-gray-900">Contact Options</h3>
+    //                                     <button
+    //                                         onClick={() => setIsRightCollapsed(true)}
+    //                                         className="p-1 hover:bg-gray-200 rounded transition"
+    //                                         title="Collapse"
+    //                                     >
+    //                                         <ChevronRight className="w-4 h-4 text-gray-600" />
+    //                                     </button>
+    //                                 </div>
+    //                                 <div className="space-y-3">
+    //                                     <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+    //                                         <Phone className="h-4 w-4" />
+    //                                         Call
+    //                                     </button>
+    //                                     <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+    //                                         <MessageSquare className="h-4 w-4" />
+    //                                         WhatsApp
+    //                                     </button>
+    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
+    //                                         <Mail className="h-4 w-4" />
+    //                                         Email
+    //                                     </button>
+    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
+    //                                         <MessageSquare className="h-4 w-4" />
+    //                                         SMS
+    //                                     </button>
+    //                                 </div>
+    //                             </div>
 
-                                {/* Quick Actions */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                                    <div className="space-y-3">
-                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-                                            <Plus className="h-4 w-4" />
-                                            Add or Merge Lead
-                                        </button>
-                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-                                            <Calendar className="h-4 w-4" />
-                                            Schedule Meeting
-                                        </button>
-                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-                                            <FileText className="h-4 w-4" />
-                                            Add Note
-                                        </button>
-                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-                                            <MessageSquare className="h-4 w-4" />
-                                            Send Message
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+    //                             {/* Quick Actions */}
+    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    //                                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h3>
+    //                                 <div className="space-y-3">
+    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+    //                                         <Plus className="h-4 w-4" />
+    //                                         Add or Merge Lead
+    //                                     </button>
+    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+    //                                         <Calendar className="h-4 w-4" />
+    //                                         Schedule Meeting
+    //                                     </button>
+    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+    //                                         <FileText className="h-4 w-4" />
+    //                                         Add Note
+    //                                     </button>
+    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+    //                                         <MessageSquare className="h-4 w-4" />
+    //                                         Send Message
+    //                                     </button>
+    //                                 </div>
+    //                             </div>
+    //                         </div>
+
+    //                         {/* Floating Expand Button when Right Sidebar is Collapsed */}
+    //                         {isRightCollapsed && (
+    //                             <button
+    //                                 onClick={() => setIsRightCollapsed(false)}
+    //                                 className="fixed bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition z-10"
+    //                                 style={{
+    //                                     right: '56px',
+    //                                     top: '8%',
+    //                                     transform: 'translateY(-50%)',
+    //                                     padding: '8px'
+    //                                 }}
+    //                                 title="Expand Quick Actions"
+    //                             >
+    //                                 <Plus className="w-5 h-5" />
+    //                             </button>
+    //                         )}
+    //                     </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     // Table View
     return (
@@ -374,7 +401,7 @@ const LeadDetail = () => {
                                         className={`cursor-pointer transition-colors ${selectedLeads.includes(lead.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
                                             }`}
                                     >
-                                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                                        <td className="px-4 py-1" onClick={(e) => e.stopPropagation()}>
                                             <input
                                                 type="checkbox"
                                                 checked={selectedLeads.includes(lead.id)}
@@ -382,7 +409,7 @@ const LeadDetail = () => {
                                                 className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                                             />
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-1">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
                                                     {lead.avatar}
@@ -390,33 +417,33 @@ const LeadDetail = () => {
                                                 <span className="font-medium text-gray-900">{lead.name}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-1">
                                             <div className="flex items-center gap-2 text-blue-600">
                                                 <Phone className="h-4 w-4" />
                                                 <span className="text-sm">{lead.phone}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-1">
                                             <div className="flex items-center gap-2 text-gray-700">
                                                 <Mail className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm">{lead.email}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-1">
                                             <div className="text-sm">
-                                                <div className="text-xs text-gray-500 uppercase">Date</div>
+                                                {/* <div className="text-xs text-gray-500 uppercase">Date</div> */}
                                                 <div className="text-gray-900 mt-0.5">{lead.date}</div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-1">
                                             <span className="text-sm text-gray-700">{lead.source}</span>
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-1">
                                             <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(lead.status)}`}>
                                                 {lead.status}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-4">
+                                        <td className="px-4 py-1">
                                             <span className="text-sm text-gray-700">{lead.type}</span>
                                         </td>
                                     </tr>
