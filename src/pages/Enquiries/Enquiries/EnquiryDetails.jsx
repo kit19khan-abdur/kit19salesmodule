@@ -356,15 +356,23 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                                                     <p>Duration: {duration}s</p>
                                                                     {call.OutCome && <p>Outcome: {call.OutCome}</p>}
                                                                     {call.recordurl && (
-                                                                        <a
-                                                                            href={call.recordurl}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="text-blue-600 hover:underline flex items-center gap-1"
-                                                                        >
-                                                                            <Phone className="w-3 h-3" />
-                                                                            Listen to recording
-                                                                        </a>
+                                                                        <div className="flex items-center gap-3">
+                                                                            <audio
+                                                                                controls
+                                                                                className="h-8"
+                                                                                src={resolveUrl(call.recordurl)}
+                                                                            >
+                                                                                Your browser does not support the audio element.
+                                                                            </audio>
+                                                                            <a
+                                                                                href={resolveUrl(call.recordurl)}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="text-blue-600 hover:underline text-sm"
+                                                                            >
+                                                                                Open in new tab
+                                                                            </a>
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -629,7 +637,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                             </button>
                             <button
                                 onClick={() => setShowCallWidget(false)}
-                                className="p-1 hover:bg-blue-600 rounded"
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
                             >
                                 ✕
                             </button>

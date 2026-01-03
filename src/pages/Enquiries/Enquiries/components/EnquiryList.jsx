@@ -1,20 +1,11 @@
-import React, { useState } from "react";
-import {
-  Search,
-  RefreshCw,
-  Filter,
-  MoreVertical,
-  Table,
-  LayoutGrid,
-  Upload,
-  Download,
-  List,
-} from "lucide-react";
-import PremiumButton from "./PremiumButton";
-import CapSuleButton from "../../../../components/CapSuleButton";
-import PopUpModal from "../../../../components/PopUpModal/PopUpModal";
-import Button from "../../../../components/common/Button";
-import ImportData from "../../../../components/ImportData/ImportData";
+import React, { useState } from 'react';
+import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Upload, Download, List } from 'lucide-react';
+import PremiumButton from './PremiumButton';
+import CapSuleButton from '../../../../components/CapSuleButton';
+import PopUpModal from '../../../../components/PopUpModal/PopUpModal';
+import Button from '../../../../components/common/Button';
+import ImportData from '../../../../components/ImportData/ImportData';
+
 
 const EnquiryList = ({
   enquiries,
@@ -36,32 +27,31 @@ const EnquiryList = ({
   sortOrder,
   setSortOrder,
   itemsPerPage,
-  setItemsPerPage,
+  setItemsPerPage
 }) => {
   const [isImportDataModal, setIsImportDataModal] = useState(false);
 
   const handleCancelImportDataModal = () => {
     setIsImportDataModal(false);
-  };
+  }
 
   const handleImportData = (data) => {
-    console.log("Import data:", data);
-    alert("Data imported successfully!");
+    console.log('Import data:', data);
+    alert('Data imported successfully!');
     setIsImportDataModal(false);
-  };
+  }
 
+ 
   if (isCollapsed) return null;
 
   const statusColors = {
-    "Hot Lead": "bg-red-100 text-red-700",
-    Lead: "bg-gray-600 text-white",
-    Open: "bg-green-100 text-green-700",
+    'Hot Lead': 'bg-red-100 text-red-700',
+    'Lead': 'bg-gray-600 text-white',
+    'Open': 'bg-green-100 text-green-700'
   };
 
   return (
-    <div
-      className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 w-80`}
-    >
+    <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 w-80`}>
       <div className="p-4 border-b border-gray-200">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-lg font-semibold text-gray-800">Enquiries</h2>
@@ -82,7 +72,7 @@ const EnquiryList = ({
               placeholder="Search leads..."
               value={searchText}
               onChange={(e) => onSearchChange(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && onSearch()}
+              onKeyPress={(e) => e.key === 'Enter' && onSearch()}
               className="w-full pl-3 pr-9 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -90,23 +80,17 @@ const EnquiryList = ({
           {/* View Toggle */}
           <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
             <button
-              onClick={() => setViewMode("card")}
-              className={`p-2 transition ${
-                viewMode === "card"
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-100"
-              }`}
+              onClick={() => setViewMode('card')}
+              className={`p-2 transition ${viewMode === 'card' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                }`}
               title="Card View"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
-              onClick={() => setViewMode("table")}
-              className={`p-2 transition ${
-                viewMode === "table"
-                  ? "bg-blue-600 text-white"
-                  : "bg-white text-gray-600 hover:bg-gray-100"
-              }`}
+              onClick={() => setViewMode('table')}
+              className={`p-2 transition ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                }`}
               title="Table View"
             >
               <List className="w-4 h-4" />
@@ -128,9 +112,7 @@ const EnquiryList = ({
               <div className="absolute right-4 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                 {/* Items Per Page */}
                 <div className="px-4 py-2 border-b border-gray-100">
-                  <label className="text-xs font-semibold text-gray-500 uppercase">
-                    Items Per Page
-                  </label>
+                  <label className="text-xs font-semibold text-gray-500 uppercase">Items Per Page</label>
                   <select
                     className="w-full mt-1.5 px-2 py-1.5 text-sm border border-gray-300 rounded bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400"
                     value={itemsPerPage}
@@ -166,6 +148,7 @@ const EnquiryList = ({
                     setShowToolbarMenu(false);
                     setIsImportDataModal(true);
                   }}
+
                 >
                   <Upload className="w-4 h-4 text-gray-600" />
                   <span>Import</span>
@@ -189,11 +172,10 @@ const EnquiryList = ({
           <div
             key={enquiry.EnquiryId}
             onClick={() => onSelectEnquiry(enquiry)}
-            className={`p-4 border-b border-gray-100 cursor-pointer transition ${
-              selectedLead === enquiry.EnquiryId
-                ? "bg-blue-50 border-l-4 border-l-blue-500"
-                : "hover:bg-gray-50"
-            }`}
+            className={`p-4 border-b border-gray-100 cursor-pointer transition ${selectedLead === enquiry.EnquiryId
+              ? 'bg-blue-50 border-l-4 border-l-blue-500'
+              : 'hover:bg-gray-50'
+              }`}
           >
             <div className="flex items-start gap-3">
               <img
@@ -201,35 +183,31 @@ const EnquiryList = ({
                 alt={enquiry.PersonName}
                 className="w-10 h-10 rounded-full object-cover flex-shrink-0"
                 onError={(e) => {
-                  e.target.src = "https://docs.kit19.com/default/person.png";
+                  e.target.src = 'https://docs.kit19.com/default/person.png';
                 }}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start mb-1">
-                  <h3 className="font-medium text-gray-800 truncate">
-                    {enquiry.PersonName}
-                  </h3>
+                  <h3 className="font-medium text-gray-800 truncate">{enquiry.PersonName}</h3>
                   <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
-                    {new Date(enquiry.CreatedDate).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
+                    {new Date(enquiry.CreatedDate).toLocaleDateString('en-IN', {
+                      day: '2-digit',
+                      month: 'short'
                     })}
                   </span>
                 </div>
-                <p className="text-xs text-gray-600 truncate">
-                  {enquiry.CsvMobileNo}
-                </p>
+                <p className="text-xs text-gray-600 truncate">{enquiry.CsvMobileNo}</p>
                 <span
-                  className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                    enquiry.IsOpen ? statusColors["Open"] : statusColors["Lead"]
-                  }`}
+                  className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${enquiry.IsOpen ? statusColors['Open'] : statusColors['Lead']
+                    }`}
                 >
-                  {enquiry.IsOpen ? "Open" : "Lead"}
+                  {enquiry.IsOpen ? 'Open' : 'Lead'}
                 </span>
               </div>
             </div>
           </div>
         ))}
+
 
         {hasMore && (
           <div className="p-4 border-t border-gray-200">
@@ -257,20 +235,25 @@ const EnquiryList = ({
         size="lg"
         footer={
           <div className="flex justify-between w-full">
-            <Button variant="secondary" onClick={handleCancelImportDataModal}>
+            <Button
+              variant="secondary"
+              onClick={handleCancelImportDataModal}
+            >
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleImportData}>
+            <Button
+              variant='primary'
+              onClick={handleImportData}
+            >
               Upload
             </Button>
           </div>
         }
       >
-        <ImportData
-          onClose={handleCancelImportDataModal}
-          onSubmit={handleImportData}
-        />
+        <ImportData onClose={handleCancelImportDataModal} onSubmit={handleImportData} />
       </PopUpModal>
+
+
     </div>
   );
 };
