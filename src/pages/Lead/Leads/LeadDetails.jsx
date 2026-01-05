@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
-import { FaWhatsapp } from "react-icons/fa";
+import { FaWhatsapp, FaRegMoneyBillAlt  } from "react-icons/fa";
+import { HiOutlineDocumentText } from "react-icons/hi2";
 import { FaUsersGear } from "react-icons/fa6";
+import { SiJfrogpipelines } from "react-icons/si";
+import { GrDocumentConfig } from "react-icons/gr";
 import nodata from '../../../assets/nodata.gif';
-import PopUpModal from '../../../components/PopUpModal/PopUpModal';
-import Button from '../../../components/common/Button';
 
 const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -231,7 +232,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="p-6 max-h-[200px] overflow-y-auto">
+                            <div className="p-6 max-h-[300px] h-[300px] overflow-y-auto">
                                 <div className="space-y-4">
                                     {activities.length === 0 ? (
                                         <div className="flex items-center justify-center py-6">
@@ -317,7 +318,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     <ChevronRight className="w-4 h-4 text-gray-600" />
                                 </button>
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-2 max-h-[280px] overflow-y-auto">
                                 <button
                                     onClick={() => setIsAddLeadModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
@@ -329,8 +330,15 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     onClick={() => setIsCreateMeetingModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
-                                    <Calendar className="w-4 h-4" />
-                                    Schedule Meeting
+                                    <Video className="w-4 h-4" />
+                                    Create Meeting
+                                </button>
+                                <button
+                                    onClick={() => setIsAddPhysicalAppointmentModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <CalendarCheck className="w-4 h-4" />
+                                    Add Appointment
                                 </button>
                                 <button
                                     onClick={() => setIsAddPhysicalAppointmentModal(true)}
@@ -345,6 +353,62 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                 >
                                     <Mic className="w-4 h-4" />
                                     Send Voice
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <NotebookPen className="w-4 h-4" />
+                                    Add Note
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <CloudUpload className="w-4 h-4" />
+                                    Upload Document
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <BookCheck className="w-4 h-4" />
+                                    Add Task
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <SiJfrogpipelines className="w-4 h-4" />
+                                    Add Deal
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <FaRegMoneyBillAlt className="w-4 h-4" />
+                                    Add Tax Setting
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <GrDocumentConfig className="w-4 h-4" />
+                                    Add Quotation
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <HiOutlineDocumentText className="w-4 h-4" />
+                                    Add Invoice
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <ListChevronsDownUp className="w-4 h-4" />
+                                    Webform
                                 </button>
                             </div>
                         </div>
