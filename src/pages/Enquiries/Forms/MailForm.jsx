@@ -67,16 +67,15 @@ const MailForm = () => {
       {useTemplate ? (
         <div className="mb-4">
           <label className="block text-sm text-gray-700 mb-2">Templates</label>
-          <div className="border rounded h-40 overflow-auto">
-            {templates.map(t => (
-              <div key={t} className={`p-2 border-b last:border-b-0 ${t === selectedTemplate ? 'bg-gray-50' : ''}`}>
-                <label className="flex items-center gap-2">
-                  <input type="radio" name="template" checked={selectedTemplate === t} onChange={() => setSelectedTemplate(t)} />
-                  <span className="text-sm">{t}</span>
-                </label>
-              </div>
+          <select
+            value={selectedTemplate}
+            onChange={(e) => setSelectedTemplate(e.target.value)}
+            className="w-full border rounded px-3 py-2"
+          >
+            {templates.map((t) => (
+              <option key={t} value={t}>{t}</option>
             ))}
-          </div>
+          </select>
         </div>
       ) : (
         <div className="mb-4">
