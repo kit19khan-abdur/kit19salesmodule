@@ -1110,42 +1110,54 @@ const EnquiryTable = ({
                                             </div>
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {/* Show all icons horizontally as in screenshot */}
-                                                <Mail
-                                                    className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setIsSendIndividualMailModal(true);
-                                                    }}
-                                                />
-                                                <GoGitBranch className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#840ab9]"
-                                                    onClick={() => setIsAddLeadModal(true)}
-                                                />
-                                                <FaWhatsapp
-                                                    className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#25D366]"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setIsWhatsAppModalOpen(true);
-                                                    }}
-                                                />
-                                                <MessageSquareMore
-                                                    className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setIsSendIndividualSMSModal(true);
-                                                    }}
-                                                />
+                                                <span title="Send Email">
+                                                    <Mail
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsSendIndividualMailModal(true);
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span title="Add to Lead">
+                                                    <GoGitBranch 
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#840ab9]"
+                                                        onClick={() => setIsAddLeadModal(true)}
+                                                    />
+                                                </span>
+                                                <span title="Send WhatsApp">
+                                                    <FaWhatsapp
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#25D366]"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsWhatsAppModalOpen(true);
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span title="Send SMS">
+                                                    <MessageSquareMore
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsSendIndividualSMSModal(true);
+                                                        }}
+                                                    />
+                                                </span>
                                                 {/* <Copy className="w-5 h-5 text-gray-400 cursor-pointer" /> */}
-                                                <Trash2
-                                                    className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#f00]"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setDeleteConfirmModal({ show: true, enquiryId: enquiry.EnquiryId });
-                                                    }}
-                                                />
+                                                <span title="Delete">
+                                                    <Trash2
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#f00]"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setDeleteConfirmModal({ show: true, enquiryId: enquiry.EnquiryId });
+                                                        }}
+                                                    />
+                                                </span>
                                                 <span
                                                     id={`row-action-icon-${enquiry.EnquiryId}`}
                                                     ref={el => rowMenuAnchorRefs.current[enquiry.EnquiryId] = el}
                                                     className="cursor-pointer"
+                                                    title="More Actions"
                                                     onClick={e => {
                                                         e.stopPropagation();
                                                         setRowMenu(rowMenu.show && rowMenu.rowId === enquiry.EnquiryId ? { show: false, rowId: null } : { show: true, rowId: enquiry.EnquiryId });
@@ -1689,7 +1701,7 @@ const EnquiryTable = ({
             >
                 <AddAppointmentForm />
             </PopUpModal>
-            
+
             <PopUpModal
                 isOpen={isWhatsAppModalOpen}
                 onClose={() => setIsWhatsAppModalOpen(false)}
