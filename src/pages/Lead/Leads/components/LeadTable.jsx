@@ -181,8 +181,8 @@ const LeadTable = ({
                                         />
                                     </td>
                                     <td className="px-4 py-2 relative">
-                                        <div className="flex items-center gap-3 justify-between">
-                                            <div className="flex items-center gap-3">
+                                        <div className="flex items-center  justify-between">
+                                            <div className="flex items-center gap-2">
                                                 <div className="flex flex-col items-center gap-2">
                                                     <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer">
                                                         {getInitials(lead.PersonName)}
@@ -276,7 +276,7 @@ const LeadTable = ({
                                     </td>
                                     <td className="px-4 py-2">
                                         <div className="flex cursor-pointer hover:text-green-600 items-center gap-1 text-blue-600 font-medium">
-                                            <span>{lead.CsvMobileNo}</span>
+                                            <span>{lead.CsvMobileNo ? lead.CsvMobileNo : '-'}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-2">
@@ -284,7 +284,7 @@ const LeadTable = ({
                                             {lead.CsvEmailId && (
                                                 <div className="flex items-center gap-1 text-gray-600">
                                                     <Mail className="w-3 h-3" />
-                                                    <span className="truncate max-w-50">{lead.CsvEmailId}</span>
+                                                    <span className="truncate max-w-50">{lead.CsvEmailId ? lead.CsvEmailId : '-'}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -292,8 +292,8 @@ const LeadTable = ({
                                     <td className="px-4 py-2">
                                         <div className="text-xs">
                                             <div className="mb-1">
-                                                <span className="font-semibold text-gray-700">Date</span>
-                                                <span className="ml-2 text-gray-600">{lead.CreatedDate ? lead.CreatedDate.split(' ')[0] : '-'}</span>
+                                                {/* <span className="font-semibold text-gray-700">Date</span> */}
+                                                <span className="ml-2 text-gray-600">{lead.CreatedDate ? lead.CreatedDate : '-'}</span>
                                             </div>
                                         </div>
                                     </td>
