@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Phone, Mail, MessageSquare, Calendar, Plus, Users, FileText, MoreHorizontal, Grid, List, ChevronDown, LayoutGrid, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Search, Phone, Mail, MessageSquare, Calendar, Plus, Users, FileText, MoreHorizontal, Grid, List, ChevronDown, LayoutGrid } from 'lucide-react';
 import LeadDetail from './LeadDetail';
 import PremiumButton from '../Enquiries/Enquiries/components/PremiumButton';
 
@@ -8,8 +8,6 @@ const Lead = () => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [viewMode, setViewMode] = useState('grid');
     const [activeTab, setActiveTab] = useState('activities');
-    const [isRightCollapsed, setIsRightCollapsed] = useState(false);
-    const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
 
 
     const leads = [
@@ -45,7 +43,7 @@ const Lead = () => {
     return (
         <div className="flex h-screen bg-gray-50">
             {/* Left Sidebar - Lead List */}
-            <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 ${isLeftCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-80 opacity-100'}`}>
+            <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
                 <div className="p-4 border-b border-gray-200">
                     <div className="relative mb-3">
                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -70,14 +68,6 @@ const Lead = () => {
                                 className={`p-1.5 rounded ${viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
                             >
                                 <LayoutGrid className="h-4 w-4" />
-                            </button>
-
-                            <button
-                                onClick={() => setIsLeftCollapsed(true)}
-                                className="p-1.5 rounded text-gray-400 hover:bg-gray-100"
-                                title="Collapse"
-                            >
-                                <ChevronLeft className="h-4 w-4" />
                             </button>
 
                         </div>
@@ -121,26 +111,9 @@ const Lead = () => {
                 </div>
             </div>
 
-            {/* Floating Expand Button for Left Sidebar when Collapsed */}
-            {isLeftCollapsed && (
-                <button
-                    onClick={() => setIsLeftCollapsed(false)}
-                    className="fixed bg-blue-600 text-white rounded-full shadow-2xl hover:bg-blue-700 transition z-[9999]"
-                    style={{
-                        left: '64px',
-                        top: '26%',
-                        transform: 'translateY(-50%)',
-                        padding: '6px'
-                    }}
-                    title="Expand Leads List"
-                >
-                    <ChevronRight className="w-6 h-6" />
-                </button>
-            )}
-
             {/* Main Content Area */}
             <div className="flex-1 overflow-y-auto">
-                <div className={`mx-auto px-2 transition-all duration-300 ${isLeftCollapsed ? 'max-w-full' : 'max-w-6xl'}`}>
+                <div className="max-w-6xl mx-auto px-2">
                     {/* Header Section */}
                     <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
                         <div className="flex items-start justify-between">
@@ -171,9 +144,9 @@ const Lead = () => {
                         </div>
                     </div>
 
-                    <div className={`grid gap-6 transition-all duration-300 ${isRightCollapsed ? 'grid-cols-1' : 'grid-cols-3'}`}>
+                    <div className="grid grid-cols-3 gap-6">
                         {/* Lead Information Card */}
-                        <div className={`space-y-6 transition-all duration-300 ${isRightCollapsed ? 'col-span-1' : 'col-span-2'}`}>
+                        <div className="col-span-2 space-y-6">
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                                 <div className="p-6 border-b border-gray-200">
                                     <h2 className="text-lg font-semibold text-gray-900">Lead Information</h2>
@@ -269,19 +242,10 @@ const Lead = () => {
                         </div>
 
                         {/* Right Sidebar - Action Panel */}
-                        <div className={`space-y-6 transition-all duration-300 relative ${isRightCollapsed ? 'w-0 overflow-hidden opacity-0' : 'col-span-1 w-auto opacity-100'}`}>
+                        <div className="col-span-1 space-y-6">
                             {/* Contact Options */}
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-semibold text-gray-900">Contact Options</h3>
-                                    <button
-                                        onClick={() => setIsRightCollapsed(true)}
-                                        className="p-1 hover:bg-gray-200 rounded transition"
-                                        title="Collapse"
-                                    >
-                                        <ChevronRight className="w-4 h-4 text-gray-600" />
-                                    </button>
-                                </div>
+                                <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact Options</h3>
                                 <div className="space-y-3">
                                     <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
                                         <Phone className="h-4 w-4" />
@@ -304,16 +268,7 @@ const Lead = () => {
 
                             {/* Quick Actions */}
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-semibold text-gray-900">Quick Actions</h3>
-                                    <button
-                                        onClick={() => setIsRightCollapsed(true)}
-                                        className="p-1 hover:bg-gray-200 rounded transition"
-                                        title="Collapse"
-                                    >
-                                        <ChevronRight className="w-4 h-4 text-gray-600" />
-                                    </button>
-                                </div>
+                                <h3 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h3>
                                 <div className="space-y-3">
                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
                                         <Plus className="h-4 w-4" />
@@ -334,23 +289,6 @@ const Lead = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Floating Expand Button when Right Sidebar is Collapsed */}
-                        {isRightCollapsed && (
-                            <button
-                                onClick={() => setIsRightCollapsed(false)}
-                                className="fixed bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition z-10"
-                                style={{
-                                    right: '56px',
-                                    top: '8%',
-                                    transform: 'translateY(-50%)',
-                                    padding: '8px'
-                                }}
-                                title="Expand Quick Actions"
-                            >
-                                <Plus className="w-5 h-5" />
-                            </button>
-                        )}
                     </div>
                 </div>
             </div>

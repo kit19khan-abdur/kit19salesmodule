@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import RichTextEditor from '../../../components/common/RichTextEditor'
 
 const MailForm = () => {
   const [selectedEmails, setSelectedEmails] = useState([])
@@ -80,7 +81,7 @@ const MailForm = () => {
       ) : (
         <div className="mb-4">
           <label className="block text-sm text-gray-700 mb-1">Compose</label>
-          <textarea className="w-full border rounded px-3 py-2 h-36" placeholder="Write your email..." />
+          <RichTextEditor placeholder="Write your email..." rows={5} />
         </div>
       )}
     </div>

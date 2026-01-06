@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import RichTextEditor from '../../../components/common/RichTextEditor';
 import { Send } from 'lucide-react';
 
 const SendMassSMS = ({ selectedCount = 0 }) => {
@@ -108,13 +109,12 @@ const SendMassSMS = ({ selectedCount = 0 }) => {
 
             {/* Message Textarea */}
             <div className="mb-4">
-                <textarea
+                <RichTextEditor
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
                     placeholder="Message"
                     rows={5}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 />
             </div>
 

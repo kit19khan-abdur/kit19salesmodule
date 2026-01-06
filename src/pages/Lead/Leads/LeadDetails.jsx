@@ -1,12 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
-import { FaWhatsapp, FaRegMoneyBillAlt  } from "react-icons/fa";
+import { FaWhatsapp, FaRegMoneyBillAlt } from "react-icons/fa";
 import { HiOutlineDocumentText } from "react-icons/hi2";
 import { FaUsersGear } from "react-icons/fa6";
 import { SiJfrogpipelines } from "react-icons/si";
 import { GrDocumentConfig } from "react-icons/gr";
 import nodata from '../../../assets/nodata.gif';
+import PopUpModal from '../../../components/PopUpModal/PopUpModal';
+import Button from '../../../components/common/Button';
+import AddFollowupForm from '../../../components/LeadForm/AddFollowupForm';
+import CreateMeetingForm from '../../../components/LeadForm/CreateMeetingForm';
+import AddAppointment from '../../../components/LeadForm/AddAppointment';
+import AddPhysicalAppointmentForm from '../../../components/LeadForm/AddPhysicalAppointmentForm';
+
 
 const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -26,6 +33,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [isAddLeadModal, setIsAddLeadModal] = useState(false);
     const [isCreateMeetingModal, setIsCreateMeetingModal] = useState(false);
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
+    const [isAddAppointmentModal, setIsAddAppointmentModal] = useState(false);
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
     const moreDropdownRef = useRef(null);
 
@@ -196,13 +204,13 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                         <div className="bg-white rounded-lg shadow-sm">
                             <div className="border-b border-gray-200">
                                 <div className={`flex px-6 items-center transition-all duration-300 ${isRightCollapsed ? 'justify-between w-full' : 'gap-6'}`}>
-                                    {['Activities', 'Calls', 'WhatsApp', 'Meetings','Task', 'Appointment'].map(tab => (
+                                    {['Activities', 'Calls', 'WhatsApp', 'Meetings', 'Task', 'Appointment'].map(tab => (
                                         <button
                                             key={tab}
                                             onClick={() => setActiveTab(tab.toLowerCase())}
                                             className={`py-4 text-sm font-medium capitalize border-b-2 transition ${activeTab === tab.toLowerCase()
-                                                    ? 'border-blue-600 text-blue-600'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                                                ? 'border-blue-600 text-blue-600'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700'
                                                 } ${isRightCollapsed ? 'flex-1' : ''}`}
                                         >
                                             {tab}
@@ -217,8 +225,8 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                             <MoreVertical className="w-5 h-5" />
                                         </button>
                                         {showMoreDropdown && (
-                                            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-[8rem] overflow-y-auto">
-                                                {[ 'Chat', 'Webform', 'Pipeline', 'WaChat Log', 'Meeting'].map((item) => (
+                                            <div className="absolute right-2 top-[60%] mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-y-auto">
+                                                {['Chat', 'Webform', 'Pipeline', 'WaChat Log', 'Meeting'].map((item) => (
                                                     <button
                                                         key={item}
                                                         onClick={() => { setActiveTab(item.toLowerCase()); setShowMoreDropdown(false); }}
@@ -334,7 +342,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     Create Meeting
                                 </button>
                                 <button
-                                    onClick={() => setIsAddPhysicalAppointmentModal(true)}
+                                    onClick={() => setIsAddAppointmentModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <CalendarCheck className="w-4 h-4" />
@@ -432,6 +440,108 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     )}
                 </div>
             </div>
+              <PopUpModal
+                isOpen={isAddLeadModal}
+                onClose={() => setIsAddLeadModal(false)}
+                title="Add Lead"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddLeadModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => {}}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddFollowupForm selectedCount={lead} />
+            </PopUpModal>
+
+
+            <PopUpModal
+                isOpen={isCreateMeetingModal}
+                onClose={() => setIsCreateMeetingModal(false)}
+                title="Create Meeting"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsCreateMeetingModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <CreateMeetingForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddAppointmentModal}
+                onClose={() => setIsAddAppointmentModal(false)}
+                title="Add Appointment"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddAppointmentModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <AddAppointment />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddPhysicalAppointmentModal}
+                onClose={() => setIsAddPhysicalAppointmentModal(false)}
+                title="Add Physical Appointment"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddPhysicalAppointmentModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <AddPhysicalAppointmentForm />
+            </PopUpModal>
+
+
         </div>
     );
 };

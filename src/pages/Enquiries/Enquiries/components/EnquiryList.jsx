@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Upload, Download, List } from 'lucide-react';
 import PremiumButton from './PremiumButton';
 import CapSuleButton from '../../../../components/CapSuleButton';
@@ -30,6 +30,7 @@ const EnquiryList = ({
   setItemsPerPage
 }) => {
   const [isImportDataModal, setIsImportDataModal] = useState(false);
+  const listRef = useRef(null);
 
   const handleCancelImportDataModal = () => {
     setIsImportDataModal(false);
@@ -40,6 +41,30 @@ const EnquiryList = ({
     alert('Data imported successfully!');
     setIsImportDataModal(false);
   }
+
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!listRef.current || isLoading || !hasMore) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+      // Trigger when user scrolls to within 100px of the bottom
+      if (scrollTop + clientHeight >= scrollHeight - 100) {
+        onLoadMore();
+      }
+    };
+
+    const currentRef = listRef.current;
+    if (currentRef) {
+      currentRef.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (currentRef) {
+        currentRef.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [isLoading, hasMore, onLoadMore]);
 
  
   if (isCollapsed) return null;
@@ -167,7 +192,7 @@ const EnquiryList = ({
       </div>
 
       {/* Enquiry List */}
-      <div className="flex-1 overflow-y-auto">
+      <div ref={listRef} className="flex-1 overflow-y-auto">
         {enquiries.map((enquiry) => (
           <div
             key={enquiry.EnquiryId}
@@ -208,23 +233,11 @@ const EnquiryList = ({
           </div>
         ))}
 
-
-        {hasMore && (
-          <div className="p-4 border-t border-gray-200">
-            <button
-              onClick={onLoadMore}
-              disabled={isLoading}
-              className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                <>Load More</>
-              )}
-            </button>
+        {/* Loading indicator when fetching more data */}
+        {isLoading && (
+          <div className="p-4 flex items-center justify-center">
+            <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
+            <span className="ml-2 text-sm text-gray-600">Loading more...</span>
           </div>
         )}
       </div>
