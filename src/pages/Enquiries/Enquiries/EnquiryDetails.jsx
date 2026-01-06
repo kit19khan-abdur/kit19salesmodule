@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, Clock, User, MapPin, TrendingUp, ChevronRight, ChevronLeft, MoreVertical, FileText, Mic2, Mic } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, Clock, User, MapPin, TrendingUp, ChevronRight, ChevronLeft, MoreVertical, FileText, Mic2, Mic, ChevronLeftCircle } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
 import { FaWhatsapp } from "react-icons/fa";
 import nodata from '../../../assets/nodata.gif';
@@ -569,16 +569,16 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                     {isRightCollapsed && (
                         <button
                             onClick={() => setIsRightCollapsed(false)}
-                            className="fixed bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition z-10"
+                            className="fixed  text-gray-600 rounded-full shadow-lg  transition z-10"
                             style={{
-                                right: '56px',
-                                top: '8%',
+                                right: '11px',
+                                top: '30%',
                                 transform: 'translateY(-50%)',
                                 padding: '8px'
                             }}
                             title="Expand Quick Actions"
                         >
-                            <Plus className="w-5 h-5" />
+                            <ChevronLeftCircle className="w-5 h-5" />
                         </button>
                     )}
                 </div>
