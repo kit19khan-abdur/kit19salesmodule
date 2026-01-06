@@ -12,7 +12,7 @@ const generateDefaultTitle = () => {
     return `NewAppointment_${y}${m}${d}${hh}${mm}${ss}`;
 };
 
-const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
+const AddPhysicalAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
     const [appointmentType, setAppointmentType] = useState('');
     const [title, setTitle] = useState(generateDefaultTitle());
     const [description, setDescription] = useState('');
@@ -219,4 +219,4 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
     );
 };
 
-export default AddAppointmentForm;
+export default AddPhysicalAppointmentForm;

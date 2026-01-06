@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PopUpModal from './PopUpModal';
 import Button from '../common/Button';
 import Input from '../common/Input';
+import RichTextEditor from '../common/RichTextEditor';
 
 /**
  * Example usage of PopUpModal with different forms
@@ -25,10 +26,9 @@ const ExampleUsage = () => {
     <form className="space-y-4">
       <Input label="Product Name" placeholder="Enter product name" />
       <Input label="Price" type="number" placeholder="Enter price" />
-      <textarea
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+      <RichTextEditor
         placeholder="Description"
-        rows="4"
+        rows={4}
       />
     </form>
   );

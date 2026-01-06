@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import RichTextEditor from '../../../components/common/RichTextEditor';
 import { Grid3x3 } from 'lucide-react';
 import { RxDropdownMenu } from "react-icons/rx";
 
@@ -160,13 +161,12 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
                 /* Compose Mail Textarea */
                 <div className="mb-4">
                     <label className="block text-sm text-gray-700 mb-2">Compose Your Message:</label>
-                    <textarea
+                    <RichTextEditor
                         name="composeContent"
                         value={formData.composeContent}
                         onChange={handleChange}
                         placeholder="Type your message here..."
                         rows={8}
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm"
                     />
                 </div>
             )}

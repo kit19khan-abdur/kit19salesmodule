@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Clock } from 'lucide-react';
-import RichTextEditor from '../../../components/common/RichTextEditor';
+import RichTextEditor from '../common/RichTextEditor';
 
 const AddFollowupForm = ({ selectedCount = 0 }) => {
     const [formData, setFormData] = useState({
