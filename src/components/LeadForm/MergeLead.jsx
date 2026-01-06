@@ -345,14 +345,14 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
           </div>
 
           {/* Plus Button - positioned between first and second column */}
-          <div className="absolute bottom-4 left-[calc(33.333%-24px)] z-20">
+          <div className="absolute bottom-[11rem] left-[calc(33.333%-24px)] z-20">
             <button className="w-12 h-12 bg-gray-400 text-white rounded-full flex items-center justify-center hover:bg-gray-500 transition shadow-lg">
               <Plus className="w-6 h-6" />
             </button>
           </div>
 
           {/* Arrow Button - positioned between second and third column */}
-          <div className="absolute bottom-4 left-[calc(66.666%-24px)] z-20">
+          <div className="absolute bottom-[11rem] left-[calc(66.666%-24px)] z-20">
             <button className="w-12 h-12 bg-gray-400 text-white rounded-full flex items-center justify-center hover:bg-gray-500 transition shadow-lg">
               <ArrowRight className="w-6 h-6" />
             </button>
