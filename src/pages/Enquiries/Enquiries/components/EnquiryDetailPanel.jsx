@@ -59,25 +59,6 @@ const EnquiryDetailPanel = ({ enquiry, onClose, activities = [] }) => {
             </div>
           </div>
 
-          {/* Quick Actions */}
-          {/* <div className="grid grid-cols-2 gap-3">
-            <button className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-              <Phone className="w-4 h-4" />
-              Call
-            </button>
-            <button className="flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-              <FaWhatsapp className="w-4 h-4" />
-              WhatsApp
-            </button>
-            <button className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-              <Mail className="w-4 h-4" />
-              Email
-            </button>
-            <button className="flex items-center justify-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-              <MessageSquare className="w-4 h-4" />
-              SMS
-            </button>
-          </div> */}
 
           {/* Contact Information */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">

@@ -51,9 +51,9 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
   ];
 
   const leadFields = [
-    { id: 'phone', label: '919790690380', value: '919790690380' },
-    { id: 'mobile1', label: '', value: '' },
+    { id: 'name', label: 'Abdur', value: 'Abdur' },
     { id: 'mobile2', label: '', value: '' },
+    { id: 'phone', label: '919790690380', value: '919790690380' },
     { id: 'email', label: '', value: '' },
     { id: 'email1', label: '', value: '' },
     { id: 'email2', label: '', value: '' },
@@ -62,6 +62,7 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
     { id: 'city', label: '', value: '' },
     { id: 'pincode', label: '', value: '' },
     { id: 'residentialAddress', label: '', value: '' },
+    { id: 'officeAddress', label: '', value: '' },
   ];
 
   const handleEnquiryFieldSelect = (fieldId, value) => {
@@ -104,7 +105,7 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
     onClose();
   };
 
-  console.log('MergeLead render - showFollowupForm:', showFollowupForm);
+  // console.log('MergeLead render - showFollowupForm:', showFollowupForm);
 
   if (!isOpen) return null;
 
