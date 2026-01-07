@@ -40,7 +40,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
     const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
     const [draggedTab, setDraggedTab] = useState(null);
-    
+
     // Initialize tabs order from localStorage or use default
     const defaultTabs = ['activities', 'calls', 'Whatsapp Chat Log', 'meetings', 'Physical Appointments', 'chat', 'webform'];
     const [tabsOrder, setTabsOrder] = useState(() => {
@@ -99,7 +99,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
 
     const handleDrop = (e, targetTab) => {
         e.preventDefault();
-        
+
         if (!draggedTab || draggedTab === targetTab) return;
 
         const newOrder = [...tabsOrder];
@@ -234,6 +234,12 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                     <h1 className="text-2xl font-bold text-gray-900 mb-1">{enquiry.PersonName}</h1>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                         <span
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setShowCallWidget(true);
+                                                setCallStatus('Requesting');
+                                                setCallTimer('00:00:00');
+                                            }}
                                             className="flex  cursor-pointer hover:text-[#088b7e] items-center gap-1">
                                             <Phone className="w-4 h-4" />
                                             {enquiry.CsvMobileNo}
@@ -346,13 +352,11 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                             onDrop={(e) => handleDrop(e, tab)}
                                             onDragEnd={handleDragEnd}
                                             onClick={() => setActiveTab(tab)}
-                                            className={`py-4 text-sm font-medium capitalize border-b-2 transition cursor-move ${
-                                                activeTab === tab
+                                            className={`py-4 text-sm font-medium capitalize border-b-2 transition cursor-move ${activeTab === tab
                                                     ? 'border-blue-600 text-blue-600'
                                                     : 'border-transparent text-gray-500 hover:text-gray-700'
-                                            } ${isRightCollapsed ? 'flex-1' : ''} ${
-                                                draggedTab === tab ? 'opacity-50' : ''
-                                            }`}
+                                                } ${isRightCollapsed ? 'flex-1' : ''} ${draggedTab === tab ? 'opacity-50' : ''
+                                                }`}
                                         >
                                             {tab}
                                         </button>
