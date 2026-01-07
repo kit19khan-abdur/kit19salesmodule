@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import RichTextEditor from '../../../components/common/RichTextEditor'
+import RichTextEditorArea from '../../../components/common/RichTextEditorArea'
 
 const SMSForm = () => {
   const [tab, setTab] = useState('indian') // 'indian' or 'nonIndian'
@@ -68,8 +69,8 @@ const SMSForm = () => {
             <div>
               <label className="block text-sm text-gray-700 mb-1">Message</label>
               <div className="relative">
-                <RichTextEditor value={message} onChange={e => setMessage(e.target.value)} placeholder="Message" rows={4} />
-                <div className="absolute bottom-2 right-2 text-xs text-gray-500">{charCount} / {maxChars}</div>
+                <RichTextEditorArea className="w-full border rounded px-3 py-2 h-28" value={message} onChange={e => setMessage(e.target.value)} placeholder="Message" rows={4} />
+                {/* <div className="absolute bottom-2 right-2 text-xs text-gray-500">{charCount} / {maxChars}</div> */}
               </div>
             </div>
           </div>
@@ -100,8 +101,8 @@ const SMSForm = () => {
 
             <div>
               <label className="block text-sm text-gray-700 mb-1">Compose SMS</label>
-              <RichTextEditor value={message} onChange={e => setMessage(e.target.value)} placeholder="Compose SMS" rows={4} />
-              <div className="text-xs text-gray-500 mt-1">{charCount} / {maxChars}</div>
+              <RichTextEditorArea className="w-full border rounded px-3 py-2 h-28" value={message} onChange={e => setMessage(e.target.value)} placeholder="Compose SMS" rows="4" />
+              {/* <div className="text-xs text-gray-500 mt-1">{charCount} / {maxChars}</div> */}
             </div>
 
             <div className="flex items-center gap-4">

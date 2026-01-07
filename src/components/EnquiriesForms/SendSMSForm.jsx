@@ -41,21 +41,19 @@ const SendSMSForm = () => {
       <div className="flex border-b border-gray-300 mb-4">
         <button
           onClick={() => setActiveTab('indian')}
-          className={`px-6 py-2 font-medium text-sm transition-colors ${
-            activeTab === 'indian'
-              ? 'text-green-600 border-b-2 border-green-600'
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
+          className={`px-6 py-2 font-medium text-sm transition-colors ${activeTab === 'indian'
+            ? 'text-green-600 border-b-2 border-green-600'
+            : 'text-gray-600 hover:text-gray-800'
+            }`}
         >
           Indian SMS
         </button>
         <button
           onClick={() => setActiveTab('non-indian')}
-          className={`px-6 py-2 font-medium text-sm transition-colors ${
-            activeTab === 'non-indian'
-              ? 'text-green-600 border-b-2 border-green-600'
-              : 'text-gray-600 hover:text-gray-800'
-          }`}
+          className={`px-6 py-2 font-medium text-sm transition-colors ${activeTab === 'non-indian'
+            ? 'text-green-600 border-b-2 border-green-600'
+            : 'text-gray-600 hover:text-gray-800'
+            }`}
         >
           Non-Indian SMS
         </button>
@@ -142,15 +140,16 @@ const SendSMSForm = () => {
 
           {/* Message Textarea */}
           <div className="relative">
-            <RichTextEditor
+            <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Message"
-              rows={5}
+              rows="5"
+              className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
             />
-            <button className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded">
+            {/* <button className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded">
               <Wand2 className="w-5 h-5 text-gray-500" />
-            </button>
+            </button> */}
           </div>
 
           {/* IsUnicode Checkbox */}
@@ -207,18 +206,19 @@ const SendSMSForm = () => {
 
           {/* Compose SMS */}
           <div className="relative">
-            <RichTextEditor
+            <textarea
               value={composeSMS}
               onChange={(e) => setComposeSMS(e.target.value)}
               placeholder="Compose SMS"
-              rows={5}
+              rows="5"
+              className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
             />
-            <button className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded">
+            {/* <button className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded">
               <Wand2 className="w-5 h-5 text-gray-500" />
             </button>
             <div className="absolute bottom-2 right-2 text-xs text-gray-500">
               {composeSMS.length} / 2000
-            </div>
+            </div> */}
           </div>
 
           {/* Insert Placeholder Button */}
