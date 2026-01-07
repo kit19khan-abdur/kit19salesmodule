@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, LayoutGrid, List } from 'lucide-react';
 import PremiumButton from '../../../Enquiries/Enquiries/components/PremiumButton';
+import FollowupTooltip from './FollowupTooltip';
 
 const LeadList = ({
   leads,
@@ -23,6 +24,22 @@ const LeadList = ({
   const getStatusColor = (lead) => {
     if (lead.IsOpen) return 'bg-green-100 text-green-700';
     return 'bg-gray-600 text-white';
+  };
+
+  const getBadgeColor = (count) => {
+    const num = count || 0;
+    if (num === 0) return 'bg-gray-400';
+    if (num === 1) return 'bg-green-400';
+    if (num === 2) return 'bg-green-500';
+    if (num === 3) return 'bg-lime-500';
+    if (num === 4) return 'bg-yellow-400';
+    if (num === 5) return 'bg-yellow-500';
+    if (num === 6) return 'bg-orange-400';
+    if (num === 7) return 'bg-orange-500';
+    if (num === 8) return 'bg-red-400';
+    if (num === 9) return 'bg-red-500';
+    if (num >= 10) return 'bg-red-600';
+    return 'bg-blue-500';
   };
 
   return (
@@ -71,7 +88,7 @@ const LeadList = ({
       </div>
 
       {/* Lead List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto overflow-x-visible">
         {isLoading && leads.length === 0 ? (
           <div className="flex items-center justify-center p-8">
             <div className="text-gray-500">Loading...</div>
@@ -92,8 +109,16 @@ const LeadList = ({
               }`}
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                  {getInitials(lead.PersonName)}
+                <div className="relative">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                    {getInitials(lead.PersonName)}
+                  </div>
+                  {/* Followup Count Badge with Tooltip */}
+                  <FollowupTooltip lead={lead}>
+                    <div className={`absolute z-50 -bottom-1 -right-1 w-6 h-6 ${getBadgeColor(lead.FollowupCount)} border-2 border-white rounded-full flex items-center justify-center text-white font-bold text-xs cursor-pointer hover:brightness-110 transition-all shadow-md`}>
+                      {lead.FollowupCount || 0}
+                    </div>
+                  </FollowupTooltip>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
