@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, LayoutGrid, List } from 'lucide-react';
 import PremiumButton from '../../../Enquiries/Enquiries/components/PremiumButton';
 import FollowupTooltip from './FollowupTooltip';
+import { BsTelephonePlus } from "react-icons/bs";
+import PopUpModal from '../../../../components/common/Modal';
+import ScheduleCallForm from './ScheduleCallForm';
 
 const LeadList = ({
   leads,
@@ -20,6 +23,9 @@ const LeadList = ({
     if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
+
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [scheduleLead, setScheduleLead] = useState(null);
 
   const getStatusColor = (lead) => {
     if (lead.IsOpen) return 'bg-green-100 text-green-700';
@@ -119,15 +125,43 @@ const LeadList = ({
                       {lead.FollowupCount || 0}
                     </div>
                   </FollowupTooltip>
+
+                  {/* Call icon overlay next to avatar - stops propagation so it doesn't select the lead */}
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setScheduleLead(lead);
+                          setShowScheduleModal(true);
+                        }}
+                        className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-blue-600 shadow-sm"
+                        title="Call"
+                      >
+                        <BsTelephonePlus size={14} />
+                      </button>
+                    </>
+                  
+                    {showScheduleModal && (
+                      <PopUpModal isOpen={showScheduleModal} onClose={() => setShowScheduleModal(false)} title="Schedule Call">
+                        <ScheduleCallForm
+                          lead={scheduleLead}
+                          onCancel={() => setShowScheduleModal(false)}
+                          onSave={(data) => {
+                            console.debug('scheduled call', data, 'for', scheduleLead);
+                            setShowScheduleModal(false);
+                          }}
+                        />
+                      </PopUpModal>
+                    )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-1">
                     <h3 className="font-semibold text-gray-900 text-sm truncate">
                       {lead.PersonName}
                     </h3>
-                    <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                    <div className="text-xs text-gray-500 whitespace-nowrap ml-2">
                       {lead.CreatedDate?.split(',')[0] || ''}
-                    </span>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-600 mb-2">{lead.CsvMobileNo}</p>
                   <span
