@@ -85,9 +85,10 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
             <div>
                 <label className="text-sm font-medium">Description</label>
-                <RichTextEditor
+                <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none"
                     placeholder="Start Typing the details about the appointment"
                     rows={4}
                 />
@@ -95,8 +96,9 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
             <div>
                 <label className="text-sm font-medium">Remarks</label>
-                <RichTextEditor
+                <textarea
                     value={remarks}
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none"
                     onChange={(e) => setRemarks(e.target.value)}
                     placeholder="about the task..."
                     rows={3}
@@ -140,8 +142,9 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
             <div>
                 <label className="text-sm font-medium">Complete Address</label>
-                <RichTextEditor
+                <textarea
                     value={completeAddress}
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none"
                     onChange={(e) => setCompleteAddress(e.target.value)}
                     placeholder="Please enter complete address."
                     rows={3}
@@ -210,7 +213,7 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
                     <div>
                         <label className="text-sm font-medium">Remarks</label>
-                        <RichTextEditor value={remarks} onChange={e => setRemarks(e.target.value)} rows={3} />
+                        <textarea value={remarks} onChange={e => setRemarks(e.target.value)} rows={3} className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none" />
                     </div>
                 </div>
             )}

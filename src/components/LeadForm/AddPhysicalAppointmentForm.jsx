@@ -85,21 +85,23 @@ const AddPhysicalAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
             <div>
                 <label className="text-sm font-medium">Description</label>
-                <RichTextEditor
+                <textarea
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Start Typing the details about the appointment"
-                    rows={4}
+                    rows="4"
                 />
             </div>
 
             <div>
                 <label className="text-sm font-medium">Remarks</label>
-                <RichTextEditor
+                <textarea
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
                     placeholder="about the task..."
-                    rows={3}
+                    rows="3"
                 />
             </div>
 
@@ -140,11 +142,12 @@ const AddPhysicalAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
             <div>
                 <label className="text-sm font-medium">Complete Address</label>
-                <RichTextEditor
+                <textarea
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     value={completeAddress}
                     onChange={(e) => setCompleteAddress(e.target.value)}
                     placeholder="Please enter complete address."
-                    rows={3}
+                    rows="3"
                 />
             </div>
 
@@ -210,7 +213,12 @@ const AddPhysicalAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
                     <div>
                         <label className="text-sm font-medium">Remarks</label>
-                        <RichTextEditor value={remarks} onChange={e => setRemarks(e.target.value)} rows={3} />
+                        <textarea
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            value={remarks}
+                            onChange={e => setRemarks(e.target.value)}
+                            rows="3"
+                        />
                     </div>
                 </div>
             )}

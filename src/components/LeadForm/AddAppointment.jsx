@@ -68,15 +68,16 @@ const AddAppointment = () => {
           Description
         </label>
         <div className="relative">
-          <RichTextEditor
+          <textarea
             value={formData.description}
             onChange={(e) => handleChange('description', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             placeholder="Start Typing the details about the appointment"
-            rows={3}
+            rows="3"
           />
-          <button className="absolute bottom-2 right-2 p-1.5 hover:bg-gray-100 rounded transition">
+          {/* <button className="absolute bottom-2 right-2 p-1.5 hover:bg-gray-100 rounded transition">
             <Edit3 className="w-4 h-4 text-gray-400" />
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -86,15 +87,16 @@ const AddAppointment = () => {
           Remarks
         </label>
         <div className="relative">
-          <RichTextEditor
+          <textarea
             value={formData.remarks}
             onChange={(e) => handleChange('remarks', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             placeholder="about the task..."
-            rows={3}
+            rows="3"
           />
-          <button className="absolute bottom-2 right-2 p-1.5 hover:bg-gray-100 rounded transition">
+          {/* <button className="absolute bottom-2 right-2 p-1.5 hover:bg-gray-100 rounded transition">
             <Edit3 className="w-4 h-4 text-gray-400" />
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -149,11 +151,12 @@ const AddAppointment = () => {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Complete Address
         </label>
-        <RichTextEditor
+        <textarea
           value={formData.completeAddress}
           onChange={(e) => handleChange('completeAddress', e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg"
           placeholder="Please enter complete address"
-          rows={3}
+          rows="3"
         />
       </div>
 
@@ -188,8 +191,8 @@ const AddAppointment = () => {
             className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between bg-white"
           >
             <span className={formData.collaborators.length === 0 ? 'text-gray-500' : 'text-gray-900'}>
-              {formData.collaborators.length === 0 
-                ? 'Nothing selected' 
+              {formData.collaborators.length === 0
+                ? 'Nothing selected'
                 : `Selected: ${formData.collaborators.join(', ')}`}
             </span>
             <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isCollaboratorsOpen ? 'rotate-180' : ''}`} />
@@ -200,9 +203,8 @@ const AddAppointment = () => {
               {collaboratorOptions.map((collaborator) => (
                 <label
                   key={collaborator}
-                  className={`flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer ${
-                    formData.collaborators.includes(collaborator) ? 'bg-blue-500 text-white hover:bg-blue-600' : ''
-                  }`}
+                  className={`flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer ${formData.collaborators.includes(collaborator) ? 'bg-blue-500 text-white hover:bg-blue-600' : ''
+                    }`}
                 >
                   <input
                     type="checkbox"
