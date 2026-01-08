@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { X, ChevronLeft, ArrowRight, Plus } from 'lucide-react';
+import AddFollowup from '../../pages/Enquiries/Forms/AddFollowup';
+import AddFollowupForm from '../../pages/Enquiries/Forms/AddFollowupForm';
+import PopUpModal from '../PopUpModal/PopUpModal';
+import Button from '../common/Button';
 
 const MergeLead = ({ isOpen, onClose, enquiryData }) => {
   const [selectedLeadId, setSelectedLeadId] = useState('136961');
+  const [selectedFields, setSelectedFields] = useState({});
+  const [showFollowupForm, setShowFollowupForm] = useState(false);
   const [mergeData, setMergeData] = useState({
     name: 'Karthick',
     company: '',
@@ -45,9 +51,9 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
   ];
 
   const leadFields = [
-    { id: 'phone', label: '919790690380', value: '919790690380' },
-    { id: 'mobile1', label: '', value: '' },
+    { id: 'name', label: 'Abdur', value: 'Abdur' },
     { id: 'mobile2', label: '', value: '' },
+    { id: 'phone', label: '919790690380', value: '919790690380' },
     { id: 'email', label: '', value: '' },
     { id: 'email1', label: '', value: '' },
     { id: 'email2', label: '', value: '' },
@@ -56,9 +62,14 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
     { id: 'city', label: '', value: '' },
     { id: 'pincode', label: '', value: '' },
     { id: 'residentialAddress', label: '', value: '' },
+    { id: 'officeAddress', label: '', value: '' },
   ];
 
   const handleEnquiryFieldSelect = (fieldId, value) => {
+    setSelectedFields(prev => ({
+      ...prev,
+      [fieldId]: 'enquiry'
+    }));
     setMergeData(prev => ({
       ...prev,
       [fieldId]: value || ''
@@ -66,6 +77,10 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
   };
 
   const handleLeadFieldSelect = (fieldId, value) => {
+    setSelectedFields(prev => ({
+      ...prev,
+      [fieldId]: 'lead'
+    }));
     setMergeData(prev => ({
       ...prev,
       [fieldId]: value || ''
@@ -79,6 +94,19 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
     }));
   };
 
+  const handleMergeAndFollowup = () => {
+    console.log('Merge & Add Followup clicked');
+    setShowFollowupForm(true);
+    console.log('showFollowupForm set to true');
+  };
+
+  const handleFollowupClose = () => {
+    setShowFollowupForm(false);
+    onClose();
+  };
+
+  // console.log('MergeLead render - showFollowupForm:', showFollowupForm);
+
   if (!isOpen) return null;
 
   return (
@@ -91,9 +119,8 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-6xl bg-white shadow-2xl z-50 transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`fixed top-0 right-0 h-full w-full max-w-6xl bg-white shadow-2xl z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -136,226 +163,233 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
         </div>
 
         {/* Three Column Layout */}
-        <div className="relative grid grid-cols-3 gap-0 h-[calc(100vh-220px)] overflow-hidden">
-          {/* Enquiry Details Column */}
-          <div className="border-r border-gray-200 overflow-y-auto relative">
-            <div className="p-6 pb-24">
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-3">
-                  <img
-                    src="https://docs.kit19.com/default/person.png"
-                    alt="Enquiry"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="details"
-                    id="enquiry-details"
-                    defaultChecked
-                    className="w-4 h-4"
-                  />
-                  <label htmlFor="enquiry-details" className="font-semibold text-gray-800">
-                    Enquiry Details
-                  </label>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                {enquiryFields.map((field) => (
-                  <div key={field.id} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name={`field-${field.id}`}
-                      value="enquiry"
-                      onChange={() => handleEnquiryFieldSelect(field.id, field.value)}
-                      className="w-4 h-4 cursor-pointer"
-                    />
-                    <span className="text-sm text-gray-700">
-                      {field.label || <span className="text-gray-400">Empty</span>}
-                    </span>
+        <div className="relative grid grid-cols-3 gap-0 h-[calc(100vh-220px)]">
+          {/* Scrollable Container for All Three Columns */}
+          <div className="col-span-3 overflow-y-auto h-full">
+            <div className="grid grid-cols-3 gap-0 relative">
+              {/* Enquiry Details Column */}
+              <div className="border-r border-gray-200 relative">
+                <div className="p-6 pb-24">
+                  <div className="flex flex-col items-center mb-6">
+                    <div className="w-24 h-24 rounded-full overflow-hidden mb-3">
+                      <img
+                        src="https://docs.kit19.com/default/person.png"
+                        alt="Enquiry"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="details"
+                        id="enquiry-details"
+                        defaultChecked
+                        className="w-4 h-4"
+                      />
+                      <label htmlFor="enquiry-details" className="font-semibold text-gray-800">
+                        Enquiry Details
+                      </label>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
 
-          {/* Lead Details Column */}
-          <div className="border-r border-gray-200 overflow-y-auto relative">
-            <div className="p-6">
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-3">
-                  <img
-                    src="https://docs.kit19.com/default/person.png"
-                    alt="Lead"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="details"
-                    id="lead-details"
-                    className="w-4 h-4"
-                  />
-                  <label htmlFor="lead-details" className="font-semibold text-gray-800">
-                    Lead Details
-                  </label>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  Assigned To: <span className="font-medium">Abhi01 (Abhishek Kumar)</span>
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                {leadFields.map((field) => (
-                  <div key={field.id} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name={`field-${field.id}`}
-                      value="lead"
-                      onChange={() => handleLeadFieldSelect(field.id, field.value)}
-                      className="w-4 h-4 cursor-pointer"
-                    />
-                    <span className="text-sm text-gray-700">
-                      {field.label || <span className="text-gray-400">Empty</span>}
-                    </span>
+                  <div className="space-y-2">
+                    {enquiryFields.map((field) => (
+                      <div key={field.id} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name={`field-${field.id}`}
+                          value="enquiry"
+                          checked={selectedFields[field.id] === 'enquiry'}
+                          onChange={() => handleEnquiryFieldSelect(field.id, field.value)}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {field.label || <span className="text-gray-400">Empty</span>}
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Merge Details Column */}
-          <div className="overflow-y-auto">
-            <div className="p-6">
-              <div className="flex flex-col items-center mb-6">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-3">
-                  <img
-                    src="https://docs.kit19.com/default/person.png"
-                    alt="Merge"
-                    className="w-full h-full object-cover"
-                  />
                 </div>
-                <h3 className="font-semibold text-gray-800">Merge Details</h3>
               </div>
 
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Karthick"
-                  value={mergeData.name}
-                  onChange={(e) => handleMergeDataChange('name', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Company"
-                  value={mergeData.company}
-                  onChange={(e) => handleMergeDataChange('company', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="+91 9790690380"
-                  value={mergeData.phone}
-                  onChange={(e) => handleMergeDataChange('phone', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Mobile1"
-                  value={mergeData.mobile1}
-                  onChange={(e) => handleMergeDataChange('mobile1', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Mobile2"
-                  value={mergeData.mobile2}
-                  onChange={(e) => handleMergeDataChange('mobile2', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Email"
-                  value={mergeData.email}
-                  onChange={(e) => handleMergeDataChange('email', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Email1"
-                  value={mergeData.email1}
-                  onChange={(e) => handleMergeDataChange('email1', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Email2"
-                  value={mergeData.email2}
-                  onChange={(e) => handleMergeDataChange('email2', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Country"
-                  value={mergeData.country}
-                  onChange={(e) => handleMergeDataChange('country', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="State"
-                  value={mergeData.state}
-                  onChange={(e) => handleMergeDataChange('state', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="City"
-                  value={mergeData.city}
-                  onChange={(e) => handleMergeDataChange('city', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="0"
-                  value={mergeData.pincode}
-                  onChange={(e) => handleMergeDataChange('pincode', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Residential Address"
-                  value={mergeData.residentialAddress}
-                  onChange={(e) => handleMergeDataChange('residentialAddress', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Office Address"
-                  value={mergeData.officeAddress}
-                  onChange={(e) => handleMergeDataChange('officeAddress', e.target.value)}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              {/* Lead Details Column */}
+              <div className="border-r border-gray-200 relative">
+                <div className="p-6">
+                  <div className="flex flex-col items-center mb-6">
+                    <div className="w-24 h-24 rounded-full overflow-hidden mb-3">
+                      <img
+                        src="https://docs.kit19.com/default/person.png"
+                        alt="Lead"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="details"
+                        id="lead-details"
+                        className="w-4 h-4"
+                      />
+                      <label htmlFor="lead-details" className="font-semibold text-gray-800">
+                        Lead Details
+                      </label>
+                    </div>
+                    <p className="text-sm text-gray-600 mt-2">
+                      Assigned To: <span className="font-medium">Abhi01 (Abhishek Kumar)</span>
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {leadFields.map((field) => (
+                      <div key={field.id} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name={`field-${field.id}`}
+                          value="lead"
+                          checked={selectedFields[field.id] === 'lead'}
+                          onChange={() => handleLeadFieldSelect(field.id, field.value)}
+                          className="w-4 h-4 cursor-pointer"
+                        />
+                        <span className="text-sm text-gray-700">
+                          {field.label || <span className="text-gray-400">Empty</span>}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Merge Details Column */}
+              <div className="relative">
+                <div className="p-6">
+                  <div className="flex flex-col items-center mb-6">
+                    <div className="w-24 h-24 rounded-full overflow-hidden mb-3">
+                      <img
+                        src="https://docs.kit19.com/default/person.png"
+                        alt="Merge"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <h3 className="font-semibold text-gray-800">Merge Details</h3>
+                  </div>
+
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      placeholder="Karthick"
+                      value={mergeData.name}
+                      onChange={(e) => handleMergeDataChange('name', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Company"
+                      value={mergeData.company}
+                      onChange={(e) => handleMergeDataChange('company', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="+91 9790690380"
+                      value={mergeData.phone}
+                      onChange={(e) => handleMergeDataChange('phone', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Mobile1"
+                      value={mergeData.mobile1}
+                      onChange={(e) => handleMergeDataChange('mobile1', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Mobile2"
+                      value={mergeData.mobile2}
+                      onChange={(e) => handleMergeDataChange('mobile2', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Email"
+                      value={mergeData.email}
+                      onChange={(e) => handleMergeDataChange('email', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Email1"
+                      value={mergeData.email1}
+                      onChange={(e) => handleMergeDataChange('email1', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Email2"
+                      value={mergeData.email2}
+                      onChange={(e) => handleMergeDataChange('email2', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Country"
+                      value={mergeData.country}
+                      onChange={(e) => handleMergeDataChange('country', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="State"
+                      value={mergeData.state}
+                      onChange={(e) => handleMergeDataChange('state', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="City"
+                      value={mergeData.city}
+                      onChange={(e) => handleMergeDataChange('city', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="0"
+                      value={mergeData.pincode}
+                      onChange={(e) => handleMergeDataChange('pincode', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Residential Address"
+                      value={mergeData.residentialAddress}
+                      onChange={(e) => handleMergeDataChange('residentialAddress', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Office Address"
+                      value={mergeData.officeAddress}
+                      onChange={(e) => handleMergeDataChange('officeAddress', e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Plus Button - positioned between first and second column */}
+              <div className="absolute top-[50%] left-[calc(33.333%-24px)] z-20">
+                <button className="w-12 h-12 bg-gray-400 text-white rounded-full flex items-center justify-center hover:bg-gray-500 transition shadow-lg">
+                  <Plus className="w-6 h-6" />
+                </button>
+              </div>
+
+              {/* Arrow Button - positioned between second and third column */}
+              <div className="absolute top-[50%] left-[calc(66.666%-24px)] z-20">
+                <button className="w-12 h-12 bg-gray-400 text-white rounded-full flex items-center justify-center hover:bg-gray-500 transition shadow-lg">
+                  <ArrowRight className="w-6 h-6" />
+                </button>
               </div>
             </div>
-          </div>
-
-          {/* Plus Button - positioned between first and second column */}
-          <div className="absolute bottom-4 left-[calc(33.333%-24px)] z-20">
-            <button className="w-12 h-12 bg-gray-400 text-white rounded-full flex items-center justify-center hover:bg-gray-500 transition shadow-lg">
-              <Plus className="w-6 h-6" />
-            </button>
-          </div>
-
-          {/* Arrow Button - positioned between second and third column */}
-          <div className="absolute bottom-4 left-[calc(66.666%-24px)] z-20">
-            <button className="w-12 h-12 bg-gray-400 text-white rounded-full flex items-center justify-center hover:bg-gray-500 transition shadow-lg">
-              <ArrowRight className="w-6 h-6" />
-            </button>
           </div>
         </div>
 
@@ -370,11 +404,41 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
           <button className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-medium">
             Merge to Lead
           </button>
-          <button className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-medium">
+          <button
+            onClick={() => setShowFollowupForm(true)}
+            className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-medium"
+          >
             Merge & Add Follow up
           </button>
         </div>
       </div>
+
+      <PopUpModal
+        isOpen={showFollowupForm}
+        onClose={handleFollowupClose}
+        title="Add Lead"
+        size="lg"
+        footer={
+          <div className="flex justify-between w-full">
+            <Button
+              variant="secondary"
+              onClick={handleFollowupClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='primary'
+              onClick={handleFollowupClose}
+            >
+              Save
+            </Button>
+          </div>
+        }
+      >
+        <AddFollowupForm selectedCount={enquiryData} />
+      </PopUpModal>
+
+
     </>
   );
 };

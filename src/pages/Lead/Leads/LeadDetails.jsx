@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp, Undo2, ChevronLeftCircle } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
 import { FaWhatsapp, FaRegMoneyBillAlt } from "react-icons/fa";
 import { HiOutlineDocumentText } from "react-icons/hi2";
@@ -48,12 +48,47 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
 
     const moreDropdownRef = useRef(null);
+    const [draggedItem, setDraggedItem] = useState(null);
+    const [tabsOrder, setTabsOrder] = useState([]);
+    const [moreTabsOrder, setMoreTabsOrder] = useState([]);
+    const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0, tab: null, source: null });
+    const MAX_MAIN_TABS = 7;
 
-    // // Mock activities
-    // const mockActivities = [
-    //     { EventName: 'Outbound call made', UserLogin: 'John Doe', EventDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), EventType: 'https://kit19.com/assets/custom/img/LeadActivityIMG/Call.png' },
-    //     { EventName: 'Note added: Follow up required', UserLogin: 'Sarah Smith', EventDate: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), EventType: 'https://kit19.com/assets/custom/img/LeadActivityIMG/Note.png' },
-    // ];
+    // Default tabs
+    const defaultTabs = ['Activities', 'Calls', 'FollowUp', 'Document', 'Notes', 'Task', 'Appointment'];
+    const defaultMoreTabs = ['Chat', 'Webform', 'Pipeline', 'WaChat Log', 'Meeting'];
+
+    // Load tabs order from localStorage on mount
+    useEffect(() => {
+        const savedOrder = localStorage.getItem('leadDetailTabsOrder');
+        const savedMoreOrder = localStorage.getItem('leadDetailMoreTabsOrder');
+        
+        if (savedOrder) {
+            try {
+                setTabsOrder(JSON.parse(savedOrder));
+            } catch (error) {
+                setTabsOrder(defaultTabs);
+            }
+        } else {
+            setTabsOrder(defaultTabs);
+        }
+
+        if (savedMoreOrder) {
+            try {
+                setMoreTabsOrder(JSON.parse(savedMoreOrder));
+            } catch (error) {
+                setMoreTabsOrder(defaultMoreTabs);
+            }
+        } else {
+            setMoreTabsOrder(defaultMoreTabs);
+        }
+    }, []);
+
+    // Mock activities
+    const mockActivities = [
+        { EventName: 'Outbound call made', UserLogin: 'John Doe', EventDate: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), EventType: 'https://kit19.com/assets/custom/img/LeadActivityIMG/Call.png' },
+        { EventName: 'Note added: Follow up required', UserLogin: 'Sarah Smith', EventDate: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), EventType: 'https://kit19.com/assets/custom/img/LeadActivityIMG/Note.png' },
+    ];
 
     // useEffect(() => {
     //     setActivities(mockActivities);
@@ -379,22 +414,139 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
         }
     }, [activeTab, lead]);
 
+    // Drag and drop handlers
+    const handleDragStart = (e, tab, source = 'main') => {
+        setDraggedItem({ tab, source });
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDrop = (e, dropTab, dropSource = 'main') => {
+        e.preventDefault();
+        if (!draggedItem || (draggedItem.tab === dropTab && draggedItem.source === dropSource)) return;
+
+        const dragSource = draggedItem.source;
+        const dragTab = draggedItem.tab;
+
+        // Handle different drag/drop scenarios
+        if (dragSource === 'main' && dropSource === 'main') {
+            // Both in main tabs - reorder
+            const newOrder = [...tabsOrder];
+            const dragIndex = newOrder.indexOf(dragTab);
+            const dropIndex = newOrder.indexOf(dropTab);
+            newOrder.splice(dragIndex, 1);
+            newOrder.splice(dropIndex, 0, dragTab);
+            setTabsOrder(newOrder);
+            localStorage.setItem('leadDetailTabsOrder', JSON.stringify(newOrder));
+        } else if (dragSource === 'main' && dropSource === 'more') {
+            // From main to more dropdown
+            const newMainOrder = tabsOrder.filter(t => t !== dragTab);
+            const newMoreOrder = [...moreTabsOrder];
+            const dropIndex = newMoreOrder.indexOf(dropTab);
+            newMoreOrder.splice(dropIndex, 0, dragTab);
+            setTabsOrder(newMainOrder);
+            setMoreTabsOrder(newMoreOrder);
+            localStorage.setItem('leadDetailTabsOrder', JSON.stringify(newMainOrder));
+            localStorage.setItem('leadDetailMoreTabsOrder', JSON.stringify(newMoreOrder));
+        } else if (dragSource === 'more' && dropSource === 'main') {
+            // From more dropdown to main - check limit
+            if (tabsOrder.length >= MAX_MAIN_TABS) {
+                alert(`You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`);
+                setDraggedItem(null);
+                return;
+            }
+            const newMoreOrder = moreTabsOrder.filter(t => t !== dragTab);
+            const newMainOrder = [...tabsOrder];
+            const dropIndex = newMainOrder.indexOf(dropTab);
+            newMainOrder.splice(dropIndex, 0, dragTab);
+            setTabsOrder(newMainOrder);
+            setMoreTabsOrder(newMoreOrder);
+            localStorage.setItem('leadDetailTabsOrder', JSON.stringify(newMainOrder));
+            localStorage.setItem('leadDetailMoreTabsOrder', JSON.stringify(newMoreOrder));
+        } else if (dragSource === 'more' && dropSource === 'more') {
+            // Both in more dropdown - reorder
+            const newOrder = [...moreTabsOrder];
+            const dragIndex = newOrder.indexOf(dragTab);
+            const dropIndex = newOrder.indexOf(dropTab);
+            newOrder.splice(dragIndex, 1);
+            newOrder.splice(dropIndex, 0, dragTab);
+            setMoreTabsOrder(newOrder);
+            localStorage.setItem('leadDetailMoreTabsOrder', JSON.stringify(newOrder));
+        }
+
+        setDraggedItem(null);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedItem(null);
+    };
+
+    const handleContextMenu = (e, tab, source) => {
+        e.preventDefault();
+        setContextMenu({
+            show: true,
+            x: e.clientX,
+            y: e.clientY,
+            tab,
+            source
+        });
+    };
+
+    const moveToDropdown = (tab) => {
+        const newMainOrder = tabsOrder.filter(t => t !== tab);
+        const newMoreOrder = [...moreTabsOrder, tab];
+        setTabsOrder(newMainOrder);
+        setMoreTabsOrder(newMoreOrder);
+        localStorage.setItem('leadDetailTabsOrder', JSON.stringify(newMainOrder));
+        localStorage.setItem('leadDetailMoreTabsOrder', JSON.stringify(newMoreOrder));
+        setContextMenu({ show: false, x: 0, y: 0, tab: null, source: null });
+    };
+
+    const moveToMainTabs = (tab) => {
+        if (tabsOrder.length >= MAX_MAIN_TABS) {
+            alert(`You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`);
+            setContextMenu({ show: false, x: 0, y: 0, tab: null, source: null });
+            return;
+        }
+        const newMoreOrder = moreTabsOrder.filter(t => t !== tab);
+        const newMainOrder = [...tabsOrder, tab];
+        setTabsOrder(newMainOrder);
+        setMoreTabsOrder(newMoreOrder);
+        localStorage.setItem('leadDetailTabsOrder', JSON.stringify(newMainOrder));
+        localStorage.setItem('leadDetailMoreTabsOrder', JSON.stringify(newMoreOrder));
+        setContextMenu({ show: false, x: 0, y: 0, tab: null, source: null });
+    };
+
     // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event) => {
+            // Don't close if clicking inside context menu
+            const contextMenuElement = document.getElementById('context-menu');
+            if (contextMenuElement && contextMenuElement.contains(event.target)) {
+                return;
+            }
+            
             if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target)) {
                 setShowMoreDropdown(false);
             }
+            // Close context menu when clicking anywhere
+            if (contextMenu.show) {
+                setContextMenu({ show: false, x: 0, y: 0, tab: null, source: null });
+            }
         };
 
-        if (showMoreDropdown) {
+        if (showMoreDropdown || contextMenu.show) {
             document.addEventListener('mousedown', handleClickOutside);
         }
 
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [showMoreDropdown]);
+    }, [showMoreDropdown, contextMenu.show]);
 
     // Call timer effect
     useEffect(() => {
@@ -541,21 +693,24 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                         <div className="bg-white rounded-lg shadow-sm">
                             <div className="border-b border-gray-200">
                                 <div className={`flex px-6 items-center transition-all duration-300 ${isRightCollapsed ? 'justify-between w-full' : 'gap-6'}`}>
-                                    {visibleTabs.map(tab => {
-                                        const key = tab.toLowerCase().replace(/\s+/g, '');
-                                        return (
-                                            <button
-                                                key={tab}
-                                                onClick={() => setActiveTab(key)}
-                                                className={`py-4 text-sm font-medium capitalize border-b-2 transition ${activeTab === key
-                                                    ? 'border-blue-600 text-blue-600'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                                                    } ${isRightCollapsed ? 'flex-1' : ''}`}
-                                            >
-                                                {tab}
-                                            </button>
-                                        );
-                                    })}
+                                    {tabsOrder.map(tab => (
+                                        <button
+                                            key={tab}
+                                            draggable
+                                            onDragStart={(e) => handleDragStart(e, tab, 'main')}
+                                            onDragOver={handleDragOver}
+                                            onDrop={(e) => handleDrop(e, tab, 'main')}
+                                            onDragEnd={handleDragEnd}
+                                            onClick={() => setActiveTab(tab.toLowerCase())}
+                                            onContextMenu={(e) => handleContextMenu(e, tab, 'main')}
+                                            className={`py-4 text-sm font-medium capitalize border-b-2 transition cursor-move ${activeTab === tab.toLowerCase()
+                                                ? 'border-blue-600 text-blue-600'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                                                } ${isRightCollapsed ? 'flex-1' : ''} ${draggedItem?.tab === tab && draggedItem?.source === 'main' ? 'opacity-50' : ''}`}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
                                     <div className="relative" ref={moreDropdownRef}>
                                         <button
                                             onClick={() => setShowMoreDropdown(!showMoreDropdown)}
@@ -564,21 +719,75 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                         >
                                             <MoreVertical className="w-5 h-5" />
                                         </button>
+                                        {/* <button
+                                            onClick={() => {
+                                                localStorage.removeItem('leadDetailTabsOrder');
+                                                localStorage.removeItem('leadDetailMoreTabsOrder');
+                                                setTabsOrder(defaultTabs);
+                                                setMoreTabsOrder(defaultMoreTabs);
+                                            }}
+                                            className="py-4 px-2 text-gray-600 hover:text-gray-900 transition"
+                                            title="Reset"
+                                        >
+                                            <Undo2  className="w-5 h-5" />
+                                        </button> */}
                                         {showMoreDropdown && (
                                             <div className="absolute right-2 top-[60%] mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-y-auto">
-                                                        {moreTabs.map((item) => (
-                                                            <button
-                                                                key={item}
-                                                                onClick={() => { setActiveTab(item.toLowerCase().replace(/\s+/g, '')); setShowMoreDropdown(false); }}
-                                                                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0"
-                                                            >
-                                                                {item}
-                                                            </button>
-                                                        ))}
+                                                {moreTabsOrder.map((item) => (
+                                                    <div
+                                                        key={item}
+                                                        draggable
+                                                        onDragStart={(e) => handleDragStart(e, item, 'more')}
+                                                        onDragOver={handleDragOver}
+                                                        onDrop={(e) => handleDrop(e, item, 'more')}
+                                                        onDragEnd={handleDragEnd}
+                                                        onClick={() => { setActiveTab(item.toLowerCase()); setShowMoreDropdown(false); }}
+                                                        onContextMenu={(e) => handleContextMenu(e, item, 'more')}
+                                                        className={`w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition border-b border-gray-100 last:border-b-0 cursor-move ${draggedItem?.tab === item && draggedItem?.source === 'more' ? 'opacity-50' : ''}`}
+                                                    >
+                                                        {item}
+                                                    </div>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Context Menu */}
+                                {contextMenu.show && (
+                                    <div
+                                        id="context-menu"
+                                        className="fixed bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] py-1 min-w-[160px]"
+                                        style={{
+                                            left: `${contextMenu.x}px`,
+                                            top: `${contextMenu.y}px`
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        {contextMenu.source === 'main' ? (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    moveToDropdown(contextMenu.tab);
+                                                }}
+                                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                                            >
+                                                Move to More Menu
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    moveToMainTabs(contextMenu.tab);
+                                                }}
+                                                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                                disabled={tabsOrder.length >= MAX_MAIN_TABS}
+                                            >
+                                                Move to Main Tabs {tabsOrder.length >= MAX_MAIN_TABS && '(Full)'}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             <div className="p-6 max-h-[300px] h-[300px] overflow-y-auto">
                                 <div className="space-y-4">
@@ -786,16 +995,16 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     {isRightCollapsed && (
                         <button
                             onClick={() => setIsRightCollapsed(false)}
-                            className="fixed bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition z-10"
+                            className="fixed  text-gray-600 rounded-full shadow-lg transition z-10"
                             style={{
-                                right: '56px',
-                                top: '8%',
+                                right: '11px',
+                                top: '30%',
                                 transform: 'translateY(-50%)',
                                 padding: '8px'
                             }}
                             title="Expand Quick Actions"
                         >
-                            <Plus className="w-5 h-5" />
+                            <ChevronLeftCircle className="w-5 h-5" />
                         </button>
                     )}
                 </div>

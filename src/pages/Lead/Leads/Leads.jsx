@@ -48,64 +48,57 @@ const Leads = () => {
   // Fetch leads function - you'll need to implement the API call
   const fetchLeads = async (loadMore = false, page = 1) => {
     setIsLoading(true);
-    // const start = loadMore ? startIndex : (page - 1) * parseInt(itemsPerPage);
-
     const pageNum = page || currentPage || 1;
-        const limit = parseInt(itemsPerPage) || 20;
-        const start = loadMore ? startIndex : (pageNum - 1) * limit;
-        const end = start + limit - 1;
+    const limit = parseInt(itemsPerPage) || 20;
+    const startNo = loadMore ? startIndex : (pageNum - 1) * limit;
+    const endNo = startNo + limit - 1;
 
-        // Build Details object to match GetLeadDetailListNew definition
-        const details = {
-            draw: pageNum,
-            StartNo: start,
-            EndNo: end,
-            UserId: userId || 0,
-            SearchName: '',
-            ParentId: parentId || 0,
-            FilterText: searchText || '',
-            OrderStr: '',
-            TextSearch: searchText || '',
-            NotFollowUp: 0
-        };
+    const details = {
+      draw: pageNum,
+      StartNo: startNo,
+      EndNo: endNo,
+      UserId: userId || '',
+      SearchName: '',
+      ParentId: parentId || '',
+      FilterText: searchText || '',
+      OrderStr: '',
+      TextSearch: searchText || '',
+      NotFollowUp: 0
+    };
 
-        const payload = {
-            Token: TokenId,
-            Message: "",
-            LoggedUserId: userId,
-            MAC_Address: "",
-            IP_Address: "102.16.32.189",
-            Details: details,
-            BroadcastName: ""
-        };
-
-
-    // setTotalRecord(mockLeads.length);
+    const payload = {
+      Token: TokenId,
+      Message: "",
+      LoggedUserId: userId,
+      MAC_Address: "",
+      IP_Address: "102.16.32.189",
+      Details: details,
+      BroadcastName: ""
+    };
 
     try {
-               // Use the detail-list API which returns a DataTable-like response
-               const response = await getLeadDetailList(payload);
-               // The helper returns response.data (objResponseStatusEntity), so Details contains the DataTableResponse
-               const table = response?.Details || {};
-               setTotalRecord(table?.recordsFiltered || table?.recordsTotal || 0);
-   
-               const rows = table?.data || [];
-               if (loadMore) {
-                   setLeads(prev => [...prev, ...rows]);
-               } else {
-                   setLeads(rows);
-                   if (rows.length > 0) {
-                       const first = rows[0];
-                       // Data keys vary; try common id fields
-                       setSelectedLead(first.LeadId || first.Id || first.id || first.leadId || null);
-                   }
-               }
-           } catch (error) {
-               console.error('fetchLeads error:', error);
-           } finally {
-               setIsLoading(false);
-           }
-       };
+      const response = await getLeadDetailList(payload);
+      // The API returns an objResponseStatusEntity where Details is a DataTableResponse
+      const table = response?.Details ?? {};
+      const rows = Array.isArray(table?.data) ? table.data : [];
+      setTotalRecord(table?.recordsFiltered || table?.recordsTotal || rows.length);
+
+      if (loadMore) {
+        setLeads(prev => [...prev, ...rows]);
+      } else {
+        setLeads(rows);
+        if (rows && rows.length > 0 && !selectedLeadData) {
+          const first = rows[0];
+          setSelectedLead(first.LeadId || first.Id || first.id || first.leadId || null);
+          setSelectedLeadData(first);
+        }
+      }
+    } catch (error) {
+      console.error('fetchLeads error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchLeads(false, currentPage);

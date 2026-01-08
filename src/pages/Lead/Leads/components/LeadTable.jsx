@@ -4,6 +4,7 @@ import { GoGitBranch } from 'react-icons/go';
 import { FaWhatsapp } from 'react-icons/fa';
 import RowActionMenu from '../../../../components/RowActionMenu';
 import LeadDetailsDrawer from './LeadDetailsDrawer';
+import FollowupTooltip from './FollowupTooltip';
 import nodata from '../../../../assets/nodata.gif';
 
 const LeadTable = ({
@@ -30,6 +31,22 @@ const LeadTable = ({
     const getInitials = (name) => {
         if (!name) return '?';
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    };
+
+    const getBadgeColor = (count) => {
+        const num = count || 0;
+        if (num === 0) return 'bg-gray-400';
+        if (num === 1) return 'bg-green-400';
+        if (num === 2) return 'bg-green-500';
+        if (num === 3) return 'bg-lime-500';
+        if (num === 4) return 'bg-yellow-400';
+        if (num === 5) return 'bg-yellow-500';
+        if (num === 6) return 'bg-orange-400';
+        if (num === 7) return 'bg-orange-500';
+        if (num === 8) return 'bg-red-400';
+        if (num === 9) return 'bg-red-500';
+        if (num >= 10) return 'bg-red-600';
+        return 'bg-blue-500';
     };
 
     const handleSelectAll = () => {
@@ -184,8 +201,16 @@ const LeadTable = ({
                                         <div className="flex items-center  justify-between">
                                             <div className="flex items-center gap-2">
                                                 <div className="flex flex-col items-center gap-2">
-                                                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer">
-                                                        {getInitials(lead.PersonName)}
+                                                    <div className="relative">
+                                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer">
+                                                            {getInitials(lead.PersonName)}
+                                                        </div>
+                                                        {/* Followup Count Badge with Tooltip */}
+                                                        <FollowupTooltip lead={lead}>
+                                                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 ${getBadgeColor(lead.FollowupCount)} border-2 border-white rounded-full flex items-center justify-center text-white font-bold text-xs cursor-pointer hover:brightness-110 transition-all shadow-md`}>
+                                                                {lead.FollowupCount || 0}
+                                                            </div>
+                                                        </FollowupTooltip>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 mb-1">
