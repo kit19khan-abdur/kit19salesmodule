@@ -60,8 +60,8 @@ const LeadDetailsDrawer = ({ isOpen, onClose, lead }) => {
                                     <Phone className="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div className="flex-1">
-                                    <a href={`tel:${lead.CsvMobileNo}`} className="text-blue-600 font-medium hover:underline">
-                                        {lead.CsvMobileNo}
+                                    <a href={`tel:${lead.MobileNo}`} className="text-blue-600 font-medium hover:underline">
+                                        {lead.MobileNo}
                                     </a>
                                 </div>
                             </div>
@@ -74,8 +74,8 @@ const LeadDetailsDrawer = ({ isOpen, onClose, lead }) => {
                                     <Mail className="w-5 h-5 text-purple-600" />
                                 </div>
                                 <div className="flex-1">
-                                    <a href={`mailto:${lead.CsvEmailId}`} className="text-purple-600 font-medium hover:underline break-all">
-                                        {lead.CsvEmailId}
+                                    <a href={`mailto:${lead.EmailID}`} className="text-purple-600 font-medium hover:underline break-all">
+                                        {lead.EmailID || 'N/A'}
                                     </a>
                                 </div>
                             </div>
@@ -88,7 +88,7 @@ const LeadDetailsDrawer = ({ isOpen, onClose, lead }) => {
                                     <User className="w-5 h-5 text-green-600" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-gray-900 font-medium">{lead.LeadId || 'LD-2024-0001'}</p>
+                                    <p className="text-gray-900 font-medium">{lead.LeadNo || 'LD-2024-0001'}</p>
                                 </div>
                             </div>
                         </div>
@@ -100,7 +100,7 @@ const LeadDetailsDrawer = ({ isOpen, onClose, lead }) => {
                                     <Calendar className="w-5 h-5 text-orange-600" />
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-gray-900 font-medium">{lead.CreatedDate}</p>
+                                    <p className="text-gray-900 font-medium">{lead.CreatedOn}</p>
                                 </div>
                             </div>
                         </div>
@@ -111,7 +111,7 @@ const LeadDetailsDrawer = ({ isOpen, onClose, lead }) => {
                         <div className="border-t border-gray-200 pt-4">
                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-sm font-semibold text-gray-500 uppercase">Source</span>
-                                <span className="text-sm text-gray-900 font-medium">{lead.Source || '-'}</span>
+                                <span className="text-sm text-gray-900 font-medium">{lead.SourceName || '-'}</span>
                             </div>
                         </div>
 

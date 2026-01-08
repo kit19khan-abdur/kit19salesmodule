@@ -29,7 +29,7 @@ const RowActionMenu = ({ show, anchorRef, onClose, onAction, menuId }) => {
     <div
       id={menuId}
       className="absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[220px] py-2 mt-2 right-0"
-      style={{ top: '64%', left: 'auto' }}
+      style={{ top: '85%', left: 'auto' }}
       ref={menuRef}
       onClick={(e) => e.stopPropagation()}
     >

@@ -21,12 +21,12 @@ const LeadDetailPanel = ({ lead, onClose }) => {
           <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-xl">
             {lead.PersonName?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
           </div>
-          <div>
+          {/* <div>
             <h2 className="text-xl font-bold text-gray-900">{lead.PersonName}</h2>
             <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${lead.IsOpen ? 'bg-green-100 text-green-700' : 'bg-gray-600 text-white'}`}>
               {lead.IsOpen ? 'Open' : 'Closed'}
             </span>
-          </div>
+          </div> */}
         </div>
 
         <div className="space-y-4">
@@ -34,7 +34,7 @@ const LeadDetailPanel = ({ lead, onClose }) => {
             <label className="text-xs text-gray-500 uppercase tracking-wide">Phone</label>
             <div className="flex items-center gap-2 mt-1">
               <Phone className="w-4 h-4 text-gray-400" />
-              <p className="text-sm font-medium text-gray-900">{lead.CsvMobileNo}</p>
+              <p className="text-sm font-medium text-gray-900">{lead.MobileNo}</p>
             </div>
           </div>
 
@@ -42,31 +42,31 @@ const LeadDetailPanel = ({ lead, onClose }) => {
             <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
             <div className="flex items-center gap-2 mt-1">
               <Mail className="w-4 h-4 text-gray-400" />
-              <p className="text-sm font-medium text-gray-900">{lead.CsvEmailId || 'N/A'}</p>
+              <p className="text-sm font-medium text-gray-900">{lead.EmailId || 'N/A'}</p>
             </div>
           </div>
 
           <div>
             <label className="text-xs text-gray-500 uppercase tracking-wide">Lead ID</label>
-            <p className="mt-1 text-sm font-medium text-gray-900">{lead.LeadId}</p>
+            <p className="mt-1 text-sm font-medium text-gray-900">{lead.ID}</p>
           </div>
 
           <div>
             <label className="text-xs text-gray-500 uppercase tracking-wide">Created Date</label>
             <div className="flex items-center gap-2 mt-1">
               <Calendar className="w-4 h-4 text-gray-400" />
-              <p className="text-sm font-medium text-gray-900">{lead.CreatedDate}</p>
+              <p className="text-sm font-medium text-gray-900">{lead.CreatedOn}</p>
             </div>
           </div>
 
           <div>
             <label className="text-xs text-gray-500 uppercase tracking-wide">Source</label>
-            <p className="mt-1 text-sm font-medium text-gray-900">{lead.Source || 'N/A'}</p>
+            <p className="mt-1 text-sm font-medium text-gray-900">{lead.SourceName || 'N/A'}</p>
           </div>
 
           <div>
             <label className="text-xs text-gray-500 uppercase tracking-wide">Type</label>
-            <p className="mt-1 text-sm font-medium text-gray-900">{lead.Type || 'N/A'}</p>
+            <p className="mt-1 text-sm font-medium text-gray-900">{lead.FollowupStatus || 'N/A'}</p>
           </div>
         </div>
       </div>

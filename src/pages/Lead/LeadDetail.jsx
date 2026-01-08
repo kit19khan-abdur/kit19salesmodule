@@ -2,16 +2,23 @@ import React, { useState } from 'react';
 import { Search, Phone, Mail, MessageSquare, Calendar, Plus, FileText, MoreVertical, Grid, List, RefreshCw, ChevronDown, ChevronLeft, ChevronRight, X, LayoutGrid } from 'lucide-react';
 import Lead from './Lead';
 
-const LeadDetail = () => {
+const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], onSelectLead, currentPage: currentPageProp, onPageChange } ) => {
     const [view, setView] = useState('table'); // 'table' or 'grid'
     const [selectedLeads, setSelectedLeads] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(currentPageProp || 1);
+    // Keep local currentPage in sync when parent controls it
+    React.useEffect(() => {
+        if (typeof currentPageProp === 'number' && currentPageProp !== currentPage) {
+            setCurrentPage(currentPageProp);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPageProp]);
     const [detailView, setDetailView] = useState(null);
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [showAllTabs, setShowAllTabs] = useState(false);
     const [activeTab, setActiveTab] = useState('activities');
 
-    const leadsData = [
+    const defaultLeads = [
         { id: 1, name: 'Rajesh Kumar', phone: '+91 98765 43210', email: 'rajesh.kumar@email.com', date: '28 Dec 2024, 10:30 AM', source: 'Website', status: 'Open', type: 'Hot Lead', avatar: 'RK', city: 'Mumbai', state: 'Maharashtra', pincode: '400001' },
         { id: 2, name: 'Priya Sharma', phone: '+91 98765 43211', email: 'priya.sharma@email.com', date: '27 Dec 2024, 02:15 PM', source: 'Referral', status: 'Open', type: 'Warm Lead', avatar: 'PS', city: 'Delhi', state: 'Delhi', pincode: '110001' },
         { id: 3, name: 'Amit Patel', phone: '+91 98765 43212', email: 'amit.patel@email.com', date: '26 Dec 2024, 09:45 AM', source: '-', status: 'Callback', type: '-', avatar: 'AP', city: 'Ahmedabad', state: 'Gujarat', pincode: '380001' },
@@ -22,12 +29,34 @@ const LeadDetail = () => {
         { id: 8, name: 'Kavita Joshi', phone: '+91 98765 43217', email: 'kavita.joshi@email.com', date: '21 Dec 2024, 10:00 AM', source: 'Facebook', status: 'Open', type: 'Cold Lead', avatar: 'KJ', city: 'Jaipur', state: 'Rajasthan', pincode: '302001' },
     ];
 
-    const activities = [
+    const defaultActivities = [
         { type: 'call', action: 'Outbound call made', user: 'John Doe', time: '2 hours ago', icon: Phone },
         { type: 'note', action: 'Note added: Follow up required', user: 'Sarah Smith', time: '5 hours ago', icon: FileText },
         { type: 'email', action: 'Email sent to lead', user: 'John Doe', time: '1 day ago', icon: Mail },
         { type: 'meeting', action: 'Meeting scheduled', user: 'Mike Johnson', time: '2 days ago', icon: Calendar },
     ];
+
+    const leadsSource = (Array.isArray(leadsProp) && leadsProp.length > 0) ? leadsProp : defaultLeads;
+    const activitiesSource = (Array.isArray(activitiesProp) && activitiesProp.length > 0) ? activitiesProp : defaultActivities;
+
+    const normalizeLead = (l) => ({
+        id: l.Id || l.id || l.LeadId || l.leadId || null,
+        name: l.PersonName || l.Name || l.FullName || l.name || l.LeadName || '',
+        phone: l.CsvMobileNo || l.MobileNo || l.Phone || l.Mobile || l.phone || '',
+        email: l.Email || l.email || '',
+        date: l.CreatedDate || l.date || '',
+        source: l.Source || l.source || '',
+        status: l.Status || l.status || '',
+        type: l.Type || l.type || '',
+        avatar: l.avatar || (l.PersonName ? l.PersonName.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : (l.Name ? l.Name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : '')),
+        city: l.City || l.city || '',
+        state: l.State || l.state || '',
+        pincode: l.Pincode || l.pincode || '',
+        raw: l
+    });
+
+    const leads = leadsSource.map(normalizeLead);
+    const activitiesList = activitiesSource;
 
     const toggleLeadSelection = (id) => {
         setSelectedLeads(prev =>
@@ -36,7 +65,7 @@ const LeadDetail = () => {
     };
 
     const toggleSelectAll = () => {
-        setSelectedLeads(selectedLeads.length === leadsData.length ? [] : leadsData.map(l => l.id));
+        setSelectedLeads(selectedLeads.length === leads.length ? [] : leads.map(l => l.id));
     };
 
     const getStatusColor = (status) => {
@@ -53,7 +82,7 @@ const LeadDetail = () => {
     }
 
     if (detailView) {
-        const lead = leadsData.find(l => l.id === detailView);
+        const lead = leads.find(l => l.id === detailView);
 
         return (
             <div className="flex h-screen bg-gray-50">
@@ -80,10 +109,10 @@ const LeadDetail = () => {
                     </div>
 
                     <div className="flex-1 overflow-y-auto">
-                        {leadsData.map(l => (
+                        {leads.map(l => (
                             <div
                                 key={l.id}
-                                onClick={() => setDetailView(l.id)}
+                                onClick={() => { setDetailView(l.id); if (onSelectLead) onSelectLead(l.raw); }}
                                 className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${detailView === l.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
                                     }`}
                             >
@@ -94,7 +123,7 @@ const LeadDetail = () => {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex justify-between items-start mb-1">
                                             <h3 className="font-medium text-gray-900 text-sm truncate">{l.name}</h3>
-                                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{l.date.split(',')[0]}</span>
+                                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{String(l.date || '').split(',')[0]}</span>
                                         </div>
                                         <p className="text-xs text-gray-600 mb-2">{l.phone}</p>
                                         <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(l.status)}`}>
@@ -232,7 +261,7 @@ const LeadDetail = () => {
 
                                     <div className="p-6">
                                         <div className="space-y-4">
-                                            {activities.map((activity, idx) => (
+                                            {activitiesList.map((activity, idx) => (
                                                 <div key={idx} className="flex gap-4">
                                                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                                                         <activity.icon className="h-5 w-5 text-blue-600" />
@@ -352,7 +381,7 @@ const LeadDetail = () => {
                                     <th className="w-12 px-4 py-3 text-left">
                                         <input
                                             type="checkbox"
-                                            checked={selectedLeads.length === leadsData.length}
+                                            checked={selectedLeads.length === leads.length}
                                             onChange={toggleSelectAll}
                                             className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                                         />
@@ -367,10 +396,10 @@ const LeadDetail = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {leadsData.map((lead) => (
+                                {leads.map((lead) => (
                                     <tr
                                         key={lead.id}
-                                        onClick={() => setDetailView(lead.id)}
+                                        onClick={() => { setDetailView(lead.id); if (onSelectLead) onSelectLead(lead.raw); }}
                                         className={`cursor-pointer transition-colors ${selectedLeads.includes(lead.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
                                             }`}
                                     >
@@ -429,7 +458,10 @@ const LeadDetail = () => {
                     <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end">
                         <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 shadow-sm">
                             <button
-                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                onClick={() => {
+                                    const next = Math.max(1, currentPage - 1);
+                                    if (onPageChange) onPageChange(next); else setCurrentPage(next);
+                                }}
                                 disabled={currentPage === 1}
                                 className="p-2 hover:bg-white rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
@@ -438,7 +470,7 @@ const LeadDetail = () => {
                             {[1, 2, 3, 4, 5].map((page) => (
                                 <button
                                     key={page}
-                                    onClick={() => setCurrentPage(page)}
+                                    onClick={() => { if (onPageChange) onPageChange(page); else setCurrentPage(page); }}
                                     className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${currentPage === page
                                         ? 'bg-blue-600 text-white'
                                         : 'text-gray-700 hover:bg-white'
@@ -448,7 +480,7 @@ const LeadDetail = () => {
                                 </button>
                             ))}
                             <button
-                                onClick={() => setCurrentPage(currentPage + 1)}
+                                onClick={() => { const next = currentPage + 1; if (onPageChange) onPageChange(next); else setCurrentPage(next); }}
                                 className="p-2 hover:bg-white rounded transition-colors"
                             >
                                 <ChevronRight className="h-4 w-4 text-gray-600" />

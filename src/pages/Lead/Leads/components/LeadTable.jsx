@@ -135,49 +135,6 @@ const LeadTable = ({
                 </div>
             </div>
 
-            {/* Mass Operation Buttons */}
-            {selectedLeads.length > 0 && (
-                <div className="px-6 py-3 border-b border-gray-200 bg-blue-50 flex items-center gap-3 flex-wrap">
-                    <span className="text-sm font-medium text-gray-700">{selectedLeads.length} selected</span>
-                    <button
-                        onClick={() => console.log('Add Followup for', selectedLeads)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                    >
-                        Add Followup
-                    </button>
-                    <button
-                        onClick={() => console.log('Send SMS to', selectedLeads)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                    >
-                        Send SMS
-                    </button>
-                    <button
-                        onClick={() => console.log('Send Mail to', selectedLeads)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                    >
-                        Send Mail
-                    </button>
-                    <button
-                        onClick={() => console.log('Update', selectedLeads)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                    >
-                        Update
-                    </button>
-                    <button
-                        onClick={() => console.log('Add Tag to', selectedLeads)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                    >
-                        Add Tag
-                    </button>
-                    <button
-                        onClick={() => console.log('Remove Tag from', selectedLeads)}
-                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                    >
-                        Remove Tag
-                    </button>
-                </div>
-            )}
-
             {/* Showing Records */}
             <div className="px-6 py-2 border-b border-gray-200 flex items-center justify-start bg-gray-50">
                 <div className="text-sm text-gray-600">
@@ -225,8 +182,8 @@ const LeadTable = ({
                         <tbody className="bg-white divide-y divide-gray-200">
                             {leads.map((lead) => (
                                 <tr
-                                    key={lead.id}
-                                    className={`transition hover:bg-gray-50 group cursor-pointer ${selectedLead === lead.id ? 'bg-blue-50' : ''}`}
+                                    key={lead.ID}
+                                    className={`transition hover:bg-gray-50 group cursor-pointer ${selectedLead === lead.ID ? 'bg-blue-50' : ''}`}
                                     onClick={() => {
                                         setSelectedLeadForDrawer(lead);
                                         setIsDrawerOpen(true);
@@ -236,8 +193,8 @@ const LeadTable = ({
                                         <input
                                             type="checkbox"
                                             className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                                            checked={selectedLeads.includes(lead.id)}
-                                            onChange={() => handleSelectLead(lead.id)}
+                                            checked={selectedLeads.includes(lead.ID)}
+                                            onChange={() => handleSelectLead(lead.ID)}
                                         />
                                     </td>
                                     <td className="px-4 py-2 relative">
@@ -307,13 +264,13 @@ const LeadTable = ({
                                                     />
                                                 </span>
                                                 <span
-                                                    id={`row-action-icon-${lead.id}`}
-                                                    ref={el => rowMenuAnchorRefs.current[lead.id] = el}
+                                                    id={`row-action-icon-${lead.ID}`}
+                                                    ref={el => rowMenuAnchorRefs.current[lead.ID] = el}
                                                     className="cursor-pointer"
                                                     title="More Actions"
                                                     onClick={e => {
                                                         e.stopPropagation();
-                                                        setRowMenu(rowMenu.show && rowMenu.rowId === lead.id ? { show: false, rowId: null } : { show: true, rowId: lead.id });
+                                                        setRowMenu(rowMenu.show && rowMenu.rowId === lead.ID ? { show: false, rowId: null } : { show: true, rowId: lead.ID });
                                                     }}
                                                 >
                                                     <MoreVertical className="w-5 h-5 text-gray-600 hover:text-gray-800" />
@@ -321,10 +278,10 @@ const LeadTable = ({
                                             </div>
                                             {/* Row action menu dropdown */}
                                             <RowActionMenu
-                                                show={rowMenu.show && rowMenu.rowId === lead.id}
-                                                anchorRef={{ current: rowMenuAnchorRefs.current[lead.id] }}
+                                                show={rowMenu.show && rowMenu.rowId === lead.ID}
+                                                anchorRef={{ current: rowMenuAnchorRefs.current[lead.ID] }}
                                                 onClose={() => setRowMenu({ show: false, rowId: null })}
-                                                menuId={`row-action-menu-${lead.id}`}
+                                                menuId={`row-action-menu-${lead.ID}`}
                                                 onAction={action => {
                                                     setRowMenu({ show: false, rowId: null });
                                                     if (action === 'edit') {
@@ -344,15 +301,15 @@ const LeadTable = ({
                                     </td>
                                     <td className="px-4 py-2">
                                         <div className="flex cursor-pointer hover:text-green-600 items-center gap-1 text-blue-600 font-medium">
-                                            <span>{lead.CsvMobileNo ? lead.CsvMobileNo : '-'}</span>
+                                            <span>{lead.MobileNo ? lead.CsvMobileNo : '-'}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-2">
                                         <div className="flex items-center gap-3 text-xs">
-                                            {lead.CsvEmailId && (
+                                            {lead.EmailId && (
                                                 <div className="flex items-center gap-1 text-gray-600">
                                                     <Mail className="w-3 h-3" />
-                                                    <span className="truncate max-w-50">{lead.CsvEmailId ? lead.CsvEmailId : '-'}</span>
+                                                    <span className="truncate max-w-50">{lead.EmailId ? lead.CsvEmailId : '-'}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -361,17 +318,17 @@ const LeadTable = ({
                                         <div className="text-xs">
                                             <div className="mb-1">
                                                 {/* <span className="font-semibold text-gray-700">Date</span> */}
-                                                <span className="ml-2 text-gray-600">{lead.CreatedDate ? lead.CreatedDate : '-'}</span>
+                                                <span className="ml-2 text-gray-600">{lead.CreatedOn ? lead.CreatedOn : '-'}</span>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-2 text-sm text-gray-700">{lead.Source || '-'}</td>
-                                    <td className="px-4 py-2">
+                                    <td className="px-4 py-2 text-sm text-gray-700">{lead.SourceName || '-'}</td>
+                                    {/* <td className="px-4 py-2">
                                         <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${lead.IsOpen ? 'bg-green-100 text-green-700' : 'bg-gray-600 text-white'}`}>
                                             {lead.IsOpen ? 'Open' : 'Closed'}
                                         </span>
-                                    </td>
-                                    <td className="px-4 py-2 text-sm text-gray-700">{lead.Type || '-'}</td>
+                                    </td> */}
+                                    {/* <td className="px-4 py-2 text-sm text-gray-700">{lead.Type || '-'}</td> */}
                                 </tr>
                             ))}
                         </tbody>

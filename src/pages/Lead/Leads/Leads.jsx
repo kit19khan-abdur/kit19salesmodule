@@ -4,6 +4,7 @@ import LeadDetails from './LeadDetails';
 import LeadList from './components/LeadList';
 import LeadTable from './components/LeadTable';
 import LeadDetailPanel from './components/LeadDetailPanel';
+import { getLeadList, getLeadActivities, getLeadDetailList } from '../../../utils/lead';
 import { getSession } from '../../../getSession';
 import nodata from '../../../assets/nodata.gif';
 
@@ -13,7 +14,7 @@ const Leads = () => {
   const [leads, setLeads] = useState([]);
   const [startIndex, setStartIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState('20');
-  const { userId, TokenId } = getSession();
+  const { userId, TokenId, parentId} = getSession();
   const [selectedLeadData, setSelectedLeadData] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -47,28 +48,56 @@ const Leads = () => {
   // Fetch leads function - you'll need to implement the API call
   const fetchLeads = async (loadMore = false, page = 1) => {
     setIsLoading(true);
-    const start = loadMore ? startIndex : (page - 1) * parseInt(itemsPerPage);
+    const pageNum = page || currentPage || 1;
+    const limit = parseInt(itemsPerPage) || 20;
+    const startNo = loadMore ? startIndex : (pageNum - 1) * limit;
+    const endNo = startNo + limit - 1;
 
-    // Mock data for now - replace with actual API call
-    const mockLeads = [
-      { id: 1, PersonName: 'Rajesh Kumar', CsvMobileNo: '+91 98765 43210', CsvEmailId: 'rajesh.kumar@email.com', CreatedDate: '28 Dec 2024, 10:30 AM', Source: 'Website', IsOpen: true, Type: 'Hot Lead', LeadId: 'LD-2024-0001', Image: 'https://docs.kit19.com/default/person.png',FollowupCount: 0 },
-      { id: 2, PersonName: 'Priya Sharma', CsvMobileNo: '+91 98765 43211', CsvEmailId: 'priya.sharma@email.com', CreatedDate: '27 Dec 2024, 02:15 PM', Source: 'Referral', IsOpen: false, Type: 'Warm Lead', LeadId: 'LD-2024-0002', Image: 'https://docs.kit19.com/default/person.png',FollowupCount: 6 },
-      { id: 3, PersonName: 'Amit Patel', CsvMobileNo: '+91 98765 43212', CsvEmailId: 'amit.patel@email.com', CreatedDate: '26 Dec 2024, 09:45 AM', Source: '-', IsOpen: false, Type: '-', LeadId: 'LD-2024-0003', Image: 'https://docs.kit19.com/default/person.png',FollowupCount: 8  },
-    ];
+    const details = {
+      draw: pageNum,
+      StartNo: startNo,
+      EndNo: endNo,
+      UserId: userId || '',
+      SearchName: '',
+      ParentId: parentId || '',
+      FilterText: searchText || '',
+      OrderStr: '',
+      TextSearch: searchText || '',
+      NotFollowUp: 0
+    };
 
-    setTotalRecord(mockLeads.length);
+    const payload = {
+      Token: TokenId,
+      Message: "",
+      LoggedUserId: userId,
+      MAC_Address: "",
+      IP_Address: "102.16.32.189",
+      Details: details,
+      BroadcastName: ""
+    };
 
-    if (loadMore) {
-      setLeads(prev => [...prev, ...mockLeads]);
-    } else {
-      setLeads(mockLeads);
-      if (mockLeads && mockLeads.length > 0 && !selectedLeadData) {
-        setSelectedLead(mockLeads[0].id);
-        setSelectedLeadData(mockLeads[0]);
+    try {
+      const response = await getLeadDetailList(payload);
+      // The API returns an objResponseStatusEntity where Details is a DataTableResponse
+      const table = response?.Details ?? {};
+      const rows = Array.isArray(table?.data) ? table.data : [];
+      setTotalRecord(table?.recordsFiltered || table?.recordsTotal || rows.length);
+
+      if (loadMore) {
+        setLeads(prev => [...prev, ...rows]);
+      } else {
+        setLeads(rows);
+        if (rows && rows.length > 0 && !selectedLeadData) {
+          const first = rows[0];
+          setSelectedLead(first.LeadId || first.Id || first.id || first.leadId || null);
+          setSelectedLeadData(first);
+        }
       }
+    } catch (error) {
+      console.error('fetchLeads error:', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   useEffect(() => {

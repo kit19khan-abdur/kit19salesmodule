@@ -1,43 +1,220 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Search, Phone, Mail, MessageSquare, Calendar, Plus, Users, FileText, MoreHorizontal, Grid, List, ChevronDown, LayoutGrid } from 'lucide-react';
 import LeadDetail from './LeadDetail';
 import PremiumButton from '../Enquiries/Enquiries/components/PremiumButton';
+import { getLeadList, getLeadActivities, getLeadDetailList } from '../../utils/lead';
+import { getSession } from '../../getSession';
 
 const Lead = () => {
-    const [selectedLead, setSelectedLead] = useState(1);
+    const [selectedLead, setSelectedLead] = useState(null);
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [viewMode, setViewMode] = useState('grid');
     const [activeTab, setActiveTab] = useState('activities');
 
+    const [leads, setLeads] = useState([]);
+    const [activities, setActivities] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [itemsPerPage, setItemsPerPage] = useState('20');
+    const [startIndex, setStartIndex] = useState(0);
+    const [totalRecord, setTotalRecord] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [searchText, setSearchText] = useState('');
 
-    const leads = [
-        { id: 1, name: 'Rajesh Kumar', phone: '+91 98765 43210', status: 'Open', date: '28 Dec 2024', avatar: 'RK' },
-        { id: 2, name: 'Priya Sharma', phone: '+91 98765 43211', status: 'Callback', date: '27 Dec 2024', avatar: 'PS' },
-        { id: 3, name: 'Amit Patel', phone: '+91 98765 43212', status: 'Closed', date: '26 Dec 2024', avatar: 'AP' },
-        { id: 4, name: 'Sneha Reddy', phone: '+91 98765 43213', status: 'Open', date: '25 Dec 2024', avatar: 'SR' },
-        { id: 5, name: 'Vikram Singh', phone: '+91 98765 43214', status: 'Callback', date: '24 Dec 2024', avatar: 'VS' },
-    ];
+    const { userId,parentId, TokenId } = getSession();
 
-    const currentLead = leads.find(l => l.id === selectedLead);
+    const currentLead = leads.find(l => l.id === selectedLead) || leads[0] || null;
 
-    const activities = [
-        { type: 'call', action: 'Outbound call made', user: 'John Doe', time: '2 hours ago', icon: Phone },
-        { type: 'note', action: 'Note added: Follow up required', user: 'Sarah Smith', time: '5 hours ago', icon: FileText },
-        { type: 'email', action: 'Email sent to lead', user: 'John Doe', time: '1 day ago', icon: Mail },
-        { type: 'meeting', action: 'Meeting scheduled', user: 'Mike Johnson', time: '2 days ago', icon: Calendar },
-    ];
+    const fetchLeads = async (loadMore = false, page = 1) => {
+        setIsLoading(true);
+        const pageNum = page || currentPage || 1;
+        const limit = parseInt(itemsPerPage) || 20;
+        const start = loadMore ? startIndex : (pageNum - 1) * limit;
+        const end = start + limit - 1;
+
+        // Build Details object to match GetLeadDetailListNew definition
+        const details = {
+            draw: pageNum,
+            StartNo: start,
+            EndNo: end,
+            UserId: userId || 0,
+            SearchName: '',
+            ParentId: parentId || 0,
+            FilterText: searchText || '',
+            OrderStr: '',
+            TextSearch: searchText || '',
+            NotFollowUp: 0
+        };
+
+        const payload = {
+            Token: TokenId,
+            Message: "",
+            LoggedUserId: userId,
+            MAC_Address: "",
+            IP_Address: "102.16.32.189",
+            Details: details,
+            BroadcastName: ""
+        };
+
+        try {
+            // Use the detail-list API which returns a DataTable-like response
+            const response = await getLeadDetailList(payload);
+            // The helper returns response.data (objResponseStatusEntity), so Details contains the DataTableResponse
+            const table = response?.Details || {};
+            setTotalRecord(table?.recordsFiltered || table?.recordsTotal || 0);
+
+            const rows = table?.data || [];
+            if (loadMore) {
+                setLeads(prev => [...prev, ...rows]);
+            } else {
+                setLeads(rows);
+                if (rows.length > 0) {
+                    const first = rows[0];
+                    // Data keys vary; try common id fields
+                    setSelectedLead(first.LeadId || first.Id || first.id || first.leadId || null);
+                }
+            }
+        } catch (error) {
+            console.error('fetchLeads error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const handleLoadMore = () => {
+    const newStart = startIndex + parseInt(itemsPerPage);
+    setStartIndex(newStart);
+    fetchLeads(true);
+    };
+    const handleSelectLead = async (lead) => {
+        setSelectedLead(lead.LeadId || lead.ID || null);
+        try {
+            // const payload = {
+            //     LeadId: lead.LeadId || lead.ID,
+            //     Start: 0,
+            //     Limit: 10
+            // };
+             const details = {
+            LeadId: lead.LeadId || lead.ID,
+                Start: 0,
+                Limit: 10
+        };
+
+        const payload = {
+            Token: TokenId,
+            Message: "",
+            LoggedUserId: userId,
+            MAC_Address: "",
+            IP_Address: "102.16.32.189",
+            Details: details,
+            BroadcastName: ""
+        };
+            const response = await getLeadActivities(payload);
+            setActivities(response?.d || []);
+        } catch (error) {
+            console.error('getLeadActivities error:', error);
+            setActivities([]);
+        }
+    };
+
+    
+const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchLeads(false, page);
+  };
+
+  useEffect(() => {
+        fetchLeads(false, 1);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+  // Fetch data when itemsPerPage changes
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+      fetchLeads(false, 1);
+    } else {
+      fetchLeads(false, 1);
+    }
+  }, [itemsPerPage]);
+const searchTText = async () => {
+    setLeads([]);
+    setStartIndex(0);
+    const payload = {
+      Token: TokenId,
+      Message: "",
+      LoggedUserId: userId,
+      MAC_Address: "",
+      IP_Address: "102.16.32.189",
+      Details: {
+        UserId: userId,
+        CustomSearchId: 0,
+        PredefinedSearchId: 0,
+                FilterText: searchText,
+        Start: 0,
+        Limit: parseInt(itemsPerPage)
+      },
+      BroadcastName: ""
+    };
+    try {
+      const response = await getLeadList(payload);
+      setLeads(response.Details.data);
+      if (response.Details.data && response.Details.data.length > 0) {
+        setSelectedLead(response.Details.data[0].LeadID);
+      }
+    } catch (error) {
+      console.error('search error:', error);
+    }
+  };
+const searchLeadText = async () => {
+        setLeads([]);
+        setStartIndex(0);
+        const payload = {
+            Token: TokenId,
+            Message: "",
+            LoggedUserId: userId,
+            MAC_Address: "",
+            IP_Address: "102.16.32.189",
+            Details: {
+                UserId: userId,
+                CustomSearchId: 0,
+                PredefinedSearchId: 0,
+                FilterText: searchText,
+                Start: 0,
+                Limit: parseInt(itemsPerPage)
+            },
+            BroadcastName: ""
+        };
+        try {
+            const response = await getLeadList(payload);
+            const data = response.Details?.data || [];
+            setLeads(data);
+            if (data.length > 0) {
+                const first = data[0];
+                setSelectedLead(first.LeadId || first.id || null);
+                // optionally fetch activities for the first result
+                try {
+                    const actResp = await getLeadActivities({ LeadID: first.LeadId || first.id, Start: 0, Limit: 10 });
+                    setActivities(actResp?.d || []);
+                } catch (err) {
+                    console.error('searchLeadText - getLeadActivities error:', err);
+                    setActivities([]);
+                }
+            }
+        } catch (error) {
+            console.error('search error:', error);
+        }
+    };
 
     const getStatusColor = (status) => {
         switch (status) {
             case 'Open': return 'bg-blue-100 text-blue-700';
-            case 'Callback': return 'bg-yellow-100 text-yellow-700';
+            case 'Call-Back': return 'bg-yellow-100 text-yellow-700';
             case 'Closed': return 'bg-gray-100 text-gray-700';
             default: return 'bg-gray-100 text-gray-700';
         }
     };
 
     if (viewMode === 'list') {
-        return <LeadDetail />;
+        return <LeadDetail leads={leads} activities={activities} onSelectLead={handleSelectLead} currentPage={currentPage} onPageChange={handlePageChange} />;
     }
 
     return (
@@ -49,9 +226,19 @@ const Lead = () => {
                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
                         <input
                             type="text"
+                            value={searchText}
+                            onChange={e => setSearchText(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') { setCurrentPage(1); setStartIndex(0); searchLeadText(); } }}
                             placeholder="Search leads..."
-                            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full pl-9 pr-20 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        <button
+                            type="button"
+                            onClick={() => { setCurrentPage(1); setStartIndex(0); searchLeadText(); }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-blue-600 text-white rounded text-sm"
+                        >
+                            Search
+                        </button>
                     </div>
                     <div className="flex justify-between items-center">
                         <h2 className="text-lg font-semibold text-gray-800">Leads</h2>
@@ -77,37 +264,45 @@ const Lead = () => {
                 <div className="flex-1 overflow-y-auto">
                     {leads.map(lead => (
                         <div
-                            key={lead.id}
-                            onClick={() => setSelectedLead(lead.id)}
-                            className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${selectedLead === lead.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
+                            key={lead.Id || lead.id}
+                            onClick={() => handleSelectLead(lead)}
+                            className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${selectedLead === lead.ID ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
                                 }`}
                         >
                             <div className="flex items-start gap-3">
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
-                                    {lead.avatar}
+                                    {/* {lead.avatar} */}
+                                    <img
+                src={lead.Image}
+                alt={lead.PersonName}
+                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                onError={(e) => {
+                  e.target.src = 'https://docs.kit19.com/default/person.png';
+                }}
+              />
                                 </div>
+                                
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-1">
-                                        <h3 className="font-medium text-gray-900 text-sm truncate">{lead.name}</h3>
-                                        <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{lead.date}</span>
+                                            <h3 className="font-medium text-gray-900 text-sm truncate">{lead.PersonName || lead.name}</h3>
+                                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{lead.CreatedOn || lead.date}</span>
                                     </div>
-                                    <p className="text-xs text-gray-600 mb-2">{lead.phone}</p>
-                                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.status)}`}>
-                                        {lead.status}
-                                    </span>
+                                        <p className="text-xs text-gray-600 mb-2">{lead.MobileNo || lead.phone}</p>
+                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.FollowupStatus || lead.status)}`}>
+                                            {lead.Status || lead.status}
+                                        </span>
                                 </div>
                             </div>
                         </div>
                     ))}
-                    <div className="p-4 border-t border-gray-200 flex justify-center">
-                                <PremiumButton
-                                //   onClick={onLoadMore}
-                                //   disabled={isLoading}
-                                  // className="loadmorebutton"
-                                >
-                                 Load More
-                                </PremiumButton>
-                              </div>
+                                        <div className="p-4 border-t border-gray-200 flex justify-center">
+                                                <PremiumButton
+                                                        onClick={handleLoadMore}
+                                                        disabled={isLoading}
+                                                >
+                                                        Load More
+                                                </PremiumButton>
+                                        </div>
                 </div>
             </div>
 
@@ -122,24 +317,24 @@ const Lead = () => {
                                     {currentLead?.avatar}
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-gray-900 mb-2">{currentLead?.name}</h1>
+                                    <h1 className="text-2xl font-bold text-gray-900 mb-2">{currentLead?.PersonName}</h1>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
                                         <div className="flex items-center gap-1.5">
                                             <Phone className="h-4 w-4" />
-                                            <span>{currentLead?.phone}</span>
+                                            <span>{currentLead?.MobileNo}</span>
                                         </div>
                                         <div className="flex items-center gap-1.5">
                                             <Mail className="h-4 w-4" />
-                                            <span>rajesh.kumar@email.com</span>
+                                            <span>{currentLead?.EmailId}</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="text-right">
                                 <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium ${getStatusColor(currentLead?.status)}`}>
-                                    {currentLead?.status}
+                                    {currentLead?.FollowupStatus}
                                 </span>
-                                <p className="text-xs text-gray-500 mt-2">Created: {currentLead?.date}, 10:30 AM</p>
+                                <p className="text-xs text-gray-500 mt-2">Created: {currentLead?.CreatedOn}, 10:30 AM</p>
                             </div>
                         </div>
                     </div>
@@ -155,37 +350,37 @@ const Lead = () => {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div>
                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-                                            <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.phone}</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.MobileNo}</p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
-                                            <p className="mt-1 text-sm font-medium text-gray-900">rajesh.kumar@email.com</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.Email}</p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Lead ID</label>
-                                            <p className="mt-1 text-sm font-medium text-gray-900">LD-2024-{currentLead?.id.toString().padStart(4, '0')}</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">LD-2024-{currentLead && (currentLead.LeadNo || currentLead.id) ? String(currentLead.LeadNo || currentLead.id).padStart(4, '0') : ''}</p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Created Date</label>
-                                            <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.date}</p>
+                                            <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.CreatedOn}</p>
                                         </div>
                                         {showMoreDetails && (
                                             <>
                                                 <div>
                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">City</label>
-                                                    <p className="mt-1 text-sm font-medium text-gray-900">Mumbai</p>
+                                                    <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.City}</p>
                                                 </div>
                                                 <div>
                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">State</label>
-                                                    <p className="mt-1 text-sm font-medium text-gray-900">Maharashtra</p>
+                                                    <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.State}</p>
                                                 </div>
                                                 <div>
                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">Pincode</label>
-                                                    <p className="mt-1 text-sm font-medium text-gray-900">400001</p>
+                                                    <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.PinCode}</p>
                                                 </div>
                                                 <div>
                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">Source</label>
-                                                    <p className="mt-1 text-sm font-medium text-gray-900">Website Form</p>
+                                                    <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.SourceName}</p>
                                                 </div>
                                             </>
                                         )}
@@ -226,13 +421,13 @@ const Lead = () => {
                                         {activities.map((activity, idx) => (
                                             <div key={idx} className="flex gap-4">
                                                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <activity.icon className="h-5 w-5 text-blue-600" />
+                                                <Phone className="h-5 w-5 text-blue-600" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                                                    <p className="text-xs text-gray-500 mt-0.5">
-                                                        by {activity.user} • {activity.time}
-                                                    </p>
+                                                <p className="text-sm font-medium text-gray-900">{activity.Action || activity.action || activity}</p>
+                                                <p className="text-xs text-gray-500 mt-0.5">
+                                                    by {activity.UserName || activity.user || ''} • {activity.CreatedDate || activity.time || ''}
+                                                </p>
                                                 </div>
                                             </div>
                                         ))}

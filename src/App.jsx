@@ -6,6 +6,7 @@ import { ConfigProvider } from 'antd';
 import { antdTheme } from './antd-config';
 import 'antd/dist/reset.css';
 import { getToken } from './getSession';
+import Task from './pages/Task/Task';
 
 // Layout
 import MainLayout from './components/layout/MainLayout';
@@ -68,7 +69,7 @@ const AppRoutes = () => {
         <Route path="/conversions" element={<div className="text-2xl font-bold">Conversions</div>} />
         <Route path="/segments" element={<div className="text-2xl font-bold">Segmentation</div>} />
         <Route path="/call-list" element={<div className="text-2xl font-bold">Call List</div>} />
-        <Route path="/tasks" element={<div className="text-2xl font-bold">Tasks</div>} />
+        <Route path="/tasks" element={<Task />} />
         <Route path="/appointments" element={<div className="text-2xl font-bold">Appointments</div>} />
         <Route path="/physical-appointments" element={<div className="text-2xl font-bold">Physical Appointments</div>} />
         <Route path="/activities" element={<div className="text-2xl font-bold">Lead Activities</div>} />
