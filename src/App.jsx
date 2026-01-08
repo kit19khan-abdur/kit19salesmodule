@@ -6,6 +6,7 @@ import { ConfigProvider } from 'antd';
 import { antdTheme } from './antd-config';
 import 'antd/dist/reset.css';
 import { getToken } from './getSession';
+import Task from './pages/Task/Task';
 
 // Layout
 import MainLayout from './components/layout/MainLayout';
@@ -15,8 +16,7 @@ import {Enquiries, Login} from './pages';
 import Dashboard from './pages/Dashboard';
 import PipelinePage from './pages/PipelinePage';
 import ExampleUsage from './components/PopUpModal/ExampleUsage';
-import Lead from './pages/Lead/Lead';
-import Task from './pages/Task/Task';
+import Leads from './pages/Lead/Leads/Leads';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -64,7 +64,7 @@ const AppRoutes = () => {
       >
         <Route path="/" element={<Dashboard />} />
         <Route path="/enquiries" element={<Enquiries />} />
-        <Route path="/leads" element={<Lead />} />
+        <Route path="/leads" element={<Leads />} />
         <Route path="/exampleusage" element={<ExampleUsage />} />
         <Route path="/conversions" element={<div className="text-2xl font-bold">Conversions</div>} />
         <Route path="/segments" element={<div className="text-2xl font-bold">Segmentation</div>} />

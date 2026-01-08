@@ -33,15 +33,10 @@ export const getLeadActivities = async (payload) => {
     }
 }
 
-export const getCallLogt = async (entityName, entityId, start, length) => {
+export const getCallLogt = async (payload) => {
     try {
         // const response = await wcfInstance.post('UserCRMCampaign/Service/CRMService.asmx/getCallLog', {
-        const response = await wcfInstance.post('UserCRMCampaign/GetCallLog', {
-            EntityName: entityName,
-            EntityID: entityId,
-            Start: start,
-            Limit: length
-        })
+        const response = await serviceInstance.post('UserCRM/GetCallLog', payload)
         return response.data
     } catch (error) {
         console.error('getCallLogt error:', error);
@@ -51,7 +46,7 @@ export const getCallLogt = async (entityName, entityId, start, length) => {
 
 export const getPhysiscalAppointmentWidgetList = async (entityId, entityName) =>{
     try {
-        const response = await wcfInstance.post('UserCRMCampaign/Service/ToDoService.asmx/GetPhysicalAppointmentWidgetList', {
+        const response = await serviceInstance.post('UserCRMCampaign/Service/ToDoService.asmx/GetPhysicalAppointmentWidgetList', {
             EntityId: entityId,
             EntityName: entityName
         })
@@ -70,6 +65,76 @@ export const getVirtulAPList  = async (filterText) =>{
         return response.data
     } catch (error) {
         console.error('getVirtulAPList error:', error);     
+        throw error;
+    }
+}
+
+export const getTaskHistoryListByUserId_new = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetTaskHistoryListByUserId_new', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getTaskHistoryListByUserId_new error:', error);
+        throw error;
+    }
+}
+
+export const getWebformDetailsByLeadId = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetWebformDetailsByLeadId', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getWebformDetailsByLeadId error:', error);
+        throw error;
+    }
+}
+
+export const getPipelineHistoryByLeadID = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/PipelineHistoryByLeadID', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getPipelineHistoryByLeadID error:', error);
+        throw error;
+    }
+}
+
+export const getTawkToChatLogsByLeadId = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetTawkToChatLogsByLeadId', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getTawkToChatLogsByLeadId error:', error);
+        throw error;
+    }
+}
+
+export const getFollowupsByLeadId = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetData', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getFollowupsByLeadId error:', error);
+        throw error;
+    }
+}
+
+export const getNotesByLeadId = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetNotes', payload);
+        return response.data;
+    } catch (error) {
+        console.error('GetNotes error:', error);
+        throw error;
+    }
+}
+
+export const getDocumentsByLeadId = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetDocuments', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getDocumentsByLeadId error:', error);
         throw error;
     }
 }

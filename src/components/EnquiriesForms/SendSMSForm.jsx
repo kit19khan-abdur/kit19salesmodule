@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Wand2 } from 'lucide-react';
+import RichTextEditor from '../common/RichTextEditor';
 
 const SendSMSForm = () => {
   const [activeTab, setActiveTab] = useState('indian');
@@ -141,12 +142,11 @@ const SendSMSForm = () => {
 
           {/* Message Textarea */}
           <div className="relative">
-            <textarea
+            <RichTextEditor
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Message"
-              rows="5"
-              className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              rows={5}
             />
             <button className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded">
               <Wand2 className="w-5 h-5 text-gray-500" />
@@ -207,12 +207,11 @@ const SendSMSForm = () => {
 
           {/* Compose SMS */}
           <div className="relative">
-            <textarea
+            <RichTextEditor
               value={composeSMS}
               onChange={(e) => setComposeSMS(e.target.value)}
               placeholder="Compose SMS"
-              rows="5"
-              className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+              rows={5}
             />
             <button className="absolute right-2 top-2 p-1 hover:bg-gray-100 rounded">
               <Wand2 className="w-5 h-5 text-gray-500" />

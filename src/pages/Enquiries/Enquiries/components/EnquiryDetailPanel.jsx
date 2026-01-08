@@ -60,7 +60,7 @@ const EnquiryDetailPanel = ({ enquiry, onClose, activities = [] }) => {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* <div className="grid grid-cols-2 gap-3">
             <button className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
               <Phone className="w-4 h-4" />
               Call
@@ -77,7 +77,7 @@ const EnquiryDetailPanel = ({ enquiry, onClose, activities = [] }) => {
               <MessageSquare className="w-4 h-4" />
               SMS
             </button>
-          </div>
+          </div> */}
 
           {/* Contact Information */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">

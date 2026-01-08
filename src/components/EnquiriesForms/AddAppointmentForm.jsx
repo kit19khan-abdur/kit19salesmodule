@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import RichTextEditor from '../common/RichTextEditor';
 
 const generateDefaultTitle = () => {
     const now = new Date();
@@ -84,21 +85,21 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
             <div>
                 <label className="text-sm font-medium">Description</label>
-                <textarea
+                <RichTextEditor
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none"
                     placeholder="Start Typing the details about the appointment"
+                    rows={4}
                 />
             </div>
 
             <div>
                 <label className="text-sm font-medium">Remarks</label>
-                <textarea
+                <RichTextEditor
                     value={remarks}
                     onChange={(e) => setRemarks(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-20 resize-none"
                     placeholder="about the task..."
+                    rows={3}
                 />
             </div>
 
@@ -139,11 +140,11 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
             <div>
                 <label className="text-sm font-medium">Complete Address</label>
-                <textarea
+                <RichTextEditor
                     value={completeAddress}
                     onChange={(e) => setCompleteAddress(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-20 resize-none"
                     placeholder="Please enter complete address."
+                    rows={3}
                 />
             </div>
 
@@ -209,7 +210,7 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
                     <div>
                         <label className="text-sm font-medium">Remarks</label>
-                        <textarea value={remarks} onChange={e => setRemarks(e.target.value)} className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-20 resize-none" />
+                        <RichTextEditor value={remarks} onChange={e => setRemarks(e.target.value)} rows={3} />
                     </div>
                 </div>
             )}

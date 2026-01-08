@@ -25,6 +25,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import CreateMeetingForm from '../../../../components/EnquiriesForms/CreateMeetingForm';
 import AddAppointmentForm from '../../../../components/EnquiriesForms/AddAppointmentForm';
 import nodata from '../../../../assets/nodata.gif';
+import WhatsAppForm from '../../../../components/EnquiriesForms/WhatsAppForm';
 
 const EnquiryTable = ({
     enquiries,
@@ -94,6 +95,7 @@ const EnquiryTable = ({
     const callIntervalRef = useRef(null);
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
     const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, enquiryId: null });
+    const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
     const totalPages = Math.ceil(totalRecord / itemsPerPage);
 
     // Start/stop call timer when call widget is shown/hidden
@@ -1076,149 +1078,170 @@ const EnquiryTable = ({
                             )}
                         </tr>
                     </thead>
-                    {processedEnquiries?.length > 0 ? (<tbody className="bg-white divide-y divide-gray-200">
-                        {processedEnquiries.map((enquiry) => (
-                            <tr
-                                key={enquiry.EnquiryId}
-                                className={`transition hover:bg-gray-50 group ${selectedLead === enquiry.EnquiryId ? 'bg-blue-50' : ''}`}
-                            >
-                                <td className="px-3 py-4" onClick={(e) => e.stopPropagation()}>
-                                    <input
-                                        type="checkbox"
-                                        className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                                        checked={selectedEnquiries.includes(enquiry.EnquiryId)}
-                                        onChange={() => handleSelectEnquiry(enquiry.EnquiryId)}
-                                    />
-                                </td>
-                                {visibleColumns.enquiryDetails && (
-                                    <td className="px-4 py-4 relative">
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex flex-col items-center gap-2">
-                                                <div
-                                                    className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer"
-                                                    onClick={(e) => { e.stopPropagation(); onSelectEnquiry(enquiry); }}
-                                                >
-                                                    {getInitials(enquiry.PersonName)}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="font-semibold text-gray-900 text-sm cursor-pointer" onClick={(e) => { e.stopPropagation(); onSelectEnquiry(enquiry); }}>{enquiry.PersonName}</span>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {/* Show all icons horizontally as in screenshot */}
-                                            <Mail
-                                                className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setIsSendIndividualMailModal(true);
-                                                }}
-                                            />
-                                            <GoGitBranch className="w-5 h-5 text-gray-400 cursor-pointer hover:text-green-400"
-                                                onClick={() => setIsAddLeadModal(true)}
-                                            />
-                                            <MessageSquareMore
-                                                className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setIsSendIndividualSMSModal(true);
-                                                }}
-                                            />
-                                            {/* <Copy className="w-5 h-5 text-gray-400 cursor-pointer" /> */}
-                                            <Trash2
-                                                className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#f00]"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setDeleteConfirmModal({ show: true, enquiryId: enquiry.EnquiryId });
-                                                }}
-                                            />
-                                            <span
-                                                id={`row-action-icon-${enquiry.EnquiryId}`}
-                                                ref={el => rowMenuAnchorRefs.current[enquiry.EnquiryId] = el}
-                                                className="cursor-pointer"
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    setRowMenu(rowMenu.show && rowMenu.rowId === enquiry.EnquiryId ? { show: false, rowId: null } : { show: true, rowId: enquiry.EnquiryId });
-                                                }}
-                                            >
-                                                <MoreVertical className="w-5 h-5 text-gray-400 hover:text-gray-700" />
-                                            </span>
-                                        </div>
-                                        {/* Row action menu dropdown */}
-                                        <RowActionMenu
-                                            show={rowMenu.show && rowMenu.rowId === enquiry.EnquiryId}
-                                            anchorRef={{ current: rowMenuAnchorRefs.current[enquiry.EnquiryId] }}
-                                            onClose={() => setRowMenu({ show: false, rowId: null })}
-                                            menuId={`row-action-menu-${enquiry.EnquiryId}`}
-                                            onAction={action => {
-                                                setRowMenu({ show: false, rowId: null });
-                                                if (action === 'sendVoice') {
-                                                    setIsSendVoiceModal(true);
-                                                } else if (action === 'meeting') {
-                                                    setIsCreateMeetingModal(true)
-                                                } else if (action === 'appointment') {
-                                                    setIsAddPhysicalAppointmentModal(true)
-                                                } else {
-                                                    alert(`Action: ${action} for ${enquiry.PersonName} and Id ${enquiry.EnquiryId}`);
-                                                }
-                                            }}
+                    {processedEnquiries?.length > 0 ? (
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {processedEnquiries.map((enquiry) => (
+                                <tr
+                                    key={enquiry.EnquiryId}
+                                    className={`transition hover:bg-gray-50 group ${selectedLead === enquiry.EnquiryId ? 'bg-blue-50' : ''}`}
+                                >
+                                    <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
+                                        <input
+                                            type="checkbox"
+                                            className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                                            checked={selectedEnquiries.includes(enquiry.EnquiryId)}
+                                            onChange={() => handleSelectEnquiry(enquiry.EnquiryId)}
                                         />
                                     </td>
-                                )}
-                                {visibleColumns.mobileNo && (
-                                    <td className='px-4 py-4'>
-                                        <div className="flex cursor-pointer hover:text-green-600 items-center gap-1 text-blue-600 font-medium">
-                                            {/* <Phone className="w-3 h-3" /> */}
-                                            <span onClick={(e) => {
-                                                e.stopPropagation();
-                                                setShowCallWidget(true);
-                                                setCallStatus('Requesting');
-                                                setCallTimer('00:00:00');
-                                            }}
-                                            >{enquiry.CsvMobileNo}</span>
-                                        </div>
-                                    </td>
-                                )}
-                                {visibleColumns.emailId && (
-                                    <td className='px-4 py-4'>
-                                        <div className="flex items-center gap-3 text-xs">
-
-                                            {enquiry.CsvEmailId && (
-                                                <div className="flex items-center gap-1 text-gray-600">
-                                                    <Mail className="w-3 h-3" />
-                                                    <span className="truncate max-w-50">{enquiry.CsvEmailId}</span>
+                                    {visibleColumns.enquiryDetails && (
+                                        <td className="px-4 py-2 relative">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <div
+                                                        className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer"
+                                                        onClick={(e) => { e.stopPropagation(); onSelectEnquiry(enquiry); }}
+                                                    >
+                                                        {getInitials(enquiry.PersonName)}
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </td>
-                                )}
-                                {visibleColumns.creationDetails && (
-                                    <td className="px-4 py-4">
-                                        <div className="text-xs">
-                                            <div className="mb-1">
-                                                <span className="font-semibold text-gray-700">Date</span>
-                                                <span className="ml-2 text-gray-600">{enquiry.CreatedDate}</span>
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <span className="font-semibold text-gray-900 text-sm cursor-pointer" onClick={(e) => { e.stopPropagation(); onSelectEnquiry(enquiry); }}>{enquiry.PersonName}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                )}
-                                {visibleColumns.source && (
-                                    <td className="px-4 py-4 text-sm text-gray-700">{enquiry.Source || '-'}</td>
-                                )}
-                                {visibleColumns.status && (
-                                    <td className="px-4 py-4">
-                                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${enquiry.IsOpen ? 'bg-green-100 text-green-700' : 'bg-gray-600 text-white'
-                                            }`}>
-                                            {enquiry.IsOpen ? 'Open' : 'Lead'}
-                                        </span>
-                                    </td>
-                                )}
-                                {visibleColumns.type && (
-                                    <td className="px-4 py-4 text-sm text-gray-700">{enquiry.Type || '-'}</td>
-                                )}
-                            </tr>
-                        ))}
-                    </tbody>) : (
+                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {/* Show all icons horizontally as in screenshot */}
+                                                <span title="Send Email">
+                                                    <Mail
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsSendIndividualMailModal(true);
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span title="Add to Lead">
+                                                    <GoGitBranch 
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#840ab9]"
+                                                        onClick={() => setIsAddLeadModal(true)}
+                                                    />
+                                                </span>
+                                                <span title="Send WhatsApp">
+                                                    <FaWhatsapp
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#25D366]"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsWhatsAppModalOpen(true);
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span title="Send SMS">
+                                                    <MessageSquareMore
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsSendIndividualSMSModal(true);
+                                                        }}
+                                                    />
+                                                </span>
+                                                {/* <Copy className="w-5 h-5 text-gray-400 cursor-pointer" /> */}
+                                                <span title="Delete">
+                                                    <Trash2
+                                                        className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#f00]"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setDeleteConfirmModal({ show: true, enquiryId: enquiry.EnquiryId });
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span
+                                                    id={`row-action-icon-${enquiry.EnquiryId}`}
+                                                    ref={el => rowMenuAnchorRefs.current[enquiry.EnquiryId] = el}
+                                                    className="cursor-pointer"
+                                                    title="More Actions"
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        setRowMenu(rowMenu.show && rowMenu.rowId === enquiry.EnquiryId ? { show: false, rowId: null } : { show: true, rowId: enquiry.EnquiryId });
+                                                    }}
+                                                >
+                                                    <MoreVertical className="w-5 h-5 text-gray-400 hover:text-gray-700" />
+                                                </span>
+                                            </div>
+                                            {/* Row action menu dropdown */}
+                                            <RowActionMenu
+                                                show={rowMenu.show && rowMenu.rowId === enquiry.EnquiryId}
+                                                anchorRef={{ current: rowMenuAnchorRefs.current[enquiry.EnquiryId] }}
+                                                onClose={() => setRowMenu({ show: false, rowId: null })}
+                                                menuId={`row-action-menu-${enquiry.EnquiryId}`}
+                                                onAction={action => {
+                                                    setRowMenu({ show: false, rowId: null });
+                                                    if (action === 'sendVoice') {
+                                                        setIsSendVoiceModal(true);
+                                                    } else if (action === 'meeting') {
+                                                        setIsCreateMeetingModal(true)
+                                                    } else if (action === 'appointment') {
+                                                        setIsAddPhysicalAppointmentModal(true)
+                                                    } else {
+                                                        alert(`Action: ${action} for ${enquiry.PersonName} and Id ${enquiry.EnquiryId}`);
+                                                    }
+                                                }}
+                                            />
+                                        </td>
+                                    )}
+                                    {visibleColumns.mobileNo && (
+                                        <td className='px-4'>
+                                            <div className="flex cursor-pointer hover:text-green-600 items-center gap-1 text-blue-600 font-medium">
+                                                {/* <Phone className="w-3 h-3" /> */}
+                                                <span onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowCallWidget(true);
+                                                    setCallStatus('Requesting');
+                                                    setCallTimer('00:00:00');
+                                                }}
+                                                >{enquiry.CsvMobileNo}</span>
+                                            </div>
+                                        </td>
+                                    )}
+                                    {visibleColumns.emailId && (
+                                        <td className='px-4'>
+                                            <div className="flex items-center gap-3 text-xs">
+
+                                                {enquiry.CsvEmailId && (
+                                                    <div className="flex items-center gap-1 text-gray-600">
+                                                        <Mail className="w-3 h-3" />
+                                                        <span className="truncate max-w-50">{enquiry.CsvEmailId}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </td>
+                                    )}
+                                    {visibleColumns.creationDetails && (
+                                        <td className="px-4">
+                                            <div className="text-xs">
+                                                <div className="mb-1">
+                                                    <span className="font-semibold text-gray-700">Date</span>
+                                                    <span className="ml-2 text-gray-600">{enquiry.CreatedDate}</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    )}
+                                    {visibleColumns.source && (
+                                        <td className="px-4 text-sm text-gray-700">{enquiry.Source || '-'}</td>
+                                    )}
+                                    {visibleColumns.status && (
+                                        <td className="px-4">
+                                            <span className={`inline-block px-2 rounded-full text-xs font-medium ${enquiry.IsOpen ? 'bg-green-100 text-green-700' : 'bg-gray-600 text-white'
+                                                }`}>
+                                                {enquiry.IsOpen ? 'Open' : 'Lead'}
+                                            </span>
+                                        </td>
+                                    )}
+                                    {visibleColumns.type && (
+                                        <td className="px-4 text-sm text-gray-700">{enquiry.Type || '-'}</td>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    ) : (
                         <div className="flex items-center justify-center h-[30vh] w-full bg-[#ffffff]">
                             <img src={nodata} alt="nodata" />
                         </div>
@@ -1679,6 +1702,31 @@ const EnquiryTable = ({
                 <AddAppointmentForm />
             </PopUpModal>
 
+            <PopUpModal
+                isOpen={isWhatsAppModalOpen}
+                onClose={() => setIsWhatsAppModalOpen(false)}
+                title="Send WhatsApp Message"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsWhatsAppModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='outline'
+                            onClick={() => { }}
+                        >
+                            Send
+                        </Button>
+                    </div>
+                }
+            >
+                <WhatsAppForm />
+            </PopUpModal>
+
             {/* Call Widget Sticky Popup */}
             {showCallWidget && (
                 <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999]">
@@ -1691,7 +1739,7 @@ const EnquiryTable = ({
                             </button>
                             <button
                                 onClick={() => setShowCallWidget(false)}
-                                className="p-1 hover:bg-blue-600 rounded"
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
                             >
                                 ✕
                             </button>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import RichTextEditor from '../../../components/common/RichTextEditor';
 import { Grid3x3 } from 'lucide-react';
 
 const InternalSMSForm = ({ onClose, onSubmit }) => {
@@ -67,14 +68,12 @@ const InternalSMSForm = ({ onClose, onSubmit }) => {
         <label className="block text-sm font-medium text-gray-800 mb-2">
           Compose SMS
         </label>
-        <textarea
+        <RichTextEditor
           name="message"
           value={formData.message}
           onChange={handleInputChange}
           placeholder="Message"
           rows={6}
-          maxLength={2000}
-          className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
         />
         <div className="flex justify-end mt-1">
           <span className="text-xs text-gray-500">

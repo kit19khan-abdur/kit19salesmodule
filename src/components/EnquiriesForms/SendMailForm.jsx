@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import RichTextEditor from '../common/RichTextEditor';
 import { FileText } from 'lucide-react';
 
 const SendMailForm = () => {
@@ -147,12 +148,11 @@ const SendMailForm = () => {
         </div>
       ) : (
         <div className="mb-6">
-          <textarea
+          <RichTextEditor
             value={mailBody}
             onChange={(e) => setMailBody(e.target.value)}
             placeholder="Compose your email here..."
-            rows="8"
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+            rows={8}
           />
         </div>
       )}

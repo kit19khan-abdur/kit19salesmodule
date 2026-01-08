@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, Clock, User, MapPin, TrendingUp, ChevronRight, ChevronLeft, MoreVertical, FileText, Mic2, Mic } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, Clock, User, MapPin, TrendingUp, ChevronRight, ChevronLeft, MoreVertical, FileText, Mic2, Mic, ChevronLeftCircle } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
 import { FaWhatsapp } from "react-icons/fa";
 import nodata from '../../../assets/nodata.gif';
@@ -14,6 +14,7 @@ import CreateMeetingForm from '../../../components/EnquiriesForms/CreateMeetingF
 import { FaUsersGear } from "react-icons/fa6";
 import AddAppointmentForm from '../../../components/EnquiriesForms/AddAppointmentForm';
 import SendVoiceForm from '../../../components/EnquiriesForms/SendVoiceForm';
+import MergeLead from '../../../components/LeadForm/MergeLead';
 
 const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -37,6 +38,15 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     const [isCreateMeetingModal, setIsCreateMeetingModal] = useState(false);
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
+    const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
+    const [draggedTab, setDraggedTab] = useState(null);
+    
+    // Initialize tabs order from localStorage or use default
+    const defaultTabs = ['activities', 'calls', 'Whatsapp Chat Log', 'meetings', 'Physical Appointments', 'chat', 'webform'];
+    const [tabsOrder, setTabsOrder] = useState(() => {
+        const savedOrder = localStorage.getItem('enquiryTabsOrder');
+        return savedOrder ? JSON.parse(savedOrder) : defaultTabs;
+    });
 
     // Start/stop call timer when call widget is shown/hidden
     useEffect(() => {
@@ -70,6 +80,43 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
             }
         };
     }, [showCallWidget]);
+
+    // Save tabs order to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('enquiryTabsOrder', JSON.stringify(tabsOrder));
+    }, [tabsOrder]);
+
+    // Drag and drop handlers
+    const handleDragStart = (e, tab) => {
+        setDraggedTab(tab);
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDrop = (e, targetTab) => {
+        e.preventDefault();
+        
+        if (!draggedTab || draggedTab === targetTab) return;
+
+        const newOrder = [...tabsOrder];
+        const draggedIndex = newOrder.indexOf(draggedTab);
+        const targetIndex = newOrder.indexOf(targetTab);
+
+        // Remove dragged item and insert at target position
+        newOrder.splice(draggedIndex, 1);
+        newOrder.splice(targetIndex, 0, draggedTab);
+
+        setTabsOrder(newOrder);
+        setDraggedTab(null);
+    };
+
+    const handleDragEnd = () => {
+        setDraggedTab(null);
+    };
 
     const resolveUrl = (url) => {
         if (!url) return 'https://kit19.com/assets/custom/img/LeadActivityIMG/Whatsapp.png';
@@ -290,14 +337,22 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                         <div className="bg-white rounded-lg shadow-sm">
                             <div className="border-b border-gray-200">
                                 <div className={`flex px-6 items-center transition-all duration-300 ${isRightCollapsed ? 'justify-between w-full' : 'gap-6'}`}>
-                                    {['activities', 'calls', 'Whatsapp Chat Log', 'meetings', ...(isRightCollapsed || showAllTabs ? ['Physical Appointments', 'chat', 'webform'] : [])].map(tab => (
+                                    {(isRightCollapsed || showAllTabs ? tabsOrder : tabsOrder.slice(0, 4)).map(tab => (
                                         <button
                                             key={tab}
+                                            draggable
+                                            onDragStart={(e) => handleDragStart(e, tab)}
+                                            onDragOver={handleDragOver}
+                                            onDrop={(e) => handleDrop(e, tab)}
+                                            onDragEnd={handleDragEnd}
                                             onClick={() => setActiveTab(tab)}
-                                            className={`py-4 text-sm font-medium capitalize border-b-2 transition ${activeTab === tab
-                                                ? 'border-blue-600 text-blue-600'
-                                                : 'border-transparent text-gray-500 hover:text-gray-700'
-                                                } ${isRightCollapsed ? 'flex-1' : ''}`}
+                                            className={`py-4 text-sm font-medium capitalize border-b-2 transition cursor-move ${
+                                                activeTab === tab
+                                                    ? 'border-blue-600 text-blue-600'
+                                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                                            } ${isRightCollapsed ? 'flex-1' : ''} ${
+                                                draggedTab === tab ? 'opacity-50' : ''
+                                            }`}
                                         >
                                             {tab}
                                         </button>
@@ -356,15 +411,23 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                                                     <p>Duration: {duration}s</p>
                                                                     {call.OutCome && <p>Outcome: {call.OutCome}</p>}
                                                                     {call.recordurl && (
-                                                                        <a
-                                                                            href={call.recordurl}
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="text-blue-600 hover:underline flex items-center gap-1"
-                                                                        >
-                                                                            <Phone className="w-3 h-3" />
-                                                                            Listen to recording
-                                                                        </a>
+                                                                        <div className="flex items-center gap-3">
+                                                                            <audio
+                                                                                controls
+                                                                                className="h-8"
+                                                                                src={resolveUrl(call.recordurl)}
+                                                                            >
+                                                                                Your browser does not support the audio element.
+                                                                            </audio>
+                                                                            <a
+                                                                                href={resolveUrl(call.recordurl)}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="text-blue-600 hover:underline text-sm"
+                                                                            >
+                                                                                Open in new tab
+                                                                            </a>
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -468,7 +531,14 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                             </div>
                             <div className="space-y-2">
                                 <button
-                                    onClick={() => setIsAddLeadModal(true)}
+                                    onClick={() => {
+                                        // Only open if status is "Lead" (IsOpen is false)
+                                        if (!enquiry.IsOpen) {
+                                            setIsMergeLeadOpen(true);
+                                        } else {
+                                            setIsAddLeadModal(true);
+                                        }
+                                    }}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
                                     <GoGitBranch className="w-4 h-4" />
                                     Add Or Merge Leads
@@ -499,16 +569,16 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                     {isRightCollapsed && (
                         <button
                             onClick={() => setIsRightCollapsed(false)}
-                            className="fixed bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition z-10"
+                            className="fixed  text-gray-600 rounded-full shadow-lg  transition z-10"
                             style={{
-                                right: '56px',
-                                top: '8%',
+                                right: '11px',
+                                top: '30%',
                                 transform: 'translateY(-50%)',
                                 padding: '8px'
                             }}
                             title="Expand Quick Actions"
                         >
-                            <Plus className="w-5 h-5" />
+                            <ChevronLeftCircle className="w-5 h-5" />
                         </button>
                     )}
                 </div>
@@ -629,7 +699,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                             </button>
                             <button
                                 onClick={() => setShowCallWidget(false)}
-                                className="p-1 hover:bg-blue-600 rounded"
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
                             >
                                 ✕
                             </button>
@@ -786,6 +856,12 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                 <SendVoiceForm />
             </PopUpModal>
 
+            {/* Merge Lead Drawer */}
+            <MergeLead
+                isOpen={isMergeLeadOpen}
+                onClose={() => setIsMergeLeadOpen(false)}
+                enquiryData={enquiry}
+            />
 
         </div>
     );

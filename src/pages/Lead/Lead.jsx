@@ -325,7 +325,7 @@ const searchLeadText = async () => {
                                         </div>
                                         <div className="flex items-center gap-1.5">
                                             <Mail className="h-4 w-4" />
-                                            <span>{currentLead?.email}</span>
+                                            <span>{currentLead?.EmailId}</span>
                                         </div>
                                     </div>
                                 </div>
