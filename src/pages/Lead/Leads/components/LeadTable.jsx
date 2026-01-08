@@ -135,6 +135,49 @@ const LeadTable = ({
                 </div>
             </div>
 
+            {/* Mass Operation Buttons */}
+            {selectedLeads.length > 0 && (
+                <div className="px-6 py-3 border-b border-gray-200 bg-blue-50 flex items-center gap-3 flex-wrap">
+                    <span className="text-sm font-medium text-gray-700">{selectedLeads.length} selected</span>
+                    <button
+                        onClick={() => console.log('Add Followup for', selectedLeads)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                    >
+                        Add Followup
+                    </button>
+                    <button
+                        onClick={() => console.log('Send SMS to', selectedLeads)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                    >
+                        Send SMS
+                    </button>
+                    <button
+                        onClick={() => console.log('Send Mail to', selectedLeads)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                    >
+                        Send Mail
+                    </button>
+                    <button
+                        onClick={() => console.log('Update', selectedLeads)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                    >
+                        Update
+                    </button>
+                    <button
+                        onClick={() => console.log('Add Tag to', selectedLeads)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                    >
+                        Add Tag
+                    </button>
+                    <button
+                        onClick={() => console.log('Remove Tag from', selectedLeads)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                    >
+                        Remove Tag
+                    </button>
+                </div>
+            )}
+
             {/* Showing Records */}
             <div className="px-6 py-2 border-b border-gray-200 flex items-center justify-start bg-gray-50">
                 <div className="text-sm text-gray-600">

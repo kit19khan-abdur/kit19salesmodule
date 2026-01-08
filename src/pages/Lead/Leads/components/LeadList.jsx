@@ -19,6 +19,7 @@ const LeadList = ({
   viewMode,
   setViewMode
 }) => {
+  const [selectedLeads, setSelectedLeads] = useState([]);
   const getInitials = (name) => {
     if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -48,12 +49,40 @@ const LeadList = ({
     return 'bg-blue-500';
   };
 
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedLeads(leads.map(lead => lead.id));
+    } else {
+      setSelectedLeads([]);
+    }
+  };
+
+  const handleSelectLead = (leadId) => {
+    setSelectedLeads(prev => {
+      if (prev.includes(leadId)) {
+        return prev.filter(id => id !== leadId);
+      } else {
+        return [...prev, leadId];
+      }
+    });
+  };
+
   return (
     <div className="bg-white border-r border-gray-200 flex flex-col h-full">
       <div className="p-4 border-b border-gray-200">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-lg font-semibold text-gray-800">Leads</h2>
           <div className="flex items-center gap-2">
+            {/* Select All Checkbox */}
+            {viewMode === 'card' && (
+              <input
+                type="checkbox"
+                checked={selectedLeads.length === leads.length && leads.length > 0}
+                onChange={handleSelectAll}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                title="Select All"
+              />
+            )}
             {/* Compact View Toggle */}
             <div className="ml-2">
               <div className="inline-flex gap-1 items-center bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
@@ -75,6 +104,49 @@ const LeadList = ({
             </div>
           </div>
         </div>
+
+        {/* Mass Operation Buttons */}
+        {selectedLeads.length > 0 && (
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <span className="text-sm text-gray-600">{selectedLeads.length} selected</span>
+            <button
+              onClick={() => console.log('Add Followup for', selectedLeads)}
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+            >
+              Add Followup
+            </button>
+            <button
+              onClick={() => console.log('Send SMS to', selectedLeads)}
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+            >
+              Send SMS
+            </button>
+            <button
+              onClick={() => console.log('Send Mail to', selectedLeads)}
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+            >
+              Send Mail
+            </button>
+            <button
+              onClick={() => console.log('Update', selectedLeads)}
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+            >
+              Update
+            </button>
+            <button
+              onClick={() => console.log('Add Tag to', selectedLeads)}
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+            >
+              Add Tag
+            </button>
+            <button
+              onClick={() => console.log('Remove Tag from', selectedLeads)}
+              className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+            >
+              Remove Tag
+            </button>
+          </div>
+        )}
 
         {/* Search */}
         <div className="relative">
@@ -107,14 +179,23 @@ const LeadList = ({
           leads.map((lead) => (
             <div
               key={lead.id}
-              onClick={() => onSelectLead(lead)}
-              className={`p-4 border-b border-gray-100 cursor-pointer transition ${
-                selectedLead === lead.id
+              className={`p-4 border-b border-gray-100 cursor-pointer transition ${selectedLead === lead.id
                   ? 'bg-blue-50 border-l-4 border-l-blue-600'
                   : 'hover:bg-gray-50'
-              }`}
+                }`}
             >
               <div className="flex items-start gap-3">
+                {/* Checkbox for selection */}
+                <input
+                  type="checkbox"
+                  checked={selectedLeads.includes(lead.id)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    handleSelectLead(lead.id);
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="mt-3 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
                 <div className="relative">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                     {getInitials(lead.PersonName)}
@@ -127,34 +208,34 @@ const LeadList = ({
                   </FollowupTooltip>
 
                   {/* Call icon overlay next to avatar - stops propagation so it doesn't select the lead */}
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setScheduleLead(lead);
-                          setShowScheduleModal(true);
+                  <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setScheduleLead(lead);
+                        setShowScheduleModal(true);
+                      }}
+                      className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-blue-600 shadow-sm"
+                      title="Call"
+                    >
+                      <BsTelephonePlus size={14} />
+                    </button>
+                  </>
+
+                  {showScheduleModal && (
+                    <PopUpModal isOpen={showScheduleModal} onClose={() => setShowScheduleModal(false)} title="Schedule Call">
+                      <ScheduleCallForm
+                        lead={scheduleLead}
+                        onCancel={() => setShowScheduleModal(false)}
+                        onSave={(data) => {
+                          console.debug('scheduled call', data, 'for', scheduleLead);
+                          setShowScheduleModal(false);
                         }}
-                        className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-blue-600 shadow-sm"
-                        title="Call"
-                      >
-                        <BsTelephonePlus size={14} />
-                      </button>
-                    </>
-                  
-                    {showScheduleModal && (
-                      <PopUpModal isOpen={showScheduleModal} onClose={() => setShowScheduleModal(false)} title="Schedule Call">
-                        <ScheduleCallForm
-                          lead={scheduleLead}
-                          onCancel={() => setShowScheduleModal(false)}
-                          onSave={(data) => {
-                            console.debug('scheduled call', data, 'for', scheduleLead);
-                            setShowScheduleModal(false);
-                          }}
-                        />
-                      </PopUpModal>
-                    )}
+                      />
+                    </PopUpModal>
+                  )}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0" onClick={() => onSelectLead(lead)}>
                   <div className="flex justify-between items-start mb-1">
                     <h3 className="font-semibold text-gray-900 text-sm truncate">
                       {lead.PersonName}
