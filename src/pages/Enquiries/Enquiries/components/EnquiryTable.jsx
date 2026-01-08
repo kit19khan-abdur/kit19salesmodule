@@ -26,6 +26,7 @@ import CreateMeetingForm from '../../../../components/EnquiriesForms/CreateMeeti
 import AddAppointmentForm from '../../../../components/EnquiriesForms/AddAppointmentForm';
 import nodata from '../../../../assets/nodata.gif';
 import WhatsAppForm from '../../../../components/EnquiriesForms/WhatsAppForm';
+import MergeLead from '../../../../components/LeadForm/MergeLead';
 
 const EnquiryTable = ({
     enquiries,
@@ -96,6 +97,7 @@ const EnquiryTable = ({
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
     const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, enquiryId: null });
     const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+    const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
     const totalPages = Math.ceil(totalRecord / itemsPerPage);
 
     // Start/stop call timer when call widget is shown/hidden
@@ -1120,9 +1122,15 @@ const EnquiryTable = ({
                                                     />
                                                 </span>
                                                 <span title="Add to Lead">
-                                                    <GoGitBranch 
+                                                    <GoGitBranch
                                                         className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#840ab9]"
-                                                        onClick={() => setIsAddLeadModal(true)}
+                                                        onClick={() => {
+                                                            if (!enquiry.IsOpen) {
+                                                                setIsMergeLeadOpen(true);
+                                                            } else {
+                                                                setIsAddLeadModal(true)
+                                                            }
+                                                        }}
                                                     />
                                                 </span>
                                                 <span title="Send WhatsApp">
@@ -1726,6 +1734,12 @@ const EnquiryTable = ({
             >
                 <WhatsAppForm />
             </PopUpModal>
+
+            <MergeLead
+                isOpen={isMergeLeadOpen}
+                onClose={() => setIsMergeLeadOpen(false)}
+                enquiryData={enquiries}
+            />
 
             {/* Call Widget Sticky Popup */}
             {showCallWidget && (

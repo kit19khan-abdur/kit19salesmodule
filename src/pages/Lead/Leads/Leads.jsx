@@ -51,9 +51,9 @@ const Leads = () => {
 
     // Mock data for now - replace with actual API call
     const mockLeads = [
-      { id: 1, PersonName: 'Rajesh Kumar', CsvMobileNo: '+91 98765 43210', CsvEmailId: 'rajesh.kumar@email.com', CreatedDate: '28 Dec 2024, 10:30 AM', Source: 'Website', IsOpen: true, Type: 'Hot Lead', LeadId: 'LD-2024-0001', Image: 'https://docs.kit19.com/default/person.png' },
-      { id: 2, PersonName: 'Priya Sharma', CsvMobileNo: '+91 98765 43211', CsvEmailId: 'priya.sharma@email.com', CreatedDate: '27 Dec 2024, 02:15 PM', Source: 'Referral', IsOpen: false, Type: 'Warm Lead', LeadId: 'LD-2024-0002', Image: 'https://docs.kit19.com/default/person.png' },
-      { id: 3, PersonName: 'Amit Patel', CsvMobileNo: '+91 98765 43212', CsvEmailId: 'amit.patel@email.com', CreatedDate: '26 Dec 2024, 09:45 AM', Source: '-', IsOpen: false, Type: '-', LeadId: 'LD-2024-0003', Image: 'https://docs.kit19.com/default/person.png' },
+      { id: 1, PersonName: 'Rajesh Kumar', CsvMobileNo: '+91 98765 43210', CsvEmailId: 'rajesh.kumar@email.com', CreatedDate: '28 Dec 2024, 10:30 AM', Source: 'Website', IsOpen: true, Type: 'Hot Lead', LeadId: 'LD-2024-0001', Image: 'https://docs.kit19.com/default/person.png',FollowupCount: 0 },
+      { id: 2, PersonName: 'Priya Sharma', CsvMobileNo: '+91 98765 43211', CsvEmailId: 'priya.sharma@email.com', CreatedDate: '27 Dec 2024, 02:15 PM', Source: 'Referral', IsOpen: false, Type: 'Warm Lead', LeadId: 'LD-2024-0002', Image: 'https://docs.kit19.com/default/person.png',FollowupCount: 6 },
+      { id: 3, PersonName: 'Amit Patel', CsvMobileNo: '+91 98765 43212', CsvEmailId: 'amit.patel@email.com', CreatedDate: '26 Dec 2024, 09:45 AM', Source: '-', IsOpen: false, Type: '-', LeadId: 'LD-2024-0003', Image: 'https://docs.kit19.com/default/person.png',FollowupCount: 8  },
     ];
 
     setTotalRecord(mockLeads.length);
