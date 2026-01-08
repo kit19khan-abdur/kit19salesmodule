@@ -11,7 +11,6 @@ const Lead = () => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [viewMode, setViewMode] = useState('grid');
     const [activeTab, setActiveTab] = useState('activities');
-
     const [leads, setLeads] = useState([]);
     const [activities, setActivities] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,10 +19,72 @@ const Lead = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchText, setSearchText] = useState('');
-
-    const { userId,parentId, TokenId } = getSession();
+    const { userId, parentId, TokenId } = getSession();
 
     const currentLead = leads.find(l => l.id === selectedLead) || leads[0] || null;
+
+    const sampleLeads = [
+        {
+            id: 101,
+            Id: 101,
+            LeadId: 101,
+            LeadID: 101,
+            PersonName: 'Alice Johnson',
+            Image: 'https://i.pravatar.cc/150?img=1',
+            MobileNo: '9876543210',
+            CsvMobileNo: '9876543210',
+            CsvEmailId: 'alice@example.com',
+            EmailId: 'alice@example.com',
+            CreatedDate: '2025-12-01, 09:00 AM',
+            CreatedOn: '2025-12-01',
+            Status: 'Open',
+            FollowupStatus: 'Open',
+            FollowupCount: 2,
+            IsOpen: true,
+            Source: 'Website',
+            Type: 'Lead'
+        },
+        {
+            id: 102,
+            Id: 102,
+            LeadId: 102,
+            LeadID: 102,
+            PersonName: 'Bob Kumar',
+            Image: 'https://i.pravatar.cc/150?img=5',
+            MobileNo: '9123456780',
+            CsvMobileNo: '9123456780',
+            CsvEmailId: 'bob@example.com',
+            EmailId: 'bob@example.com',
+            CreatedDate: '2025-12-02, 11:15 AM',
+            CreatedOn: '2025-12-02',
+            Status: 'Call-Back',
+            FollowupStatus: 'Call-Back',
+            FollowupCount: 1,
+            IsOpen: true,
+            Source: 'Campaign',
+            Type: 'Lead'
+        },
+        {
+            id: 103,
+            Id: 103,
+            LeadId: 103,
+            LeadID: 103,
+            PersonName: 'Carol Singh',
+            Image: 'https://i.pravatar.cc/150?img=12',
+            MobileNo: '9012345678',
+            CsvMobileNo: '9012345678',
+            CsvEmailId: 'carol@example.com',
+            EmailId: 'carol@example.com',
+            CreatedDate: '2025-12-03, 02:20 PM',
+            CreatedOn: '2025-12-03',
+            Status: 'Closed',
+            FollowupStatus: 'Closed',
+            FollowupCount: 0,
+            IsOpen: false,
+            Source: 'Referral',
+            Type: 'Lead'
+        }
+    ]
 
     const fetchLeads = async (loadMore = false, page = 1) => {
         setIsLoading(true);
@@ -76,14 +137,16 @@ const Lead = () => {
             }
         } catch (error) {
             console.error('fetchLeads error:', error);
+            // setLeads(sampleLeads);
+            // setSelectedLead(sampleLeads[0].id);
         } finally {
             setIsLoading(false);
         }
     };
     const handleLoadMore = () => {
-    const newStart = startIndex + parseInt(itemsPerPage);
-    setStartIndex(newStart);
-    fetchLeads(true);
+        const newStart = startIndex + parseInt(itemsPerPage);
+        setStartIndex(newStart);
+        fetchLeads(true);
     };
     const handleSelectLead = async (lead) => {
         setSelectedLead(lead.LeadId || lead.ID || null);
@@ -93,21 +156,21 @@ const Lead = () => {
             //     Start: 0,
             //     Limit: 10
             // };
-             const details = {
-            LeadId: lead.LeadId || lead.ID,
+            const details = {
+                LeadId: lead.LeadId || lead.ID,
                 Start: 0,
                 Limit: 10
-        };
+            };
 
-        const payload = {
-            Token: TokenId,
-            Message: "",
-            LoggedUserId: userId,
-            MAC_Address: "",
-            IP_Address: "102.16.32.189",
-            Details: details,
-            BroadcastName: ""
-        };
+            const payload = {
+                Token: TokenId,
+                Message: "",
+                LoggedUserId: userId,
+                MAC_Address: "",
+                IP_Address: "102.16.32.189",
+                Details: details,
+                BroadcastName: ""
+            };
             const response = await getLeadActivities(payload);
             setActivities(response?.d || []);
         } catch (error) {
@@ -116,55 +179,55 @@ const Lead = () => {
         }
     };
 
-    
-const handlePageChange = (page) => {
-    setCurrentPage(page);
-    fetchLeads(false, page);
-  };
 
-  useEffect(() => {
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchLeads(false, page);
+    };
+
+    useEffect(() => {
         fetchLeads(false, 1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-  // Fetch data when itemsPerPage changes
-  useEffect(() => {
-    if (currentPage !== 1) {
-      setCurrentPage(1);
-      fetchLeads(false, 1);
-    } else {
-      fetchLeads(false, 1);
-    }
-  }, [itemsPerPage]);
-const searchTText = async () => {
-    setLeads([]);
-    setStartIndex(0);
-    const payload = {
-      Token: TokenId,
-      Message: "",
-      LoggedUserId: userId,
-      MAC_Address: "",
-      IP_Address: "102.16.32.189",
-      Details: {
-        UserId: userId,
-        CustomSearchId: 0,
-        PredefinedSearchId: 0,
+    // Fetch data when itemsPerPage changes
+    useEffect(() => {
+        if (currentPage !== 1) {
+            setCurrentPage(1);
+            fetchLeads(false, 1);
+        } else {
+            fetchLeads(false, 1);
+        }
+    }, [itemsPerPage]);
+    const searchTText = async () => {
+        setLeads([]);
+        setStartIndex(0);
+        const payload = {
+            Token: TokenId,
+            Message: "",
+            LoggedUserId: userId,
+            MAC_Address: "",
+            IP_Address: "102.16.32.189",
+            Details: {
+                UserId: userId,
+                CustomSearchId: 0,
+                PredefinedSearchId: 0,
                 FilterText: searchText,
-        Start: 0,
-        Limit: parseInt(itemsPerPage)
-      },
-      BroadcastName: ""
+                Start: 0,
+                Limit: parseInt(itemsPerPage)
+            },
+            BroadcastName: ""
+        };
+        try {
+            const response = await getLeadList(payload);
+            setLeads(response.Details.data);
+            if (response.Details.data && response.Details.data.length > 0) {
+                setSelectedLead(response.Details.data[0].LeadID);
+            }
+        } catch (error) {
+            console.error('search error:', error);
+        }
     };
-    try {
-      const response = await getLeadList(payload);
-      setLeads(response.Details.data);
-      if (response.Details.data && response.Details.data.length > 0) {
-        setSelectedLead(response.Details.data[0].LeadID);
-      }
-    } catch (error) {
-      console.error('search error:', error);
-    }
-  };
-const searchLeadText = async () => {
+    const searchLeadText = async () => {
         setLeads([]);
         setStartIndex(0);
         const payload = {
@@ -273,36 +336,36 @@ const searchLeadText = async () => {
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
                                     {/* {lead.avatar} */}
                                     <img
-                src={lead.Image}
-                alt={lead.PersonName}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                onError={(e) => {
-                  e.target.src = 'https://docs.kit19.com/default/person.png';
-                }}
-              />
+                                        src={lead.Image}
+                                        alt={lead.PersonName}
+                                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                                        onError={(e) => {
+                                            e.target.src = 'https://docs.kit19.com/default/person.png';
+                                        }}
+                                    />
                                 </div>
-                                
+
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-1">
-                                            <h3 className="font-medium text-gray-900 text-sm truncate">{lead.PersonName || lead.name}</h3>
-                                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{lead.CreatedOn || lead.date}</span>
+                                        <h3 className="font-medium text-gray-900 text-sm truncate">{lead.PersonName || lead.name}</h3>
+                                        <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{lead.CreatedOn || lead.date}</span>
                                     </div>
-                                        <p className="text-xs text-gray-600 mb-2">{lead.MobileNo || lead.phone}</p>
-                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.FollowupStatus || lead.status)}`}>
-                                            {lead.Status || lead.status}
-                                        </span>
+                                    <p className="text-xs text-gray-600 mb-2">{lead.MobileNo || lead.phone}</p>
+                                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.FollowupStatus || lead.status)}`}>
+                                        {lead.Status || lead.status}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     ))}
-                                        <div className="p-4 border-t border-gray-200 flex justify-center">
-                                                <PremiumButton
-                                                        onClick={handleLoadMore}
-                                                        disabled={isLoading}
-                                                >
-                                                        Load More
-                                                </PremiumButton>
-                                        </div>
+                    <div className="p-4 border-t border-gray-200 flex justify-center">
+                        <PremiumButton
+                            onClick={handleLoadMore}
+                            disabled={isLoading}
+                        >
+                            Load More
+                        </PremiumButton>
+                    </div>
                 </div>
             </div>
 
@@ -407,8 +470,8 @@ const searchLeadText = async () => {
                                                 key={tab}
                                                 onClick={() => setActiveTab(tab.toLowerCase())}
                                                 className={`py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.toLowerCase()
-                                                        ? 'border-blue-500 text-blue-600'
-                                                        : 'border-transparent text-gray-600 hover:text-gray-900'
+                                                    ? 'border-blue-500 text-blue-600'
+                                                    : 'border-transparent text-gray-600 hover:text-gray-900'
                                                     }`}
                                             >
                                                 {tab}
@@ -421,13 +484,13 @@ const searchLeadText = async () => {
                                         {activities.map((activity, idx) => (
                                             <div key={idx} className="flex gap-4">
                                                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                <Phone className="h-5 w-5 text-blue-600" />
+                                                    <Phone className="h-5 w-5 text-blue-600" />
                                                 </div>
                                                 <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">{activity.Action || activity.action || activity}</p>
-                                                <p className="text-xs text-gray-500 mt-0.5">
-                                                    by {activity.UserName || activity.user || ''} • {activity.CreatedDate || activity.time || ''}
-                                                </p>
+                                                    <p className="text-sm font-medium text-gray-900">{activity.Action || activity.action || activity}</p>
+                                                    <p className="text-xs text-gray-500 mt-0.5">
+                                                        by {activity.UserName || activity.user || ''} • {activity.CreatedDate || activity.time || ''}
+                                                    </p>
                                                 </div>
                                             </div>
                                         ))}

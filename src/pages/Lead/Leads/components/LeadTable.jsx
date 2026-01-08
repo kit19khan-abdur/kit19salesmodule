@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Phone, Mail, LayoutGrid, List, RefreshCw, MoreVertical, ChevronLeft, ChevronRight, MessageSquare, Trash2, MessageSquareMore } from 'lucide-react';
+import { Search, Phone, Mail, LayoutGrid, List, RefreshCw, MoreVertical, ChevronLeft, ChevronRight, MessageSquare, Trash2, MessageSquareMore, ChevronDown } from 'lucide-react';
 import { GoGitBranch } from 'react-icons/go';
 import { FaWhatsapp } from 'react-icons/fa';
 import RowActionMenu from '../../../../components/RowActionMenu';
@@ -25,7 +25,9 @@ const LeadTable = ({
     const [rowMenu, setRowMenu] = useState({ show: false, rowId: null });
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [selectedLeadForDrawer, setSelectedLeadForDrawer] = useState(null);
+    const [showMoreActions, setShowMoreActions] = useState(false);
     const rowMenuAnchorRefs = useRef({});
+    const moreActionsRef = useRef(null);
     const totalPages = Math.ceil(totalRecord / parseInt(itemsPerPage));
 
     const getInitials = (name) => {
@@ -53,7 +55,7 @@ const LeadTable = ({
         if (selectedLeads.length === leads.length) {
             setSelectedLeads([]);
         } else {
-            setSelectedLeads(leads.map(l => l.id));
+            setSelectedLeads(leads.map(l => l.ID));
         }
     };
 
@@ -97,6 +99,20 @@ const LeadTable = ({
         return pages;
     };
 
+    // Close more actions dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (moreActionsRef.current && !moreActionsRef.current.contains(event.target)) {
+                setShowMoreActions(false);
+            }
+        };
+
+        if (showMoreActions) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [showMoreActions]);
+
     return (
         <div className="flex flex-col h-full bg-white">
             {/* Header */}
@@ -134,6 +150,123 @@ const LeadTable = ({
                     </div>
                 </div>
             </div>
+
+            {/* Mass Operation Buttons */}
+            {selectedLeads.length > 0 && (
+                <div className="px-6 py-3 border-b border-gray-200 bg-white flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => console.log('Add Lead', selectedLeads)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                        >
+                            Add Lead
+                        </button>
+                        <button
+                            onClick={() => console.log('Send SMS to', selectedLeads)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                        >
+                            Send SMS
+                        </button>
+                        <button
+                            onClick={() => console.log('Send Mail to', selectedLeads)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                        >
+                            Send Mail
+                        </button>
+                        <button
+                            onClick={() => console.log('Update', selectedLeads)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                        >
+                            Update
+                        </button>
+                        <button
+                            onClick={() => console.log('Marketing Sequence', selectedLeads)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                        >
+                            Marketing Sequence
+                        </button>
+                        <button
+                            onClick={() => console.log('Send International SMS', selectedLeads)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                        >
+                            Send InternationalSMS
+                        </button>
+
+                        {/* More Actions Dropdown */}
+                        <div className="relative" ref={moreActionsRef}>
+                            <button
+                                onClick={() => setShowMoreActions(!showMoreActions)}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition flex items-center gap-1"
+                            >
+                                ... More actions
+                                <ChevronDown className="w-4 h-4" />
+                            </button>
+                            {showMoreActions && (
+                                <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                                    <div className="py-1">
+                                        <button
+                                            onClick={() => { console.log('Add Call List', selectedLeads); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Add Call List
+                                        </button>
+                                        <button
+                                            onClick={() => { console.log('Add Tag', selectedLeads); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Add Tag
+                                        </button>
+                                        <button
+                                            onClick={() => { console.log('Remove Tag', selectedLeads); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Remove Tag
+                                        </button>
+                                        <button
+                                            onClick={() => { console.log('Add Task', selectedLeads); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Add Task
+                                        </button>
+                                        <button
+                                            onClick={() => { console.log('Add Appointment', selectedLeads); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Add Appointment
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600">
+                            {selectedLeads.length} of {totalRecord}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                            {selectedLeads.length} leads selected.
+                        </span>
+                        <button
+                            onClick={() => console.log('Delete', selectedLeads)}
+                            className="text-red-600 hover:text-red-700 transition flex items-center gap-2"
+                            title="Delete"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                            Delete
+                        </button>
+                        <button
+                            onClick={() => setSelectedLeads([])}
+                            className="p-1 hover:bg-gray-100 rounded transition"
+                            title="Clear Selection"
+                        >
+                            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Showing Records */}
             <div className="px-6 py-2 border-b border-gray-200 flex items-center justify-start bg-gray-50">
@@ -323,12 +456,6 @@ const LeadTable = ({
                                         </div>
                                     </td>
                                     <td className="px-4 py-2 text-sm text-gray-700">{lead.SourceName || '-'}</td>
-                                    {/* <td className="px-4 py-2">
-                                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${lead.IsOpen ? 'bg-green-100 text-green-700' : 'bg-gray-600 text-white'}`}>
-                                            {lead.IsOpen ? 'Open' : 'Closed'}
-                                        </span>
-                                    </td> */}
-                                    {/* <td className="px-4 py-2 text-sm text-gray-700">{lead.Type || '-'}</td> */}
                                 </tr>
                             ))}
                         </tbody>
@@ -347,7 +474,7 @@ const LeadTable = ({
             </div>
 
             {/* Floating Pagination */}
-            <div className="fixed bottom-6 right-20 transform -translate-x-1/2 bg-white border border-gray-300 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2 z-50">
+            <div className="fixed bottom-6 -right-[10.5rem] transform -translate-x-1/2 bg-white border border-gray-300 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2 z-50">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
