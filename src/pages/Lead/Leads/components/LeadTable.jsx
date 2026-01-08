@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Phone, Mail, LayoutGrid, List, RefreshCw, MoreVertical, ChevronLeft, ChevronRight, MessageSquare, Trash2, MessageSquareMore, ChevronDown } from 'lucide-react';
+import { Search, Phone, Mail,FileText, LayoutGrid, List, RefreshCw, MoreVertical, ChevronLeft, ChevronRight, MessageSquare, Trash2, MessageSquareMore, ChevronDown, Spotlight, NotebookPen, CloudUpload } from 'lucide-react';
 import { GoGitBranch } from 'react-icons/go';
 import { FaWhatsapp } from 'react-icons/fa';
 import RowActionMenu from '../../../../components/RowActionMenu';
 import LeadDetailsDrawer from './LeadDetailsDrawer';
 import FollowupTooltip from './FollowupTooltip';
 import nodata from '../../../../assets/nodata.gif';
+import { BsTelephonePlus } from "react-icons/bs";
+import PopUpModal from '../../../../components/common/Modal';
+import ScheduleCallForm from './ScheduleCallForm';
 
 const LeadTable = ({
     leads,
@@ -26,8 +29,17 @@ const LeadTable = ({
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [selectedLeadForDrawer, setSelectedLeadForDrawer] = useState(null);
     const [showMoreActions, setShowMoreActions] = useState(false);
+    const [showPagePopup, setShowPagePopup] = useState(null);
     const rowMenuAnchorRefs = useRef({});
     const moreActionsRef = useRef(null);
+    const ellipsisRefs = useRef([]);
+    const [showScheduleModal, setShowScheduleModal] = useState(false);
+    const [scheduleLead, setScheduleLead] = useState(null);
+    const [showCallWidget, setShowCallWidget] = useState(false);
+    const [showCallWidgetMenu, setShowCallWidgetMenu] = useState(false);
+    const [callStatus, setCallStatus] = useState('Requesting');
+    const [callTimer, setCallTimer] = useState('00:00:00');
+    const callIntervalRef = useRef(null);
     const totalPages = Math.ceil(totalRecord / parseInt(itemsPerPage));
 
     const getInitials = (name) => {
@@ -75,29 +87,46 @@ const LeadTable = ({
 
     const getPaginationNumbers = () => {
         const pages = [];
+        const delta = 2; // Number of pages to show around current page
+
+        // If total pages is small, show all
         if (totalPages <= 7) {
             for (let i = 1; i <= totalPages; i++) {
                 pages.push(i);
             }
-        } else {
-            if (currentPage <= 4) {
-                for (let i = 1; i <= 5; i++) pages.push(i);
-                pages.push('...');
-                pages.push(totalPages);
-            } else if (currentPage >= totalPages - 3) {
-                pages.push(1);
-                pages.push('...');
-                for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
-            } else {
-                pages.push(1);
-                pages.push('...');
-                for (let i = currentPage - 1; i <= currentPage + 1; i++) pages.push(i);
-                pages.push('...');
-                pages.push(totalPages);
-            }
+            return pages;
         }
+
+        // Always show first page
+        pages.push(1);
+
+        // Calculate range around current page
+        const rangeStart = Math.max(2, currentPage - delta);
+        const rangeEnd = Math.min(totalPages - 1, currentPage + delta);
+
+        // Add ellipsis after first page if needed
+        if (rangeStart > 2) {
+            pages.push('...');
+        }
+
+        // Add pages around current page
+        for (let i = rangeStart; i <= rangeEnd; i++) {
+            pages.push(i);
+        }
+
+        // Add ellipsis before last page if needed
+        if (rangeEnd < totalPages - 1) {
+            pages.push('...');
+        }
+
+        // Always show last page
+        pages.push(totalPages);
+
         return pages;
     };
+
+    // Helper for all page numbers
+    const getAllPageNumbers = () => Array.from({ length: totalPages }, (_, i) => i + 1);
 
     // Close more actions dropdown when clicking outside
     useEffect(() => {
@@ -105,13 +134,88 @@ const LeadTable = ({
             if (moreActionsRef.current && !moreActionsRef.current.contains(event.target)) {
                 setShowMoreActions(false);
             }
+            // Check page popup
+            if (showPagePopup !== null) {
+                const popup = document.getElementById('page-popup-box');
+                const ellipsis = ellipsisRefs.current[showPagePopup];
+                if (
+                    popup &&
+                    !popup.contains(event.target) &&
+                    ellipsis &&
+                    !ellipsis.contains(event.target)
+                ) {
+                    setShowPagePopup(null);
+                }
+            }
         };
 
-        if (showMoreActions) {
+        if (showMoreActions || showPagePopup !== null) {
             document.addEventListener('mousedown', handleClickOutside);
             return () => document.removeEventListener('mousedown', handleClickOutside);
         }
-    }, [showMoreActions]);
+    }, [showMoreActions, showPagePopup]);
+
+    // Call Widget timer effect
+    useEffect(() => {
+        if (showCallWidget) {
+            let seconds = 0;
+            setCallTimer('00:00:00');
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+            }
+            callIntervalRef.current = setInterval(() => {
+                seconds += 1;
+                const hh = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                const mm = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                const ss = String(seconds % 60).padStart(2, '0');
+                setCallTimer(`${hh}:${mm}:${ss}`);
+            }, 1000);
+        } else {
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+            setCallTimer('00:00:00');
+        }
+
+        return () => {
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+        };
+    }, [showCallWidget]);
+
+    // Call Widget timer effect
+    useEffect(() => {
+        if (showCallWidget) {
+            let seconds = 0;
+            setCallTimer('00:00:00');
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+            }
+            callIntervalRef.current = setInterval(() => {
+                seconds += 1;
+                const hh = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                const mm = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                const ss = String(seconds % 60).padStart(2, '0');
+                setCallTimer(`${hh}:${mm}:${ss}`);
+            }, 1000);
+        } else {
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+            setCallTimer('00:00:00');
+        }
+
+        return () => {
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+        };
+    }, [showCallWidget]);
 
     return (
         <div className="flex flex-col h-full bg-white">
@@ -135,16 +239,16 @@ const LeadTable = ({
                         </div>
                         <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
                             <button
-                                onClick={() => setViewMode('table')}
-                                className={`p-1.5 rounded ${viewMode === 'table' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
-                            >
-                                <List className="w-4 h-4" />
-                            </button>
-                            <button
                                 onClick={() => setViewMode('card')}
                                 className={`p-1.5 rounded ${viewMode === 'card' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
                             >
                                 <LayoutGrid className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={() => setViewMode('table')}
+                                className={`p-1.5 rounded ${viewMode === 'table' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
+                            >
+                                <List className="w-4 h-4" />
                             </button>
                         </div>
                     </div>
@@ -316,11 +420,7 @@ const LeadTable = ({
                             {leads.map((lead) => (
                                 <tr
                                     key={lead.ID}
-                                    className={`transition hover:bg-gray-50 group cursor-pointer ${selectedLead === lead.ID ? 'bg-blue-50' : ''}`}
-                                    onClick={() => {
-                                        setSelectedLeadForDrawer(lead);
-                                        setIsDrawerOpen(true);
-                                    }}
+                                    className={`transition hover:bg-gray-50 group ${selectedLead === lead.ID ? 'bg-blue-50' : ''}`}
                                 >
                                     <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                                         <input
@@ -332,28 +432,51 @@ const LeadTable = ({
                                     </td>
                                     <td className="px-4 py-2 relative">
                                         <div className="flex items-center  justify-between">
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-6">
                                                 <div className="flex flex-col items-center gap-2">
                                                     <div className="relative">
                                                         <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer">
-                                                            {getInitials(lead.PersonName)}
+                                                            <img src="https://kit19.com/assets/custom/img/img_avatar.png" alt="img" className="w-10 h-10 rounded-full" />
                                                         </div>
                                                         {/* Followup Count Badge with Tooltip */}
                                                         <FollowupTooltip lead={lead}>
-                                                            <div className={`absolute -bottom-1 -right-1 w-6 h-6 ${getBadgeColor(lead.FollowupCount)} border-2 border-white rounded-full flex items-center justify-center text-white font-bold text-xs cursor-pointer hover:brightness-110 transition-all shadow-md`}>
+                                                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getBadgeColor(lead.FollowupCount)} border-2 border-white rounded-full flex items-center justify-center text-white font-bold text-xs cursor-pointer hover:brightness-110 transition-all shadow-md`}>
                                                                 {lead.FollowupCount || 0}
                                                             </div>
                                                         </FollowupTooltip>
+                                                        {/* Call icon overlay next to avatar - stops propagation so it doesn't select the lead */}
+
+                                                        <>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setScheduleLead(lead);
+                                                                    setShowScheduleModal(true);
+                                                                }}
+                                                                className="absolute -right-3 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 hover:text-blue-600 shadow-sm"
+                                                                title="Call"
+                                                            >
+                                                                <BsTelephonePlus size={14} />
+                                                            </button>
+                                                        </>
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="font-semibold text-gray-900 text-sm cursor-pointer">{lead.PersonName}</span>
+                                                    <span 
+                                                        className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600"
+                                                        onClick={() => {
+                                                            setSelectedLeadForDrawer(lead);
+                                                            setIsDrawerOpen(true);
+                                                        }}
+                                                    >
+                                                        {lead.PersonName}
+                                                    </span>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <span title="Send Email">
                                                     <Mail
-                                                        className="w-5 h-5 cursor-pointer text-gray-600 hover:text-blue-600"
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-blue-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             // Handle mail action
@@ -361,8 +484,17 @@ const LeadTable = ({
                                                     />
                                                 </span>
                                                 <span title="Add FollowUp">
+                                                    <Spotlight
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-[#045f80]"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // Handle branch action
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span title="Merge Lead">
                                                     <GoGitBranch
-                                                        className="w-5 h-5 cursor-pointer text-gray-600 hover:text-purple-600"
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-purple-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             // Handle branch action
@@ -371,7 +503,7 @@ const LeadTable = ({
                                                 </span>
                                                 <span title="Send WhatsApp">
                                                     <FaWhatsapp
-                                                        className="w-5 h-5 cursor-pointer text-gray-600 hover:text-green-600"
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-green-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             // Handle WhatsApp action
@@ -380,7 +512,25 @@ const LeadTable = ({
                                                 </span>
                                                 <span title="Send SMS">
                                                     <MessageSquareMore
-                                                        className="w-5 h-5 cursor-pointer text-gray-600 hover:text-blue-600"
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-blue-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // Handle SMS action
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span title="Add Note">
+                                                    <NotebookPen
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-blue-600"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // Handle SMS action
+                                                        }}
+                                                    />
+                                                </span>
+                                                <span title="Upload Document">
+                                                    <CloudUpload
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-blue-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             // Handle SMS action
@@ -389,7 +539,7 @@ const LeadTable = ({
                                                 </span>
                                                 <span title="Delete">
                                                     <Trash2
-                                                        className="w-5 h-5 cursor-pointer text-gray-600 hover:text-red-600"
+                                                        className="w-6 h-6 cursor-pointer text-gray-600 hover:text-red-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             // Handle delete action
@@ -406,7 +556,7 @@ const LeadTable = ({
                                                         setRowMenu(rowMenu.show && rowMenu.rowId === lead.ID ? { show: false, rowId: null } : { show: true, rowId: lead.ID });
                                                     }}
                                                 >
-                                                    <MoreVertical className="w-5 h-5 text-gray-600 hover:text-gray-800" />
+                                                    <MoreVertical className="w-6 h-6 text-gray-600 hover:text-gray-800" />
                                                 </span>
                                             </div>
                                             {/* Row action menu dropdown */}
@@ -433,7 +583,15 @@ const LeadTable = ({
                                         </div>
                                     </td>
                                     <td className="px-4 py-2">
-                                        <div className="flex cursor-pointer hover:text-green-600 items-center gap-1 text-blue-600 font-medium">
+                                        <div 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setShowCallWidget(true);
+                                                setCallStatus('Requesting');
+                                                setCallTimer('00:00:00');
+                                            }}
+                                            className="flex cursor-pointer hover:text-[#088b7e] items-center gap-1 text-blue-600 font-medium"
+                                        >
                                             <span>{lead.MobileNo ? lead.CsvMobileNo : '-'}</span>
                                         </div>
                                     </td>
@@ -474,7 +632,7 @@ const LeadTable = ({
             </div>
 
             {/* Floating Pagination */}
-            <div className="fixed bottom-6 -right-[10.5rem] transform -translate-x-1/2 bg-white border border-gray-300 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2 z-50">
+            <div className="fixed bottom-6 -right-[8rem] transform -translate-x-1/2 bg-white border border-gray-300 rounded-lg shadow-lg px-4 py-2 flex items-center gap-2 z-50">
                 <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
@@ -486,7 +644,39 @@ const LeadTable = ({
                 <div className="flex items-center gap-1">
                     {getPaginationNumbers().map((page, index) => (
                         page === '...' ? (
-                            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">...</span>
+                            <span
+                                key={`ellipsis-${index}`}
+                                ref={el => ellipsisRefs.current[index] = el}
+                                className="px-2 text-gray-500 cursor-pointer relative"
+                                onClick={() => setShowPagePopup(showPagePopup === index ? null : index)}
+                            >
+                                ...
+                                {showPagePopup === index && (
+                                    <div
+                                        id="page-popup-box"
+                                        style={{ position: 'absolute', bottom: '120%', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, width: '50px', maxHeight: '100px', overflowY: 'auto', padding: 0 }}
+                                        className="bg-white border border-gray-300 rounded shadow-lg flex flex-col"
+                                    >
+                                        {getAllPageNumbers().map(pageNum => (
+                                            <button
+                                                key={pageNum}
+                                                onMouseDown={e => e.preventDefault()}
+                                                onClick={() => {
+                                                    setShowPagePopup(null);
+                                                    setTimeout(() => handlePageChange(pageNum), 0);
+                                                }}
+                                                className={`w-full h-8 text-center rounded text-sm font-medium transition ${currentPage === pageNum
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'text-gray-700 hover:bg-gray-100'
+                                                }`}
+                                                style={{ minWidth: '32px', padding: 0 }}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </span>
                         ) : (
                             <button
                                 key={page}
@@ -514,6 +704,115 @@ const LeadTable = ({
                 onClose={() => setIsDrawerOpen(false)}
                 lead={selectedLeadForDrawer}
             />
+
+            {/* Schedule Call Modal */}
+            {showScheduleModal && (
+                <PopUpModal isOpen={showScheduleModal} onClose={() => setShowScheduleModal(false)} title="Schedule Call">
+                    <ScheduleCallForm
+                        lead={scheduleLead}
+                        onCancel={() => setShowScheduleModal(false)}
+                        onSave={(data) => {
+                            console.debug('scheduled call', data, 'for', scheduleLead);
+                            setShowScheduleModal(false);
+                        }}
+                    />
+                </PopUpModal>
+            )}
+
+            {/* Call Widget Sticky Popup */}
+            {showCallWidget && (
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999]">
+                    {/* Header */}
+                    <div className="bg-blue-500 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Call Widget (Kit19 80)</h3>
+                        <div className="flex items-center gap-2">
+                            <button className="p-1 hover:bg-blue-600 rounded">
+                                <ChevronDown className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={() => setShowCallWidget(false)}
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-6">
+                        {/* Three dots menu */}
+                        <div className="flex justify-end mb-4 relative">
+                            <button
+                                className="text-gray-400 hover:text-gray-600"
+                                onClick={() => setShowCallWidgetMenu(!showCallWidgetMenu)}
+                            >
+                                <MoreVertical className="w-5 h-5" />
+                            </button>
+
+                            {/* Dropdown menu with icons */}
+                            {showCallWidgetMenu && (
+                                <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex gap-3 z-10">
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FileText className="w-6 h-6 text-gray-600" />
+                                    </button>
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FaWhatsapp className="w-6 h-6 text-green-600" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Profile Images */}
+                        <div className="flex items-center justify-center gap-8 mb-6">
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 1"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 mb-2">
+                                    <svg viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                                        <path d="M3 12h18M12 3v18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 2"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Status and Timer */}
+                        <div className="text-center mb-6">
+                            <h4 className="text-xl font-semibold text-gray-800 mb-2">{callStatus}</h4>
+                            <p className="text-2xl font-mono text-gray-600">{callTimer}</p>
+                        </div>
+
+                        {/* Call Disconnected Message */}
+                        <div className="bg-gray-700 text-white px-4 py-3 rounded text-center">
+                            <span className="text-sm">Call Disconnected ? </span>
+                            <button className="text-blue-400 hover:text-blue-300 font-medium">
+                                Click to report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

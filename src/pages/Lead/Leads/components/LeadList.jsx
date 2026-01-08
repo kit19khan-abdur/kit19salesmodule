@@ -186,8 +186,9 @@ const LeadList = ({
       {/* Lead List */}
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto overflow-x-visible">
         {isLoading && leads.length === 0 ? (
-          <div className="flex items-center justify-center p-8">
-            <div className="text-gray-500">Loading...</div>
+         <div className="p-4 flex items-center justify-center">
+            <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
+            <span className="ml-2 text-sm text-gray-600">Loading...</span>
           </div>
         ) : leads.length === 0 ? (
           <div className="flex items-center justify-center p-8">
@@ -216,7 +217,7 @@ const LeadList = ({
                 />
                 <div className="relative">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                    {getInitials(lead.PersonName)}
+                    <img src="https://kit19.com/assets/custom/img/img_avatar.png" alt="img" className="w-10 h-10 rounded-full" />
                   </div>
                   {/* Followup Count Badge with Tooltip */}
                   <FollowupTooltip lead={lead}>

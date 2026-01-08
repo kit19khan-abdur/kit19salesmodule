@@ -618,7 +618,15 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                 <div>
                                     <h1 className="text-2xl font-bold text-gray-900 mb-1">{lead.PersonName}</h1>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                                        <span className="flex cursor-pointer hover:text-[#088b7e] items-center gap-1">
+                                        <span 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setShowCallWidget(true);
+                                                setCallStatus('Requesting');
+                                                setCallTimer('00:00:00');
+                                            }}
+                                            className="flex cursor-pointer hover:text-[#088b7e] items-center gap-1"
+                                        >
                                             <Phone className="w-4 h-4" />
                                             {lead.MobileNo}
                                         </span>
@@ -650,7 +658,15 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-sm text-gray-500">Phone</label>
-                                    <p onClick={() => setShowCallWidget(true)} className="text-gray-900 cursor-pointer hover:text-[#088b7e] font-medium">{lead.MobileNo || 'N/A'}</p>
+                                    <p 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowCallWidget(true);
+                                            setCallStatus('Requesting');
+                                            setCallTimer('00:00:00');
+                                        }}
+                                        className="text-gray-900 cursor-pointer hover:text-[#088b7e] font-medium"
+                                    >{lead.MobileNo || 'N/A'}</p>
                                 </div>
                                 <div>
                                     <label className="text-sm text-gray-500">Email</label>
@@ -852,7 +868,12 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                             {!isContactOptionsCollapsed && (
                                 <div className="grid grid-cols-1 gap-2">
                                     <button
-                                        onClick={() => setShowCallWidget(true)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowCallWidget(true);
+                                            setCallStatus('Requesting');
+                                            setCallTimer('00:00:00');
+                                        }}
                                         className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-xs font-medium"
                                     >
                                         <Phone className="w-4 h-4" />
@@ -1110,6 +1131,88 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                 <AddPhysicalAppointmentForm />
             </PopUpModal>
 
+            {/* Call Widget Sticky Popup */}
+            {showCallWidget && (
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999]">
+                    {/* Header */}
+                    <div className="bg-blue-500 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Call Widget (Kit19 80)</h3>
+                        <div className="flex items-center gap-2">
+                            <button className="p-1 hover:bg-blue-600 rounded">
+                                <ChevronDown className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={() => setShowCallWidget(false)}
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-6">
+                        {/* Three dots menu */}
+                        <div className="flex justify-end mb-4 relative">
+                            <button
+                                className="text-gray-400 hover:text-gray-600"
+                                onClick={() => setShowCallWidget(prev => !prev)}
+                            >
+                                <MoreVertical className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Profile Images */}
+                        <div className="flex items-center justify-center gap-8 mb-6">
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 1"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 mb-2">
+                                    <svg viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                                        <path d="M3 12h18M12 3v18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 2"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Status and Timer */}
+                        <div className="text-center mb-6">
+                            <h4 className="text-xl font-semibold text-gray-800 mb-2">{callStatus}</h4>
+                            <p className="text-2xl font-mono text-gray-600">{callTimer}</p>
+                        </div>
+
+                        {/* Call Disconnected Message */}
+                        <div className="bg-gray-700 text-white px-4 py-3 rounded text-center">
+                            <span className="text-sm">Call Disconnected ? </span>
+                            <button className="text-blue-400 hover:text-blue-300 font-medium">
+                                Click to report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
     );
