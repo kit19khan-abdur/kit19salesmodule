@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Search, Phone, Mail, MessageSquare, Calendar, Plus, FileText, MoreVertical, Grid, List, RefreshCw, ChevronDown, ChevronLeft, ChevronRight, X, LayoutGrid } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import Lead from './Lead';
 
 const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], onSelectLead, currentPage: currentPageProp, onPageChange } ) => {
@@ -13,10 +14,48 @@ const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], on
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPageProp]);
+
+    // Start/stop call timer when call widget is shown/hidden
+    React.useEffect(() => {
+        if (showCallWidget) {
+            // reset and start
+            let seconds = 0;
+            setCallTimer('00:00:00');
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+            }
+            callIntervalRef.current = setInterval(() => {
+                seconds += 1;
+                const hh = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                const mm = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                const ss = String(seconds % 60).padStart(2, '0');
+                setCallTimer(`${hh}:${mm}:${ss}`);
+            }, 1000);
+        } else {
+            // stop and reset
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+            setCallTimer('00:00:00');
+        }
+
+        return () => {
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+        };
+    }, [showCallWidget]);
     const [detailView, setDetailView] = useState(null);
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [showAllTabs, setShowAllTabs] = useState(false);
     const [activeTab, setActiveTab] = useState('activities');
+    const [showCallWidget, setShowCallWidget] = useState(false);
+    const [showCallWidgetMenu, setShowCallWidgetMenu] = useState(false);
+    const [callStatus, setCallStatus] = useState('Requesting');
+    const [callTimer, setCallTimer] = useState('00:00:00');
+    const callIntervalRef = useRef(null);
 
     const defaultLeads = [
         { id: 1, name: 'Rajesh Kumar', phone: '+91 98765 43210', email: 'rajesh.kumar@email.com', date: '28 Dec 2024, 10:30 AM', source: 'Website', status: 'Open', type: 'Hot Lead', avatar: 'RK', city: 'Mumbai', state: 'Maharashtra', pincode: '400001' },
@@ -149,7 +188,15 @@ const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], on
                                     <div>
                                         <h1 className="text-2xl font-bold text-gray-900 mb-2">{lead.name}</h1>
                                         <div className="flex items-center gap-4 text-sm text-gray-600">
-                                            <div className="flex items-center gap-1.5">
+                                            <div 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowCallWidget(true);
+                                                    setCallStatus('Requesting');
+                                                    setCallTimer('00:00:00');
+                                                }}
+                                                className="flex items-center gap-1.5 cursor-pointer hover:text-[#088b7e]"
+                                            >
                                                 <Phone className="h-4 w-4" />
                                                 <span>{lead.phone}</span>
                                             </div>
@@ -180,7 +227,15 @@ const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], on
                                         <div className="grid grid-cols-2 gap-6">
                                             <div>
                                                 <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-                                                <p className="mt-1 text-sm font-medium text-gray-900">{lead.phone}</p>
+                                                <p 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setShowCallWidget(true);
+                                                        setCallStatus('Requesting');
+                                                        setCallTimer('00:00:00');
+                                                    }}
+                                                    className="mt-1 text-sm font-medium text-gray-900 cursor-pointer hover:text-[#088b7e]"
+                                                >{lead.phone}</p>
                                             </div>
                                             <div>
                                                 <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
@@ -285,7 +340,15 @@ const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], on
                                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                                     <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact Options</h3>
                                     <div className="space-y-3">
-                                        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setShowCallWidget(true);
+                                                setCallStatus('Requesting');
+                                                setCallTimer('00:00:00');
+                                            }}
+                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                                        >
                                             <Phone className="h-4 w-4" />
                                             Call
                                         </button>
@@ -420,7 +483,15 @@ const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], on
                                             </div>
                                         </td>
                                         <td className="px-4 py-4">
-                                            <div className="flex items-center gap-2 text-blue-600">
+                                            <div 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowCallWidget(true);
+                                                    setCallStatus('Requesting');
+                                                    setCallTimer('00:00:00');
+                                                }}
+                                                className="flex items-center gap-2 text-blue-600 cursor-pointer hover:text-[#088b7e]"
+                                            >
                                                 <Phone className="h-4 w-4" />
                                                 <span className="text-sm">{lead.phone}</span>
                                             </div>
@@ -489,6 +560,101 @@ const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], on
                     </div>
                 </div>
             </div>
+
+            {/* Call Widget Sticky Popup */}
+            {showCallWidget && (
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999]">
+                    {/* Header */}
+                    <div className="bg-blue-500 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Call Widget (Kit19 80)</h3>
+                        <div className="flex items-center gap-2">
+                            <button className="p-1 hover:bg-blue-600 rounded">
+                                <ChevronDown className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={() => setShowCallWidget(false)}
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-6">
+                        {/* Three dots menu */}
+                        <div className="flex justify-end mb-4 relative">
+                            <button
+                                className="text-gray-400 hover:text-gray-600"
+                                onClick={() => setShowCallWidgetMenu(!showCallWidgetMenu)}
+                            >
+                                <MoreVertical className="w-5 h-5" />
+                            </button>
+
+                            {/* Dropdown menu with icons */}
+                            {showCallWidgetMenu && (
+                                <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex gap-3 z-10">
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FileText className="w-6 h-6 text-gray-600" />
+                                    </button>
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FaWhatsapp className="w-6 h-6 text-green-600" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Profile Images */}
+                        <div className="flex items-center justify-center gap-8 mb-6">
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 1"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 mb-2">
+                                    <svg viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                                        <path d="M3 12h18M12 3v18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 2"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Status and Timer */}
+                        <div className="text-center mb-6">
+                            <h4 className="text-xl font-semibold text-gray-800 mb-2">{callStatus}</h4>
+                            <p className="text-2xl font-mono text-gray-600">{callTimer}</p>
+                        </div>
+
+                        {/* Call Disconnected Message */}
+                        <div className="bg-gray-700 text-white px-4 py-3 rounded text-center">
+                            <span className="text-sm">Call Disconnected ? </span>
+                            <button className="text-blue-400 hover:text-blue-300 font-medium">
+                                Click to report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

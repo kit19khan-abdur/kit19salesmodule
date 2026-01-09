@@ -200,14 +200,14 @@ const Leads = () => {
       </div>
 
       {/* Right Detail Panel */}
-      {showDetailPanel && viewMode === 'table' && (
+      {/* {showDetailPanel && viewMode === 'table' && (
         <div className="w-96 bg-white border-l border-gray-200">
           <LeadDetailPanel
             lead={selectedLeadData}
             onClose={() => setShowDetailPanel(false)}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

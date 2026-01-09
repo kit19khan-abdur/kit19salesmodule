@@ -1103,7 +1103,7 @@ const EnquiryTable = ({
                                                         className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer"
                                                         onClick={(e) => { e.stopPropagation(); onSelectEnquiry(enquiry); }}
                                                     >
-                                                        {getInitials(enquiry.PersonName)}
+                                                        <img src="https://kit19.com/assets/custom/img/img_avatar.png" alt="img" className="w-10 h-10 rounded-full" />
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-2 mb-1">

@@ -1,6 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
-import { Search, Phone, Mail, MessageSquare, Calendar, Plus, Users, FileText, MoreHorizontal, Grid, List, ChevronDown, LayoutGrid } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Phone, Mail, MessageSquare, Calendar, Plus, Users, FileText, MoreHorizontal, Grid, List, ChevronDown, LayoutGrid, MoreVertical } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import LeadDetail from './LeadDetail';
 import PremiumButton from '../Enquiries/Enquiries/components/PremiumButton';
 import { getLeadList, getLeadActivities, getLeadDetailList } from '../../utils/lead';
@@ -11,7 +12,6 @@ const Lead = () => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [viewMode, setViewMode] = useState('grid');
     const [activeTab, setActiveTab] = useState('activities');
-
     const [leads, setLeads] = useState([]);
     const [activities, setActivities] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,10 +20,110 @@ const Lead = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchText, setSearchText] = useState('');
-
-    const { userId,parentId, TokenId } = getSession();
+    const { userId, parentId, TokenId } = getSession();
+    const [showCallWidget, setShowCallWidget] = useState(false);
+    const [showCallWidgetMenu, setShowCallWidgetMenu] = useState(false);
+    const [callStatus, setCallStatus] = useState('Requesting');
+    const [callTimer, setCallTimer] = useState('00:00:00');
+    const callIntervalRef = useRef(null);
 
     const currentLead = leads.find(l => l.id === selectedLead) || leads[0] || null;
+
+    // Start/stop call timer when call widget is shown/hidden
+    useEffect(() => {
+        if (showCallWidget) {
+            // reset and start
+            let seconds = 0;
+            setCallTimer('00:00:00');
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+            }
+            callIntervalRef.current = setInterval(() => {
+                seconds += 1;
+                const hh = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                const mm = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                const ss = String(seconds % 60).padStart(2, '0');
+                setCallTimer(`${hh}:${mm}:${ss}`);
+            }, 1000);
+        } else {
+            // stop and reset
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+            setCallTimer('00:00:00');
+        }
+
+        return () => {
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+        };
+    }, [showCallWidget]);
+
+    const sampleLeads = [
+        {
+            id: 101,
+            Id: 101,
+            LeadId: 101,
+            LeadID: 101,
+            PersonName: 'Alice Johnson',
+            Image: 'https://i.pravatar.cc/150?img=1',
+            MobileNo: '9876543210',
+            CsvMobileNo: '9876543210',
+            CsvEmailId: 'alice@example.com',
+            EmailId: 'alice@example.com',
+            CreatedDate: '2025-12-01, 09:00 AM',
+            CreatedOn: '2025-12-01',
+            Status: 'Open',
+            FollowupStatus: 'Open',
+            FollowupCount: 2,
+            IsOpen: true,
+            Source: 'Website',
+            Type: 'Lead'
+        },
+        {
+            id: 102,
+            Id: 102,
+            LeadId: 102,
+            LeadID: 102,
+            PersonName: 'Bob Kumar',
+            Image: 'https://i.pravatar.cc/150?img=5',
+            MobileNo: '9123456780',
+            CsvMobileNo: '9123456780',
+            CsvEmailId: 'bob@example.com',
+            EmailId: 'bob@example.com',
+            CreatedDate: '2025-12-02, 11:15 AM',
+            CreatedOn: '2025-12-02',
+            Status: 'Call-Back',
+            FollowupStatus: 'Call-Back',
+            FollowupCount: 1,
+            IsOpen: true,
+            Source: 'Campaign',
+            Type: 'Lead'
+        },
+        {
+            id: 103,
+            Id: 103,
+            LeadId: 103,
+            LeadID: 103,
+            PersonName: 'Carol Singh',
+            Image: 'https://i.pravatar.cc/150?img=12',
+            MobileNo: '9012345678',
+            CsvMobileNo: '9012345678',
+            CsvEmailId: 'carol@example.com',
+            EmailId: 'carol@example.com',
+            CreatedDate: '2025-12-03, 02:20 PM',
+            CreatedOn: '2025-12-03',
+            Status: 'Closed',
+            FollowupStatus: 'Closed',
+            FollowupCount: 0,
+            IsOpen: false,
+            Source: 'Referral',
+            Type: 'Lead'
+        }
+    ]
 
     const fetchLeads = async (loadMore = false, page = 1) => {
         setIsLoading(true);
@@ -76,14 +176,16 @@ const Lead = () => {
             }
         } catch (error) {
             console.error('fetchLeads error:', error);
+            // setLeads(sampleLeads);
+            // setSelectedLead(sampleLeads[0].id);
         } finally {
             setIsLoading(false);
         }
     };
     const handleLoadMore = () => {
-    const newStart = startIndex + parseInt(itemsPerPage);
-    setStartIndex(newStart);
-    fetchLeads(true);
+        const newStart = startIndex + parseInt(itemsPerPage);
+        setStartIndex(newStart);
+        fetchLeads(true);
     };
     const handleSelectLead = async (lead) => {
         setSelectedLead(lead.LeadId || lead.ID || null);
@@ -93,21 +195,21 @@ const Lead = () => {
             //     Start: 0,
             //     Limit: 10
             // };
-             const details = {
-            LeadId: lead.LeadId || lead.ID,
+            const details = {
+                LeadId: lead.LeadId || lead.ID,
                 Start: 0,
                 Limit: 10
-        };
+            };
 
-        const payload = {
-            Token: TokenId,
-            Message: "",
-            LoggedUserId: userId,
-            MAC_Address: "",
-            IP_Address: "102.16.32.189",
-            Details: details,
-            BroadcastName: ""
-        };
+            const payload = {
+                Token: TokenId,
+                Message: "",
+                LoggedUserId: userId,
+                MAC_Address: "",
+                IP_Address: "102.16.32.189",
+                Details: details,
+                BroadcastName: ""
+            };
             const response = await getLeadActivities(payload);
             setActivities(response?.d || []);
         } catch (error) {
@@ -116,55 +218,55 @@ const Lead = () => {
         }
     };
 
-    
-const handlePageChange = (page) => {
-    setCurrentPage(page);
-    fetchLeads(false, page);
-  };
 
-  useEffect(() => {
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchLeads(false, page);
+    };
+
+    useEffect(() => {
         fetchLeads(false, 1);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-  // Fetch data when itemsPerPage changes
-  useEffect(() => {
-    if (currentPage !== 1) {
-      setCurrentPage(1);
-      fetchLeads(false, 1);
-    } else {
-      fetchLeads(false, 1);
-    }
-  }, [itemsPerPage]);
-const searchTText = async () => {
-    setLeads([]);
-    setStartIndex(0);
-    const payload = {
-      Token: TokenId,
-      Message: "",
-      LoggedUserId: userId,
-      MAC_Address: "",
-      IP_Address: "102.16.32.189",
-      Details: {
-        UserId: userId,
-        CustomSearchId: 0,
-        PredefinedSearchId: 0,
+    // Fetch data when itemsPerPage changes
+    useEffect(() => {
+        if (currentPage !== 1) {
+            setCurrentPage(1);
+            fetchLeads(false, 1);
+        } else {
+            fetchLeads(false, 1);
+        }
+    }, [itemsPerPage]);
+    const searchTText = async () => {
+        setLeads([]);
+        setStartIndex(0);
+        const payload = {
+            Token: TokenId,
+            Message: "",
+            LoggedUserId: userId,
+            MAC_Address: "",
+            IP_Address: "102.16.32.189",
+            Details: {
+                UserId: userId,
+                CustomSearchId: 0,
+                PredefinedSearchId: 0,
                 FilterText: searchText,
-        Start: 0,
-        Limit: parseInt(itemsPerPage)
-      },
-      BroadcastName: ""
+                Start: 0,
+                Limit: parseInt(itemsPerPage)
+            },
+            BroadcastName: ""
+        };
+        try {
+            const response = await getLeadList(payload);
+            setLeads(response.Details.data);
+            if (response.Details.data && response.Details.data.length > 0) {
+                setSelectedLead(response.Details.data[0].LeadID);
+            }
+        } catch (error) {
+            console.error('search error:', error);
+        }
     };
-    try {
-      const response = await getLeadList(payload);
-      setLeads(response.Details.data);
-      if (response.Details.data && response.Details.data.length > 0) {
-        setSelectedLead(response.Details.data[0].LeadID);
-      }
-    } catch (error) {
-      console.error('search error:', error);
-    }
-  };
-const searchLeadText = async () => {
+    const searchLeadText = async () => {
         setLeads([]);
         setStartIndex(0);
         const payload = {
@@ -273,36 +375,36 @@ const searchLeadText = async () => {
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
                                     {/* {lead.avatar} */}
                                     <img
-                src={lead.Image}
-                alt={lead.PersonName}
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                onError={(e) => {
-                  e.target.src = 'https://docs.kit19.com/default/person.png';
-                }}
-              />
+                                        src={lead.Image}
+                                        alt={lead.PersonName}
+                                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                                        onError={(e) => {
+                                            e.target.src = 'https://docs.kit19.com/default/person.png';
+                                        }}
+                                    />
                                 </div>
-                                
+
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start mb-1">
-                                            <h3 className="font-medium text-gray-900 text-sm truncate">{lead.PersonName || lead.name}</h3>
-                                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{lead.CreatedOn || lead.date}</span>
+                                        <h3 className="font-medium text-gray-900 text-sm truncate">{lead.PersonName || lead.name}</h3>
+                                        <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{lead.CreatedOn || lead.date}</span>
                                     </div>
-                                        <p className="text-xs text-gray-600 mb-2">{lead.MobileNo || lead.phone}</p>
-                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.FollowupStatus || lead.status)}`}>
-                                            {lead.Status || lead.status}
-                                        </span>
+                                    <p className="text-xs text-gray-600 mb-2">{lead.MobileNo || lead.phone}</p>
+                                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead.FollowupStatus || lead.status)}`}>
+                                        {lead.Status || lead.status}
+                                    </span>
                                 </div>
                             </div>
                         </div>
                     ))}
-                                        <div className="p-4 border-t border-gray-200 flex justify-center">
-                                                <PremiumButton
-                                                        onClick={handleLoadMore}
-                                                        disabled={isLoading}
-                                                >
-                                                        Load More
-                                                </PremiumButton>
-                                        </div>
+                    <div className="p-4 border-t border-gray-200 flex justify-center">
+                        <PremiumButton
+                            onClick={handleLoadMore}
+                            disabled={isLoading}
+                        >
+                            Load More
+                        </PremiumButton>
+                    </div>
                 </div>
             </div>
 
@@ -319,7 +421,15 @@ const searchLeadText = async () => {
                                 <div>
                                     <h1 className="text-2xl font-bold text-gray-900 mb-2">{currentLead?.PersonName}</h1>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                                        <div className="flex items-center gap-1.5">
+                                        <div 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setShowCallWidget(true);
+                                                setCallStatus('Requesting');
+                                                setCallTimer('00:00:00');
+                                            }}
+                                            className="flex items-center gap-1.5 cursor-pointer hover:text-[#088b7e]"
+                                        >
                                             <Phone className="h-4 w-4" />
                                             <span>{currentLead?.MobileNo}</span>
                                         </div>
@@ -350,7 +460,15 @@ const searchLeadText = async () => {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div>
                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-                                            <p className="mt-1 text-sm font-medium text-gray-900">{currentLead?.MobileNo}</p>
+                                            <p 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowCallWidget(true);
+                                                    setCallStatus('Requesting');
+                                                    setCallTimer('00:00:00');
+                                                }}
+                                                className="mt-1 text-sm font-medium text-gray-900 cursor-pointer hover:text-[#088b7e]"
+                                            >{currentLead?.MobileNo}</p>
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
@@ -407,8 +525,8 @@ const searchLeadText = async () => {
                                                 key={tab}
                                                 onClick={() => setActiveTab(tab.toLowerCase())}
                                                 className={`py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.toLowerCase()
-                                                        ? 'border-blue-500 text-blue-600'
-                                                        : 'border-transparent text-gray-600 hover:text-gray-900'
+                                                    ? 'border-blue-500 text-blue-600'
+                                                    : 'border-transparent text-gray-600 hover:text-gray-900'
                                                     }`}
                                             >
                                                 {tab}
@@ -421,13 +539,13 @@ const searchLeadText = async () => {
                                         {activities.map((activity, idx) => (
                                             <div key={idx} className="flex gap-4">
                                                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                <Phone className="h-5 w-5 text-blue-600" />
+                                                    <Phone className="h-5 w-5 text-blue-600" />
                                                 </div>
                                                 <div className="flex-1">
-                                                <p className="text-sm font-medium text-gray-900">{activity.Action || activity.action || activity}</p>
-                                                <p className="text-xs text-gray-500 mt-0.5">
-                                                    by {activity.UserName || activity.user || ''} • {activity.CreatedDate || activity.time || ''}
-                                                </p>
+                                                    <p className="text-sm font-medium text-gray-900">{activity.Action || activity.action || activity}</p>
+                                                    <p className="text-xs text-gray-500 mt-0.5">
+                                                        by {activity.UserName || activity.user || ''} • {activity.CreatedDate || activity.time || ''}
+                                                    </p>
                                                 </div>
                                             </div>
                                         ))}
@@ -442,7 +560,15 @@ const searchLeadText = async () => {
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact Options</h3>
                                 <div className="space-y-3">
-                                    <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                                    <button 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowCallWidget(true);
+                                            setCallStatus('Requesting');
+                                            setCallTimer('00:00:00');
+                                        }}
+                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                                    >
                                         <Phone className="h-4 w-4" />
                                         Call
                                     </button>
@@ -487,6 +613,101 @@ const searchLeadText = async () => {
                     </div>
                 </div>
             </div>
+
+            {/* Call Widget Sticky Popup */}
+            {showCallWidget && (
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999]">
+                    {/* Header */}
+                    <div className="bg-blue-500 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Call Widget (Kit19 80)</h3>
+                        <div className="flex items-center gap-2">
+                            <button className="p-1 hover:bg-blue-600 rounded">
+                                <ChevronDown className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={() => setShowCallWidget(false)}
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-6">
+                        {/* Three dots menu */}
+                        <div className="flex justify-end mb-4 relative">
+                            <button
+                                className="text-gray-400 hover:text-gray-600"
+                                onClick={() => setShowCallWidgetMenu(!showCallWidgetMenu)}
+                            >
+                                <MoreVertical className="w-5 h-5" />
+                            </button>
+
+                            {/* Dropdown menu with icons */}
+                            {showCallWidgetMenu && (
+                                <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex gap-3 z-10">
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FileText className="w-6 h-6 text-gray-600" />
+                                    </button>
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FaWhatsapp className="w-6 h-6 text-green-600" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Profile Images */}
+                        <div className="flex items-center justify-center gap-8 mb-6">
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 1"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 mb-2">
+                                    <svg viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                                        <path d="M3 12h18M12 3v18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 2"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Status and Timer */}
+                        <div className="text-center mb-6">
+                            <h4 className="text-xl font-semibold text-gray-800 mb-2">{callStatus}</h4>
+                            <p className="text-2xl font-mono text-gray-600">{callTimer}</p>
+                        </div>
+
+                        {/* Call Disconnected Message */}
+                        <div className="bg-gray-700 text-white px-4 py-3 rounded text-center">
+                            <span className="text-sm">Call Disconnected ? </span>
+                            <button className="text-blue-400 hover:text-blue-300 font-medium">
+                                Click to report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
