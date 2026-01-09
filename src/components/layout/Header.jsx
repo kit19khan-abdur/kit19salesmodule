@@ -1,53 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiMenu, FiBell, FiSettings } from 'react-icons/fi';
 import { X, Check, Trash2, Mail, MailOpen } from 'lucide-react';
 import clsx from 'clsx';
 import { THEME } from '../../config/constants';
+import { getSession } from '../../getSession';
+import { getNotifications } from '../../utils/lead';
 
 const Header = ({ setSidebarOpen, sidebarCollapsed, setSidebarCollapsed, toggleSidebarLock, sidebarLocked }) => {
   const user = { name: localStorage.getItem('FName') || 'User', email: localStorage.getItem('email') || 'user@example.com' };
   const displayName = localStorage.getItem('DisplayName') || 'User';
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [isNotifLoading, setIsNotifLoading] = useState(false);
 
-  const notifications = [
-    {
-      id: 1,
-      title: 'Lead added-SuperAdmin',
-      message: 'Lead with name +919145449999 was added by kmukesh343',
-      time: 'less than a minute ago',
-      isRead: false
-    },
-    {
-      id: 2,
-      title: 'Lead added-SuperAdmin',
-      message: 'Lead with name +61292370200 was added by kmukesh343',
-      time: 'less than a minute ago',
-      isRead: false
-    },
-    {
-      id: 3,
-      title: 'Lead added-SuperAdmin',
-      message: 'Lead with name +61292370200 was added by kmukesh343',
-      time: '2 minutes ago',
-      isRead: false
-    },
-    {
-      id: 4,
-      title: 'Task Assigned',
-      message: 'New task "Follow up with client" has been assigned to you',
-      time: '5 minutes ago',
-      isRead: true
-    },
-    {
-      id: 5,
-      title: 'Meeting Reminder',
-      message: 'You have a meeting scheduled at 3:00 PM today',
-      time: '30 minutes ago',
-      isRead: true
-    },
-  ];
+  const { userId, TokenId } = getSession();
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchNotifications = async () => {
+      setIsNotifLoading(true);
+      try {
+        const payload = {
+          Token: TokenId,
+          Message: "",
+          LoggedUserId: userId,
+          MAC_Address: "",
+          IP_Address: "",
+          Details: { strUserID: String(userId || '0') },
+          BroadcastName: ""
+        };
+        const resp = await getNotifications(payload);
+        let raw = resp?.Details ?? resp?.d ?? resp ?? [];
+        if (raw && raw.data) raw = raw.data;
+        const arr = Array.isArray(raw) ? raw : [];
+        // Map backend fields to the UI shape
+        const mapped = arr.map((it, idx) => ({
+          id: it.NotificationId || it.Id || it.ID || it.id || idx,
+          title: it.Title || it.NotificationTitle || it.Event || it.Subject || 'Notification',
+          message: it.Message || it.Description || it.Body || it.Msg || it.NotificationText || '',
+          time: it.Time || it.CreatedOn || it.CreatedDate || it.Date || it.TimeStamp || '',
+          isRead: (it.IsRead === 1 || it.IsRead === true || it.Read === true || String(it.IsRead) === '1') ? true : false,
+          raw: it
+        }));
+        if (mounted) setNotifications(mapped);
+      } catch (error) {
+        console.error('fetchNotifications error:', error);
+      } finally {
+        if (mounted) setIsNotifLoading(false);
+      }
+    };
+    fetchNotifications();
+    return () => { mounted = false; };
+  }, [userId, TokenId]);
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+  };
+
+  const markAsRead = (id) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+  };
+
+  const deleteNotification = (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
   
 
   return (
@@ -126,7 +144,7 @@ const Header = ({ setSidebarOpen, sidebarCollapsed, setSidebarCollapsed, toggleS
                     {unreadCount > 0 && (
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-gray-600">{unreadCount} unread</span>
-                        <button className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
+                        <button onClick={markAllAsRead} className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1">
                           <Check className="w-3 h-3" />
                           Mark all as read
                         </button>
@@ -139,6 +157,7 @@ const Header = ({ setSidebarOpen, sidebarCollapsed, setSidebarCollapsed, toggleS
                     {notifications.map((notification) => (
                       <div
                         key={notification.id}
+                        onClick={() => markAsRead(notification.id)}
                         className={`px-5 py-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer group ${
                           !notification.isRead ? 'bg-blue-50/30' : ''
                         }`}
@@ -174,12 +193,14 @@ const Header = ({ setSidebarOpen, sidebarCollapsed, setSidebarCollapsed, toggleS
                               {/* Action buttons - show on hover */}
                               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
                                 <button 
+                                  onClick={(e) => { e.stopPropagation(); markAsRead(notification.id); }}
                                   className="p-1 hover:bg-blue-100 rounded transition"
                                   title="Mark as read"
                                 >
                                   <Check className="w-4 h-4 text-blue-600" />
                                 </button>
                                 <button 
+                                  onClick={(e) => { e.stopPropagation(); deleteNotification(notification.id); }}
                                   className="p-1 hover:bg-red-100 rounded transition"
                                   title="Delete"
                                 >

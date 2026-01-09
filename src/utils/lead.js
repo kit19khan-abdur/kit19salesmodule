@@ -138,3 +138,33 @@ export const getDocumentsByLeadId = async (payload) => {
         throw error;
     }
 }
+
+export const getNotifications = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/DisplayNotification', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getNotifications error:', error);
+        throw error;
+    }
+}
+
+export const updateDialerData = async (payload) => {
+    try {
+        const response = await serviceInstance.post('DialerSetting/UpdateDialerData', payload);
+        return response.data;
+    } catch (error) {
+        console.error('updateDialerData error:', error);
+        throw error;
+    }
+}
+
+export const getScheduleCallAction = async (payload) => {
+    try {
+        const response = await serviceInstance.post('DialerSetting/GetScheduleCallAction', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getScheduleCallAction error:', error);
+        throw error;
+    }
+}
