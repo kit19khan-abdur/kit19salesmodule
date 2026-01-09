@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Phone, Mail, FileText, Upload, Download, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowRight, List, Calendar, Copy, Trash2, UserMinus, UserX, Pin, ArrowUp, ArrowDown, MessageSquareMore } from 'lucide-react';
 import ColumnHeaderMenu from './ColumnHeaderMenu';
 import { TfiLayoutColumn3 } from "react-icons/tfi";
-import RowActionMenu from '../../../../components/RowActionMenu';
 import EnquiryFilterPanel from '../EnquiryFilterPanel';
 import Modal from '../../../../components/common/Modal';
 import PopUpModal from '../../../../components/PopUpModal/PopUpModal';
@@ -27,6 +26,8 @@ import AddAppointmentForm from '../../../../components/EnquiriesForms/AddAppoint
 import nodata from '../../../../assets/nodata.gif';
 import WhatsAppForm from '../../../../components/EnquiriesForms/WhatsAppForm';
 import MergeLead from '../../../../components/LeadForm/MergeLead';
+import EnquiryRowActionMenu from '../../../../components/EnquiryRowActionMenu';
+import EditEnquiryForm from '../../../../components/EnquiriesForms/EditEnquiryForm';
 
 const EnquiryTable = ({
     enquiries,
@@ -98,6 +99,8 @@ const EnquiryTable = ({
     const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, enquiryId: null });
     const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
     const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
+    const [isEditEnquiryModal, setIsEditEnquiryModal] = useState(false);
+    const [selectedEnquiryForEdit, setSelectedEnquiryForEdit] = useState(null);
     const totalPages = Math.ceil(totalRecord / itemsPerPage);
 
     // Start/stop call timer when call widget is shown/hidden
@@ -1175,14 +1178,17 @@ const EnquiryTable = ({
                                                 </span>
                                             </div>
                                             {/* Row action menu dropdown */}
-                                            <RowActionMenu
+                                            <EnquiryRowActionMenu
                                                 show={rowMenu.show && rowMenu.rowId === enquiry.EnquiryId}
                                                 anchorRef={{ current: rowMenuAnchorRefs.current[enquiry.EnquiryId] }}
                                                 onClose={() => setRowMenu({ show: false, rowId: null })}
                                                 menuId={`row-action-menu-${enquiry.EnquiryId}`}
                                                 onAction={action => {
                                                     setRowMenu({ show: false, rowId: null });
-                                                    if (action === 'sendVoice') {
+                                                    if (action === 'edit') {
+                                                        setSelectedEnquiryForEdit(enquiry);
+                                                        setIsEditEnquiryModal(true);
+                                                    } else if (action === 'sendVoice') {
                                                         setIsSendVoiceModal(true);
                                                     } else if (action === 'meeting') {
                                                         setIsCreateMeetingModal(true)
@@ -1869,6 +1875,49 @@ const EnquiryTable = ({
                     Are you sure you want to delete Enquiry Id: <strong>{deleteConfirmModal.enquiryId}</strong>?
                 </p>
             </Modal>
+
+            {/* Edit Enquiry Modal */}
+            <PopUpModal
+                isOpen={isEditEnquiryModal}
+                onClose={() => {
+                    setIsEditEnquiryModal(false);
+                    setSelectedEnquiryForEdit(null);
+                }}
+                title="Edit Details"
+                size="xl"
+                footer={
+                     <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsEditEnquiryModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="primary"
+                            onClick={() => {
+                                console.log('Update enquiry');
+                                setIsEditEnquiryModal(false);
+                            }}
+                        >
+                            Update
+                        </Button>
+                    </div>
+                }
+            >
+                <EditEnquiryForm 
+                    enquiry={selectedEnquiryForEdit}
+                    onClose={() => {
+                        setIsEditEnquiryModal(false);
+                        setSelectedEnquiryForEdit(null);
+                    }}
+                    onSubmit={(data) => {
+                        console.log('Updated data:', data);
+                        setIsEditEnquiryModal(false);
+                        setSelectedEnquiryForEdit(null);
+                    }}
+                />
+            </PopUpModal>
         </div>
     );
 };

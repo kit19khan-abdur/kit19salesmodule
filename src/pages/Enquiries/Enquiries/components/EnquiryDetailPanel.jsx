@@ -100,7 +100,7 @@ const EnquiryDetailPanel = ({ enquiry, onClose, activities = [] }) => {
 
           {/* Lead Details */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Lead Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Enquiry Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-gray-500 mb-1">Enquiry ID</p>

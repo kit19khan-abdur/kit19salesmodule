@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { Edit, Trash2, Mic, BookCheck, ListChevronsDownUp } from 'lucide-react';
+import { Edit, Trash2, Mic, BookCheck, ListChevronsDownUp, Spotlight, CloudUpload } from 'lucide-react';
 import { FaRegMoneyBillAlt, FaUsers } from "react-icons/fa";
 import { FaUsersGear } from "react-icons/fa6";
 import { SiJfrogpipelines } from 'react-icons/si';
 import { GrDocumentConfig } from 'react-icons/gr';
 import { HiOutlineDocumentText } from 'react-icons/hi2';
+import { GoGitBranch } from 'react-icons/go';
 
 const RowActionMenu = ({ show, anchorRef, onClose, onAction, menuId }) => {
   const menuRef = useRef(null);
@@ -31,15 +32,18 @@ const RowActionMenu = ({ show, anchorRef, onClose, onAction, menuId }) => {
   return (
     <div
       id={menuId}
-      className="absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[220px] py-2 mt-2 right-0"
+      className="absolute z-50 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[220px] py-2 mt-2 right-0 max-h-[200px] overflow-y-auto"
       style={{ top: '65%', left: 'auto' }}
       ref={menuRef}
       onClick={(e) => e.stopPropagation()}
     >
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('edit')}><Spotlight className="w-4 h-4 mr-2" />Add FollowUp</button>
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('edit')}><GoGitBranch className="w-4 h-4 mr-2" />Merge Leads</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('edit')}><Edit className="w-4 h-4 mr-2" />Edit all fields</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('addTask')}><BookCheck className="w-4 h-4 mr-2" />Add Task</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('addDeal')}><SiJfrogpipelines className="w-4 h-4 mr-2" />Add Deal</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('sendVoice')}><Mic className="w-4 h-4 mr-2" />Send Voice</button>
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('meeting')}><CloudUpload className="w-4 h-4 mr-2" />Upload Document</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('meeting')}><FaUsersGear className="w-4 h-4 mr-2" />Create Meeting</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('taxSetting')}><FaRegMoneyBillAlt className="w-4 h-4 mr-2" />Add Tax Setting</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('quotation')}><GrDocumentConfig className="w-4 h-4 mr-2" />Add Quotation</button>
