@@ -355,8 +355,8 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                             onDragEnd={handleDragEnd}
                                             onClick={() => setActiveTab(tab)}
                                             className={`py-4 text-sm font-medium capitalize border-b-2 transition cursor-move ${activeTab === tab
-                                                    ? 'border-blue-600 text-blue-600'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                                                ? 'border-blue-600 text-blue-600'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700'
                                                 } ${isRightCollapsed ? 'flex-1' : ''} ${draggedTab === tab ? 'opacity-50' : ''
                                                 }`}
                                         >
@@ -901,7 +901,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                     </div>
                 }
             >
-                <EditEnquiryForm 
+                <EditEnquiryForm
                     enquiry={enquiry}
                     onClose={() => setIsEditEnquiryModal(false)}
                     onSubmit={(data) => {

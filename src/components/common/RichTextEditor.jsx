@@ -134,7 +134,7 @@ const RichTextEditor = ({
         ref={editorRef}
         contentEditable
         onInput={handleInput}
-        className="px-3 py-2 min-h-[60px] outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+        className="px-3 py-2 min-h-[60px] outline-none rounded-b-[10px] focus:ring-2 focus:ring-blue-500 focus:ring-inset"
         style={{ 
           minHeight: `${rows * 24}px`,
           maxHeight: '300px',

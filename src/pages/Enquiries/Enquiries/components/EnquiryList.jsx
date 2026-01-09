@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Upload, Download, List } from 'lucide-react';
+import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Upload, Download, List, Plus } from 'lucide-react';
 import PremiumButton from './PremiumButton';
 import CapSuleButton from '../../../../components/CapSuleButton';
 import PopUpModal from '../../../../components/PopUpModal/PopUpModal';
 import Button from '../../../../components/common/Button';
 import ImportData from '../../../../components/ImportData/ImportData';
+import AddEnquiryForm from '../../../../components/EnquiriesForms/AddEnquiryForm';
 
 
 const EnquiryList = ({
@@ -30,6 +31,7 @@ const EnquiryList = ({
   setItemsPerPage
 }) => {
   const [isImportDataModal, setIsImportDataModal] = useState(false);
+  const [isAddEnquiryModal, setIsAddEnquiryModal] = useState(false);
   const listRef = useRef(null);
 
   const handleCancelImportDataModal = () => {
@@ -66,7 +68,7 @@ const EnquiryList = ({
     };
   }, [isLoading, hasMore, onLoadMore]);
 
- 
+
   if (isCollapsed) return null;
 
   const statusColors = {
@@ -102,21 +104,16 @@ const EnquiryList = ({
             />
           </div>
 
-          {/* View Toggle */}
-          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+          <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
             <button
               onClick={() => setViewMode('card')}
-              className={`p-2 transition ${viewMode === 'card' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-              title="Card View"
+              className={`p-1.5 rounded ${viewMode === 'card' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`p-2 transition ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-              title="Table View"
+              className={`p-1.5 rounded ${viewMode === 'table' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
             >
               <List className="w-4 h-4" />
             </button>
@@ -124,6 +121,13 @@ const EnquiryList = ({
 
           {/* More Menu */}
           <div className="relative" ref={toolbarMenuRef}>
+            <button
+              className="p-2 hover:bg-gray-100 rounded-lg transition"
+              title="Add Enquiry"
+              onClick={() => setIsAddEnquiryModal(true)}
+            >
+              <Plus className="w-4 h-4 text-gray-600" />
+            </button>
             <button
               className="p-2 hover:bg-gray-100 rounded-lg transition"
               title="More"
@@ -264,6 +268,41 @@ const EnquiryList = ({
         }
       >
         <ImportData onClose={handleCancelImportDataModal} onSubmit={handleImportData} />
+      </PopUpModal>
+
+      {/* Add Enquiry Modal */}
+      <PopUpModal
+        isOpen={isAddEnquiryModal}
+        onClose={() => setIsAddEnquiryModal(false)}
+        title="Add Enquiry"
+        size="xl"
+        footer={
+          <div className="flex justify-between w-full">
+            <Button
+              variant="secondary"
+              onClick={() => setIsAddEnquiryModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                console.log('Save enquiry');
+                setIsAddEnquiryModal(false);
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        }
+      >
+        <AddEnquiryForm
+          onClose={() => setIsAddEnquiryModal(false)}
+          onSubmit={(data) => {
+            console.log('Enquiry data:', data);
+            setIsAddEnquiryModal(false);
+          }}
+        />
       </PopUpModal>
 
 
