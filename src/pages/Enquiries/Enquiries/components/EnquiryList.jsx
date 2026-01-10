@@ -164,13 +164,13 @@ const EnquiryList = ({
                   <RefreshCw className="w-4 h-4 text-gray-600" />
                   <span>Refresh</span>
                 </button>
-                <button
+                {/* <button
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
                   onClick={() => setShowToolbarMenu(false)}
                 >
                   <Filter className="w-4 h-4 text-gray-600" />
                   <span>Filter</span>
-                </button>
+                </button> */}
                 <button
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
                   onClick={() => {
