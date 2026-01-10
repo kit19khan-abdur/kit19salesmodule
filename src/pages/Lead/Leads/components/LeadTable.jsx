@@ -1,5 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, Phone, Mail, FileText, LayoutGrid, List, RefreshCw, MoreVertical, ChevronLeft, ChevronRight, MessageSquare, Trash2, MessageSquareMore, ChevronDown, Spotlight, NotebookPen, CloudUpload, Filter, Upload, Download, ChevronUp } from 'lucide-react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import {
+    Search, Phone, Mail, FileText, LayoutGrid,
+    List, RefreshCw, MoreVertical, ChevronLeft, ChevronRight,
+    MessageSquare, Trash2, MessageSquareMore, ChevronDown, Spotlight,
+    NotebookPen, CloudUpload, Filter, Upload, Download, ChevronUp,
+    ArrowUp, ArrowDown, Pin
+} from 'lucide-react';
 import { GoGitBranch } from 'react-icons/go';
 import { FaWhatsapp } from 'react-icons/fa';
 import { TfiLayoutColumn3 } from 'react-icons/tfi';
@@ -12,6 +18,7 @@ import PopUpModal from '../../../../components/common/Modal';
 import ScheduleCallForm from './ScheduleCallForm';
 import ImportData from '../../../../components/ImportData/ImportData';
 import Button from '../../../../components/common/Button';
+import ColumnHeaderMenu from '../../../Enquiries/Enquiries/components/ColumnHeaderMenu';
 
 const LeadTable = ({
     leads,
@@ -58,10 +65,20 @@ const LeadTable = ({
         LastFollowupedOn: true,
         FollowupStatus: true
     });
-    const [isImportDataModal, setIsImportDataModal] = useState(false);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+    const [headerMenu, setHeaderMenu] = useState({ show: false, col: null });
+    const [pinnedColumn, setPinnedColumn] = useState(null);
+    const headerIconRefs = useRef({}); const [isImportDataModal, setIsImportDataModal] = useState(false);
+    const [filters, setFilters] = useState({});
     const toolbarMenuRef = useRef(null);
     const columnSearchRef = useRef(null);
     const totalPages = Math.ceil(totalRecord / parseInt(itemsPerPage));
+
+    // Debug: log headerMenu changes to trace unexpected opens
+    useEffect(() => {
+        // eslint-disable-next-line no-console
+        console.log('DEBUG headerMenu ->', headerMenu);
+    }, [headerMenu]);
 
     const getInitials = (name) => {
         if (!name) return '?';
@@ -82,6 +99,53 @@ const LeadTable = ({
         if (num === 9) return 'bg-red-500';
         if (num >= 10) return 'bg-red-600';
         return 'bg-blue-500';
+    };
+
+    const sortedLeads = useMemo(() => {
+        if (!sortConfig.key) return leads;
+        return [...leads].sort((a, b) => {
+            const aVal = a[sortConfig.key];
+            const bVal = b[sortConfig.key];
+            if (aVal == null) return 1;
+            if (bVal == null) return -1;
+            if (typeof aVal === 'string' && typeof bVal === 'string') {
+                return sortConfig.direction === 'asc'
+                    ? aVal.localeCompare(bVal)
+                    : bVal.localeCompare(aVal);
+            }
+            if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+    }, [leads, sortConfig]);
+    const handleSortAsc = (key) => {
+        setSortConfig({ key, direction: 'asc' });
+        setHeaderMenu({ show: false, col: null });
+    };
+
+    const handleSortDesc = (key) => {
+        setSortConfig({ key, direction: 'desc' });
+        setHeaderMenu({ show: false, col: null });
+    };
+
+    const handleHideColumn = (key) => {
+        // Prevent hiding required columns
+        if (key === 'leadDetails' || key === 'mobileNo') {
+            setHeaderMenu({ show: false, col: null });
+            return;
+        }
+        setVisibleColumns(prev => ({ ...prev, [key]: false }));
+        setHeaderMenu({ show: false, col: null });
+    };
+
+    const handlePinColumn = (key) => {
+        // Toggle pin: if already pinned, unpin it
+        setPinnedColumn(prev => prev === key ? null : key);
+        setHeaderMenu({ show: false, col: null });
+    };
+
+    const handleFilterColumn = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
     };
 
     const handleColumnToggle = (columnKey) => {
@@ -611,22 +675,154 @@ const LeadTable = ({
                             </th>
                             {visibleColumns.leadDetails && (
                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Lead Details
+                                    <div className="flex items-center gap-1">
+                                        Lead Details
+                                        {pinnedColumn === 'leadDetails' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'PersonName' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['leadDetails'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'leadDetails'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'leadDetails' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'leadDetails'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'leadDetails'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['leadDetails'] }}
+                                        onSortAsc={() => handleSortAsc('PersonName')}
+                                        onSortDesc={() => handleSortDesc('PersonName')}
+                                        onPin={() => handlePinColumn('leadDetails')}
+                                        onHide={() => handleHideColumn('leadDetails')}
+                                        onFilter={(value) => handleFilterColumn('PersonName', value)}
+                                        canHide={false}
+                                    />
                                 </th>
                             )}
                             {visibleColumns.mobileNo && (
                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Mobile No
+                                    <div className="flex items-center gap-1">
+                                        Mobile No
+                                        {pinnedColumn === 'mobileNo' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'MobileNo' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['mobileNo'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'mobileNo'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'mobileNo' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'mobileNo'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'mobileNo'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['mobileNo'] }}
+                                        onSortAsc={() => handleSortAsc('MobileNo')}
+                                        onSortDesc={() => handleSortDesc('MobileNo')}
+                                        onPin={() => handlePinColumn('mobileNo')}
+                                        onHide={() => handleHideColumn('mobileNo')}
+                                        onFilter={(value) => handleFilterColumn('MobileNo', value)}
+                                        canHide={true}
+                                    />
                                 </th>
                             )}
                             {visibleColumns.emailId && (
                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Email ID
+                                    <div className="flex items-center gap-1">
+                                        Email ID
+                                        {pinnedColumn === 'emailId' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'EmailId' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['emailId'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'emailId'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'emailId' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'emailId'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'emailId'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['emailId'] }}
+                                        onSortAsc={() => handleSortAsc('EmailId')}
+                                        onSortDesc={() => handleSortDesc('EmailId')}
+                                        onPin={() => handlePinColumn('emailId')}
+                                        onHide={() => handleHideColumn('emailId')}
+                                        onFilter={(value) => handleFilterColumn('EmailId', value)}
+                                        canHide={true}
+                                    />
                                 </th>
                             )}
                             {visibleColumns.creationDetails && (
                                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Creation Details
+                                    <div className="flex items-center gap-1">
+                                        Creation Details
+                                        {pinnedColumn === 'creationDetails' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'CreatedDate' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['creationDetails'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'creationDetails'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'creationDetails' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'creationDetails'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'creationDetails'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['creationDetails'] }}
+                                        onSortAsc={() => handleSortAsc('CreatedDate')}
+                                        onSortDesc={() => handleSortDesc('CreatedDate')}
+                                        onPin={() => handlePinColumn('creationDetails')}
+                                        onHide={() => handleHideColumn('creationDetails')}
+                                        onFilter={(value) => handleFilterColumn('CreatedDate', value)}
+                                        canHide={true}
+                                    />
                                 </th>
                             )}
                             {visibleColumns.source && (
@@ -789,6 +985,7 @@ const LeadTable = ({
                                             </div>
                                         </td>
                                     )}
+                                    {/* {console.log(`leads`, lead)} */}
                                     {visibleColumns.mobileNo && (
                                         <td className="px-4 py-2">
                                             <div
@@ -800,17 +997,17 @@ const LeadTable = ({
                                                 }}
                                                 className="flex cursor-pointer hover:text-[#088b7e] items-center gap-1 text-blue-600 font-medium"
                                             >
-                                                <span>{lead.MobileNo ? lead.CsvMobileNo : '-'}</span>
+                                                <span>{lead.MobileNo ? lead.MobileNo : '-'}</span>
                                             </div>
                                         </td>
                                     )}
                                     {visibleColumns.emailId && (
                                         <td className="px-4 py-2">
                                             <div className="flex items-center gap-3 text-xs">
-                                                {lead.EmailId && (
+                                                {lead.EmailID && (
                                                     <div className="flex items-center gap-1 text-gray-600">
                                                         <Mail className="w-3 h-3" />
-                                                        <span className="truncate max-w-50">{lead.EmailId ? lead.CsvEmailId : '-'}</span>
+                                                        <span className="truncate max-w-50">{lead.EmailID ? lead.EmailID : '-'}</span>
                                                     </div>
                                                 )}
                                             </div>

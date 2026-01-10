@@ -413,7 +413,7 @@ const LeadList = ({
                     </div>
                   </div>
                   <p className="text-xs text-gray-600 mb-2">{lead.MobileNo}</p>
-                  {console.log(`lead`, lead)}
+                  {/* {console.log(`lead`, lead)} */}
                   <span
                     className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead)}`}
                   >
