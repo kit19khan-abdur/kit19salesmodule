@@ -42,8 +42,7 @@ const LeadList = ({
   const [isImportDataModal, setIsImportDataModal] = useState(false);
 
   const getStatusColor = (lead) => {
-    if (lead.IsOpen) return 'bg-green-100 text-green-700';
-    return 'bg-gray-600 text-white';
+    return 'bg-green-100 text-green-700';
   };
 
   const getBadgeColor = (count) => {
@@ -96,6 +95,7 @@ const LeadList = ({
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
   }, [hasMore, isLoading, onLoadMore]);
+  
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (toolbarMenuRef.current && !toolbarMenuRef.current.contains(event.target)) {
@@ -234,8 +234,6 @@ const LeadList = ({
             </div>
           </div>
         </div>
-
-
 
         {/* Mass Operation Buttons */}
         {selectedLeads.length > 0 && (
@@ -415,10 +413,11 @@ const LeadList = ({
                     </div>
                   </div>
                   <p className="text-xs text-gray-600 mb-2">{lead.MobileNo}</p>
+                  {console.log(`lead`, lead)}
                   <span
                     className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(lead)}`}
                   >
-                    {lead.IsOpen ? 'Open' : 'Closed'}
+                    {lead.FollowupStatus}
                   </span>
                 </div>
               </div>
