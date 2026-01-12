@@ -145,7 +145,7 @@ const CreateMeetingForm = () => {
 
       {/* Recurring options (visible only when recurring is checked) */}
       {isRecurring && (
-        <div className="mb-4 border border-gray-100 rounded p-3 bg-gray-50">
+        <div className="mb-4 border rounded p-3">
           <div className="mb-3">
             <label className="block text-sm font-medium text-gray-700 mb-1">Repeat type</label>
             <select
