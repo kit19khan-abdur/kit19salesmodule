@@ -21,6 +21,11 @@ const API_ENDPOINTS = {
     EXPORT: '/enquiries/export',
     MERGE: '/enquiries/merge',
     FIND_DUPLICATES: '/enquiries/duplicates',
+    SEND_EMAIL: '/UserCRM/SendEmailFromUser',
+    SEND_SMS: '/UserCRM/SendSMSFromUser',
+    GET_SENDER_LIST: '/UserCRM/GetSenderIdList',
+  VOICE_DNI: '/UserCRM/VoiceDni',
+    APP_FLOW: '/UserCRM/FuncToGetList_AppFlow',
     
     ACTIVITIES: (id) => `/enquiries/${id}/activities`
   },

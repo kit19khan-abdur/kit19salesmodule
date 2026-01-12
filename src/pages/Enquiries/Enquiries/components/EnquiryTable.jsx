@@ -26,6 +26,9 @@ import CreateMeetingForm from '../../../../components/EnquiriesForms/CreateMeeti
 import AddAppointmentForm from '../../../../components/EnquiriesForms/AddAppointmentForm';
 import nodata from '../../../../assets/nodata.gif';
 import WhatsAppForm from '../../../../components/EnquiriesForms/WhatsAppForm';
+import { axiosinstance, serviceInstance } from '../../../../axiosinstance';
+import API_ENDPOINTS from '../../../../config/apiEndpoints';
+import { getSession } from '../../../../getSession';
 
 const EnquiryTable = ({
     enquiries,
@@ -87,6 +90,12 @@ const EnquiryTable = ({
     const [isSendIndividualMailModal, setIsSendIndividualMailModal] = useState(false);
     const [isSendIndividualSMSModal, setIsSendIndividualSMSModal] = useState(false);
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
+    const [selectedEnquiryForVoice, setSelectedEnquiryForVoice] = useState(null);
+    const [voiceFormData, setVoiceFormData] = useState(null);
+    const [selectedEnquiryForMail, setSelectedEnquiryForMail] = useState(null);
+    const [mailFormData, setMailFormData] = useState(null);
+    const [selectedEnquiryForSMS, setSelectedEnquiryForSMS] = useState(null);
+    const [smsFormData, setSmsFormData] = useState(null);
     const [showCallWidget, setShowCallWidget] = useState(false);
     const [showCallWidgetMenu, setShowCallWidgetMenu] = useState(false);
     const [callStatus, setCallStatus] = useState('Requesting');
@@ -464,20 +473,126 @@ const EnquiryTable = ({
         setIsSendIndividualMailModal(false);
     }
 
-    const handleSendIndividualMail = (data) => {
-        console.log('Send individual mail data:', data);
-        alert('Mail sent successfully!');
-        setIsSendIndividualMailModal(false);
+    const handleSendIndividualMail = async () => {
+        try {
+            if (!mailFormData) {
+                alert('Please fill in the mail details');
+                return;
+            }
+            
+            console.log('Send individual mail data:', mailFormData);
+            
+            const session = getSession();
+            
+            // Get the first selected email and corresponding from account
+            const toEmail = mailFormData?.selectedEmails?.[0] || '';
+            const fromAccount = mailFormData?.fromAccounts?.[toEmail] || '';
+            
+            // Prepare SendEmail_BO structure
+            const objSendMail = {
+                Account: session.parentId?.toString() || '0',
+                SenderName:fromAccount, //session.DisplayName || session.FName + ' ' + session.LName,
+                ReplyTo: fromAccount,
+                EmailType: mailFormData?.mailMode === 'template' ? 'Template' : 'Compose',
+                Email: toEmail,
+                Email1: mailFormData?.selectedEmails?.[1] || '',
+                Email2: mailFormData?.selectedEmails?.[2] || '',
+                Message: mailFormData?.mailBody || '',
+                Template: mailFormData?.selectedTemplate || '',
+                Subject: mailFormData?.subject || '',
+                EnquiryLeadId: selectedEnquiryForMail?.EnquiryId || 0,
+                EntityType: 'Enquiry',
+                FromMailID: fromAccount,
+                UserId: session.userId?.toString() || '0'
+            };
+
+            // Prepare the payload according to RequestParamEntity structure
+            const payload = {
+                Token: session.token,
+                Details: JSON.stringify({ objSendMail })
+            };
+
+            console.log('Sending email with payload:', payload);
+
+            // Make API call to send email using serviceInstance (https://services.kit19.com)
+            const response = await serviceInstance.post(API_ENDPOINTS.ENQUIRIES.SEND_EMAIL, payload);
+            
+            console.log('Email response:', response.data);
+            
+            if (response.data.Status === 1) {
+                alert(response.data.Message || 'Mail sent successfully!');
+                setIsSendIndividualMailModal(false);
+                setMailFormData(null);
+                setSelectedEnquiryForMail(null);
+            } else if (response.data.Status === -1) {
+                alert('Invalid Token. Please login again.');
+            } else {
+                alert('Failed to send mail: ' + (response.data.Message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error sending mail:', error);
+            alert('Error sending mail: ' + (error.response?.data?.Message || error.message));
+        }
     }
 
     const handleCancelIndividualSMS = () => {
         setIsSendIndividualSMSModal(false);
     }
 
-    const handleSendIndividualSMS = (data) => {
-        console.log('Send individual SMS data:', data);
-        alert('SMS sent successfully!');
-        setIsSendIndividualSMSModal(false);
+    const handleSendIndividualSMS = async () => {
+        try {
+            console.log('Send individual SMS form data:', smsFormData, 'selectedEnquiryForSMS:', selectedEnquiryForSMS);
+            const session = getSession();
+
+            const numbers = smsFormData?.selectedNumbers || [];
+            const mobileNo = numbers[0] || '';
+            const mobileNo1 = numbers[1] || '';
+            const mobileNo2 = numbers[2] || '';
+
+            const sender = smsFormData?.senderId || smsFormData?.senderIdNonIndian || '';
+
+            const objSendSMS = {
+                Account: session.parentId?.toString() || '0',
+                SenderId: sender,
+                MobileNo: mobileNo,
+                MobileNo1: mobileNo1,
+                MobileNo2: mobileNo2,
+                Message: smsFormData?.message || '',
+                DLTTemplateId: smsFormData?.selectedTemplate || '',
+                SMSType: 'Transactional',
+                IsUnicode: !!smsFormData?.isUnicode,
+                UrlTrack: !!smsFormData?.urlTrack,
+                EnquiryLeadId: selectedEnquiryForSMS?.EnquiryId || 0,
+                EntityType: 'Enquiry',
+                UserId: session.userId?.toString() || '0',
+                AppType: smsFormData?.appType || ''
+            };
+
+            const payload = {
+                Token: session.token,
+                Details: JSON.stringify({ objSendSMS })
+            };
+
+            console.log('Sending SMS with payload:', payload);
+
+            const response = await serviceInstance.post(API_ENDPOINTS.ENQUIRIES.SEND_SMS, payload);
+
+            console.log('SMS response:', response.data);
+
+            if (response.data.Status === 1) {
+                alert(response.data.Message || 'SMS sent successfully!');
+                setIsSendIndividualSMSModal(false);
+                setSmsFormData(null);
+                setSelectedEnquiryForSMS(null);
+            } else if (response.data.Status === -1) {
+                alert('Invalid Token. Please login again.');
+            } else {
+                alert('Failed to send SMS: ' + (response.data.Message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error sending SMS:', error);
+            alert('Error sending SMS: ' + (error.response?.data?.Message || error.message));
+        }
     }
 
     const handleCancelVoice = () => {
@@ -485,9 +600,16 @@ const EnquiryTable = ({
     }
 
     const handleSendVoice = (data) => {
-        console.log('Send voice data:', data);
-        alert('Voice message sent successfully!');
+        // Prefer data param if provided, otherwise use form state collected via onFormChange
+        const payloadData = data || voiceFormData || {};
+        console.log('Send voice payload data:', payloadData, 'selectedEnquiry:', selectedEnquiryForVoice);
+
+        // TODO: Build objSendVoice and POST to backend similar to SMS/Email flows.
+        // For now, just show success and close modal. When you provide the endpoint we can implement the request.
+        alert('Voice message queued (mock): ' + (payloadData?.dniNumber || payloadData?.dni || '') );
         setIsSendVoiceModal(false);
+        setVoiceFormData(null);
+        setSelectedEnquiryForVoice(null);
     }
 
     // Helper for all page numbers
@@ -1115,6 +1237,7 @@ const EnquiryTable = ({
                                                         className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
+                                                            setSelectedEnquiryForMail(enquiry);
                                                             setIsSendIndividualMailModal(true);
                                                         }}
                                                     />
@@ -1139,6 +1262,7 @@ const EnquiryTable = ({
                                                         className="w-5 h-5 text-gray-400 cursor-pointer hover:text-blue-600"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
+                                                            setSelectedEnquiryForSMS(enquiry);
                                                             setIsSendIndividualSMSModal(true);
                                                         }}
                                                     />
@@ -1175,6 +1299,9 @@ const EnquiryTable = ({
                                                 onAction={action => {
                                                     setRowMenu({ show: false, rowId: null });
                                                     if (action === 'sendVoice') {
+                                                        // set selected enquiry so the voice form can prefill numbers
+                                                        setSelectedEnquiryForVoice(enquiry);
+                                                        console.log('Opening Send Voice modal for enquiry:', enquiry?.EnquiryId);
                                                         setIsSendVoiceModal(true);
                                                     } else if (action === 'meeting') {
                                                         setIsCreateMeetingModal(true)
@@ -1599,7 +1726,10 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <SendMailForm />
+                <SendMailForm 
+                    selectedEnquiry={selectedEnquiryForMail} 
+                    onFormChange={setMailFormData}
+                />
             </PopUpModal>
 
             <PopUpModal
@@ -1624,7 +1754,10 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <SendSMSForm />
+                <SendSMSForm 
+                    selectedEnquiry={selectedEnquiryForSMS}
+                    onFormChange={setSmsFormData}
+                />
             </PopUpModal>
 
             <PopUpModal
@@ -1649,7 +1782,10 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <SendVoiceForm />
+                <SendVoiceForm
+                    selectedEnquiry={selectedEnquiryForVoice}
+                    onFormChange={setVoiceFormData}
+                />
             </PopUpModal>
 
             <PopUpModal
@@ -1694,7 +1830,7 @@ const EnquiryTable = ({
                             variant='primary'
                             onClick={() => { }}
                         >
-                            Create Meeting
+                            Add Physical Appointment
                         </Button>
                     </div>
                 }

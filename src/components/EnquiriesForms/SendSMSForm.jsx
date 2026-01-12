@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Wand2 } from 'lucide-react';
+import { serviceInstance } from '../../axiosinstance';
+import API_ENDPOINTS from '../../config/apiEndpoints';
+import { getSession } from '../../getSession';
 
-const SendSMSForm = () => {
+const SendSMSForm = ({ selectedEnquiry, onFormChange }) => {
   const [activeTab, setActiveTab] = useState('indian');
   const [selectedNumbers, setSelectedNumbers] = useState([]);
   const [senderId, setSenderId] = useState('');
@@ -13,12 +16,77 @@ const SendSMSForm = () => {
   const [composeSMS, setComposeSMS] = useState('');
   const [senderIdNonIndian, setSenderIdNonIndian] = useState('');
 
-  const mobileNumbers = ['8990005555', '9876543210', '8765432109'];
+    
+    /*'8990005555', '9876543210', '8765432109'*/
+//  const mobileNumbers  
+//   [ 
+//      selectedNumbers.length > 0 ? selectedNumbers[0] : '',
+//      selectedNumbers.length > 1 ? selectedNumbers[1] : '',
+//      selectedNumbers.length > 2 ? selectedNumbers[2] : ''
+//   ]  
+
+  // const mobileNumbers = selectedNumbers.slice(0, 3);
+ 
+    const fallbackMobileNumbers = ['7266895785', '7530824177', '7317458804'];
+    const mobileNumbers = selectedEnquiry && selectedEnquiry.CsvMobileNo
+      ? [selectedEnquiry.CsvMobileNo, ...fallbackMobileNumbers].slice(0, 3)
+      : fallbackMobileNumbers;
+    /*
+    const mobileNumbers = [
+  ...selectedNumbers.slice(0, 3),
+  ...Array(3).fill('')
+    ].slice(0, 3);
+    */
+
+     console.log("Selected Numbers:", selectedNumbers);
+
+
+  const [senderList, setSenderList] = useState([]);
   const senderIds = [
     'Abhi01(Transactional : 15007)(Abhishek I)',
     'KITAPP(Promotional : 12345)(Kit19)',
     'SALES(Transactional : 67890)(Sales Team)'
   ];
+
+  // Fetch sender ID list from backend
+  useEffect(() => {
+    const fetchSenders = async () => {
+      try {
+        const session = getSession();
+        const payload = {
+          Token: session.token,
+          Details: JSON.stringify({ UserId: session.userId || 0 })
+        };
+
+        const resp = await serviceInstance.post(API_ENDPOINTS.ENQUIRIES.GET_SENDER_LIST, payload);
+        if (resp?.data?.Status === 1) {
+          setSenderList(resp.data.Details || []);
+        } else {
+          console.warn('GetSenderList failed', resp?.data);
+        }
+      } catch (err) {
+        console.error('Error fetching sender list', err);
+      }
+    };
+
+    fetchSenders();
+  }, []);
+
+  /*
+  const formatSenderId = (sender) =>
+  `${sender.code}(${sender.type} : ${sender.id})(${sender.owner})`;
+
+  <select value={senderId} onChange={(e) => setSenderId(e.target.value)}>
+  <option value="">Select Sender ID</option>
+  {senderIds.map((sender, index) => (
+    <option key={index} value={sender.code}>
+      {formatSenderId(sender)}
+    </option>
+   ))}
+ </select>
+ */
+
+
   const templates = [
     'Welcome Message',
     'Order Confirmation',
@@ -34,6 +102,30 @@ const SendSMSForm = () => {
     );
   };
 
+  // Auto-select enquiry mobile when a row is selected
+  useEffect(() => {
+    if (selectedEnquiry && selectedEnquiry.CsvMobileNo) {
+      setSelectedNumbers([selectedEnquiry.CsvMobileNo]);
+    }
+  }, [selectedEnquiry]);
+
+  // Notify parent about form changes
+  useEffect(() => {
+    if (typeof onFormChange === 'function') {
+      onFormChange({
+        activeTab,
+        selectedNumbers,
+        senderId,
+        senderIdNonIndian,
+        appType,
+        selectedTemplate,
+        message: activeTab === 'indian' ? message : composeSMS,
+        isUnicode,
+        urlTrack
+      });
+    }
+  }, [activeTab, selectedNumbers, senderId, senderIdNonIndian, appType, selectedTemplate, message, composeSMS, isUnicode, urlTrack, onFormChange]);
+
   return (
     <div className="w-full max-h-[600px] overflow-y-auto px-1">
       {/* Tabs */}
@@ -41,7 +133,7 @@ const SendSMSForm = () => {
         <button
           onClick={() => setActiveTab('indian')}
           className={`px-6 py-2 font-medium text-sm transition-colors ${
-            activeTab === 'indian'
+            activeTab.toLowerCase() === 'indian'
               ? 'text-green-600 border-b-2 border-green-600'
               : 'text-gray-600 hover:text-gray-800'
           }`}
@@ -51,7 +143,7 @@ const SendSMSForm = () => {
         <button
           onClick={() => setActiveTab('non-indian')}
           className={`px-6 py-2 font-medium text-sm transition-colors ${
-            activeTab === 'non-indian'
+            activeTab.toLowerCase === 'non-indian'
               ? 'text-green-600 border-b-2 border-green-600'
               : 'text-gray-600 hover:text-gray-800'
           }`}
@@ -60,7 +152,7 @@ const SendSMSForm = () => {
         </button>
       </div>
 
-      {activeTab === 'indian' ? (
+      {activeTab.toLowerCase() === 'indian' ? (
         <div className="space-y-4">
           {/* Choose Mobile Numbers */}
           <div>
@@ -73,11 +165,11 @@ const SendSMSForm = () => {
                 >
                   <input
                     type="checkbox"
-                    checked={selectedNumbers.includes(number)}
+                    checked={mobileNumbers.includes(number) && number !== ''}
                     onChange={() => handleNumberToggle(number)}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
                   />
-                  <span className="text-sm text-gray-700">{number}</span>
+                  <span className="text-sm text-gray-700-">{number}</span>
                 </label>
               ))}
             </div>
@@ -101,11 +193,15 @@ const SendSMSForm = () => {
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select Sender ID</option>
-              {senderIds.map((id, index) => (
-                <option key={index} value={id}>
-                  {id}
-                </option>
-              ))}
+              {(senderList.length > 0 ? senderList : senderIds).map((s, index) => {
+                const value = typeof s === 'string' ? s : (s.SenderId || s.Sender || s.Code || JSON.stringify(s));
+                const label = typeof s === 'string' ? s : (s.SenderName || s.SenderId || s.Code || JSON.stringify(s));
+                return (
+                  <option key={index} value={value}>
+                    {label}
+                  </option>
+                );
+              })}
             </select>
           </div>
 

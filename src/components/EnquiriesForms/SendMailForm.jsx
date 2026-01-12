@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText } from 'lucide-react';
 
-const SendMailForm = () => {
+const SendMailForm = ({ selectedEnquiry, onFormChange }) => {
   const [selectedEmails, setSelectedEmails] = useState([]);
-  const [fromAccounts, setFromAccounts] = useState(['', '', '']);
+  const [fromAccounts, setFromAccounts] = useState({});
   const [mailMode, setMailMode] = useState('template'); // 'template' or 'compose'
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [subject, setSubject] = useState('');
   const [mailBody, setMailBody] = useState('');
 
   const availableEmails = [
-    'webhui897@gmail.com',
-    'contact@example.com',
-    'support@company.com'
+    //'webhui897@gmail.com',
+    //'contact@example.com',
+    //'support@company.com'
   ];
 
   const emailAccounts = [
@@ -28,18 +28,66 @@ const SendMailForm = () => {
     { id: 4, name: 'FollowUpTemplate', type: 'Follow-up' }
   ];
 
+  // Auto-select email from selected enquiry
+  useEffect(() => {
+    if (selectedEnquiry && selectedEnquiry.CsvEmailId) {
+      const enquiryEmail = selectedEnquiry.CsvEmailId;
+      // Auto-check the checkbox if email exists in available list
+      if (availableEmails.includes(enquiryEmail)) {
+        setSelectedEmails([enquiryEmail]);
+        setFromAccounts({ [enquiryEmail]: '' });
+      } else {
+        // Add the enquiry email to the list even if it's not in the predefined list
+        setSelectedEmails([enquiryEmail]);
+        setFromAccounts({ [enquiryEmail]: '' });
+      }
+    }
+  }, [selectedEnquiry]);
+
+  // Update parent component whenever form data changes
+  useEffect(() => {
+    if (onFormChange) {
+      onFormChange({
+        selectedEmails,
+        fromAccounts,
+        mailMode,
+        selectedTemplate,
+        subject,
+        mailBody
+      });
+    }
+  }, [selectedEmails, fromAccounts, mailMode, selectedTemplate, subject, mailBody, onFormChange]);
+
   const handleEmailToggle = (email) => {
-    setSelectedEmails(prev =>
-      prev.includes(email)
-        ? prev.filter(e => e !== email)
-        : [...prev, email]
-    );
+    setSelectedEmails(prev => {
+      if (prev.includes(email)) {
+        // Remove email and its associated account
+        const newAccounts = { ...fromAccounts };
+        delete newAccounts[email];
+        setFromAccounts(newAccounts);
+        return prev.filter(e => e !== email);
+      } else {
+        // Add email with empty account
+        setFromAccounts(prevAccounts => ({ ...prevAccounts, [email]: '' }));
+        return [...prev, email];
+      }
+    });
   };
 
-  const handleAccountChange = (index, value) => {
-    const newAccounts = [...fromAccounts];
-    newAccounts[index] = value;
-    setFromAccounts(newAccounts);
+  const handleAccountChange = (email, value) => {
+    setFromAccounts(prev => ({
+      ...prev,
+      [email]: value
+    }));
+  };
+
+  // Combine available emails with enquiry email if it exists and is not already in the list
+  const getEmailList = () => {
+    const emails = [...availableEmails];
+    if (selectedEnquiry && selectedEnquiry.CsvEmailId && !emails.includes(selectedEnquiry.CsvEmailId)) {
+      emails.unshift(selectedEnquiry.CsvEmailId); // Add to the beginning
+    }
+    return emails;
   };
 
   return (
@@ -48,7 +96,7 @@ const SendMailForm = () => {
       <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-700 mb-3">Choose Emails</h3>
         <div className="space-y-2">
-          {availableEmails.map((email, index) => (
+          {getEmailList().map((email, index) => (
             <label
               key={index}
               className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer"
@@ -65,25 +113,29 @@ const SendMailForm = () => {
         </div>
       </div>
 
-      {/* From Account Dropdowns */}
-      <div className="mb-6 space-y-3">
-        {fromAccounts.map((account, index) => (
-          <div key={index}>
-            <select
-              value={account}
-              onChange={(e) => handleAccountChange(index, e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">--Select Accounts--</option>
-              {emailAccounts.map((acc, idx) => (
-                <option key={idx} value={acc}>
-                  {acc}
-                </option>
-              ))}
-            </select>
-          </div>
-        ))}
-      </div>
+      {/* From Account Dropdowns - Bound to Selected Emails */}
+      {selectedEmails.length > 0 && (
+        <div className="mb-6 space-y-3">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Select From Account</h3>
+          {selectedEmails.map((email) => (
+            <div key={email} className="space-y-1">
+              <label className="text-xs text-gray-600">For: {email}</label>
+              <select
+                value={fromAccounts[email] || ''}
+                onChange={(e) => handleAccountChange(email, e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">--Select Account--</option>
+                {emailAccounts.map((acc, idx) => (
+                  <option key={idx} value={acc}>
+                    {acc}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Mail Mode Selection */}
       <div className="mb-6 space-y-3">

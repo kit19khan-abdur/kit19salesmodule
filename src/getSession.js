@@ -6,7 +6,7 @@ export const getSession = () => {
 
 
   return {
-    token: token || null,
+    token: "-2295521862261168", //token || "-2295521862261168",// null,
     userId: isNaN(userId) ? null : userId,
     parentId: isNaN(parentId) ? null : parentId,
     FName: localStorage.getItem('FName') || '',
