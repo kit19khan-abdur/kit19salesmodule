@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Upload, Download, List } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Upload, Download, List, Plus } from 'lucide-react';
 import PremiumButton from './PremiumButton';
 import CapSuleButton from '../../../../components/CapSuleButton';
 import PopUpModal from '../../../../components/PopUpModal/PopUpModal';
 import Button from '../../../../components/common/Button';
 import ImportData from '../../../../components/ImportData/ImportData';
+import AddEnquiryForm from '../../../../components/EnquiriesForms/AddEnquiryForm';
 
 
 const EnquiryList = ({
@@ -30,6 +31,8 @@ const EnquiryList = ({
   setItemsPerPage
 }) => {
   const [isImportDataModal, setIsImportDataModal] = useState(false);
+  const [isAddEnquiryModal, setIsAddEnquiryModal] = useState(false);
+  const listRef = useRef(null);
 
   const handleCancelImportDataModal = () => {
     setIsImportDataModal(false);
@@ -41,7 +44,31 @@ const EnquiryList = ({
     setIsImportDataModal(false);
   }
 
- 
+  // Infinite scroll handler
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!listRef.current || isLoading || !hasMore) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+      // Trigger when user scrolls to within 100px of the bottom
+      if (scrollTop + clientHeight >= scrollHeight - 100) {
+        onLoadMore();
+      }
+    };
+
+    const currentRef = listRef.current;
+    if (currentRef) {
+      currentRef.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (currentRef) {
+        currentRef.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [isLoading, hasMore, onLoadMore]);
+
+
   if (isCollapsed) return null;
 
   const statusColors = {
@@ -77,21 +104,16 @@ const EnquiryList = ({
             />
           </div>
 
-          {/* View Toggle */}
-          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+          <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
             <button
               onClick={() => setViewMode('card')}
-              className={`p-2 transition ${viewMode === 'card' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-              title="Card View"
+              className={`p-1.5 rounded ${viewMode === 'card' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`p-2 transition ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-              title="Table View"
+              className={`p-1.5 rounded ${viewMode === 'table' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
             >
               <List className="w-4 h-4" />
             </button>
@@ -99,6 +121,13 @@ const EnquiryList = ({
 
           {/* More Menu */}
           <div className="relative" ref={toolbarMenuRef}>
+            <button
+              className="p-2 hover:bg-gray-100 rounded-lg transition"
+              title="Add Enquiry"
+              onClick={() => setIsAddEnquiryModal(true)}
+            >
+              <Plus className="w-4 h-4 text-gray-600" />
+            </button>
             <button
               className="p-2 hover:bg-gray-100 rounded-lg transition"
               title="More"
@@ -135,13 +164,13 @@ const EnquiryList = ({
                   <RefreshCw className="w-4 h-4 text-gray-600" />
                   <span>Refresh</span>
                 </button>
-                <button
+                {/* <button
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
                   onClick={() => setShowToolbarMenu(false)}
                 >
                   <Filter className="w-4 h-4 text-gray-600" />
                   <span>Filter</span>
-                </button>
+                </button> */}
                 <button
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
                   onClick={() => {
@@ -167,7 +196,7 @@ const EnquiryList = ({
       </div>
 
       {/* Enquiry List */}
-      <div className="flex-1 overflow-y-auto">
+      <div ref={listRef} className="flex-1 overflow-y-auto">
         {enquiries.map((enquiry) => (
           <div
             key={enquiry.EnquiryId}
@@ -208,23 +237,11 @@ const EnquiryList = ({
           </div>
         ))}
 
-
-        {hasMore && (
-          <div className="p-4 border-t border-gray-200">
-            <button
-              onClick={onLoadMore}
-              disabled={isLoading}
-              className="w-full py-2.5 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                <>Load More</>
-              )}
-            </button>
+        {/* Loading indicator when fetching more data */}
+        {isLoading && (
+          <div className="p-4 flex items-center justify-center">
+            <RefreshCw className="w-5 h-5 animate-spin text-blue-600" />
+            <span className="ml-2 text-sm text-gray-600">Loading more...</span>
           </div>
         )}
       </div>
@@ -251,6 +268,41 @@ const EnquiryList = ({
         }
       >
         <ImportData onClose={handleCancelImportDataModal} onSubmit={handleImportData} />
+      </PopUpModal>
+
+      {/* Add Enquiry Modal */}
+      <PopUpModal
+        isOpen={isAddEnquiryModal}
+        onClose={() => setIsAddEnquiryModal(false)}
+        title="Add Enquiry"
+        size="xl"
+        footer={
+          <div className="flex justify-between w-full">
+            <Button
+              variant="secondary"
+              onClick={() => setIsAddEnquiryModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                console.log('Save enquiry');
+                setIsAddEnquiryModal(false);
+              }}
+            >
+              Save
+            </Button>
+          </div>
+        }
+      >
+        <AddEnquiryForm
+          onClose={() => setIsAddEnquiryModal(false)}
+          onSubmit={(data) => {
+            console.log('Enquiry data:', data);
+            setIsAddEnquiryModal(false);
+          }}
+        />
       </PopUpModal>
 
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { serviceInstance } from '../../axiosinstance';
-import { getSession } from '../../getSession';
+import RichTextEditor from '../common/RichTextEditor';
 
 const generateDefaultTitle = () => {
     const now = new Date();
@@ -28,11 +27,6 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
     const [markCompleted, setMarkCompleted] = useState(false);
     const [outcome, setOutcome] = useState('Converted');
 
-    // Task types fetched from Services API: { id, name }
-    const [taskTypes, setTaskTypes] = useState([{ id: '', name: 'Select Meeting Settings' }]);
-    // Users for Owner/Collaborators/Assigned Field Executive
-    const [usersList, setUsersList] = useState(users || []);
-
     useEffect(() => {
         // set sensible default dates: now and +1 hour
         if (!fromDate) {
@@ -41,79 +35,6 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
             const plusHour = new Date(now.getTime() + 60 * 60 * 1000);
             setToDate(plusHour.toISOString().slice(0, 16));
         }
-    }, []);
-
-    // Fetch task types for Appointment Type dropdown
-    useEffect(() => {
-        const fetchTaskTypes = async () => {
-            try {
-                const session = getSession();
-                const payload = {
-                    Token: session.token,
-                    Details: JSON.stringify({ ParentId: session.parentId || 0 })
-                };
-
-                const resp = await serviceInstance.post('/UserCRM/GetSalesActivityTaskTypeListByParentId', payload);
-                const data = resp?.data;
-                if (data?.Status === 1 && data.Details) {
-                    // Normalize possible response shapes
-                    let rows = [];
-                    if (Array.isArray(data.Details)) rows = data.Details;
-                    else if (Array.isArray(data.Details?.data)) rows = data.Details.data;
-                    else if (Array.isArray(data.Details?.d)) rows = data.Details.d;
-
-                    const list = rows.map(r => ({
-                        id: String(r?.Id ?? r?.ID ?? r?.id ?? ''),
-                        name: String(r?.TaskType ?? r?.Tasktype ??'')
-                    })).filter(i => i.id);
-
-                    if (list.length) setTaskTypes([{ id: '', name: 'Select Meeting Settings' }, ...list]);
-                } else {
-                    console.warn('GetSalesActivityTaskTypeListByParentId fetch failed', data);
-                }
-            } catch (err) {
-                console.error('Error fetching task types', err);
-            }
-        };
-
-        fetchTaskTypes();
-    }, []);
-
-    // Fetch users for Owner / Collaborators / Assigned Field Executive using Services API
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const session = getSession();
-                const payload = {
-                    Token: session.token,
-                    Details: JSON.stringify({ UserID: session.userId || 0 })
-                };
-
-                const resp = await serviceInstance.post('/UserCRM/GetUserHierarchyList', payload);
-                const data = resp?.data;
-                if (data?.Status === 1 && data.Details) {
-                    let rows = [];
-                    if (Array.isArray(data.Details)) rows = data.Details;
-                    else if (Array.isArray(data.Details?.data)) rows = data.Details.data;
-                    else if (Array.isArray(data.Details?.d)) rows = data.Details.d;
-
-                    const list = rows.map(r => {
-                        // Use only USER_ID and User_Login for collaborators/owners
-                        const id = r?.USER_ID ?? '';
-                        const name = r?.User_Login ?? '';
-                        return { id: String(id), name: String(name) };
-                    }).filter(it => it && it.id && it.name);
-
-                    if (list.length) setUsersList(list);
-                } else {
-                    console.warn('GetUserHierarchyList fetch failed', data);
-                }
-            } catch (err) {
-                console.error('Error fetching users list', err);
-            }
-        };
-
-        fetchUsers();
     }, []);
 
     const handleSubmit = (e) => {
@@ -137,34 +58,31 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 pr-2">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-auto pr-2">
             <div>
                 <label className="text-sm font-medium">Appointment Type</label>
                 <select
                     value={appointmentType}
                     onChange={(e) => setAppointmentType(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded bg-white"
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded"
                 >
-                    {taskTypes.map(t => (
-                        <option key={t.id} value={t.id}>{t.name}</option>
-                    ))}
+                    <option value="">Select Meeting Settings</option>
+                    <option value="virtual">Virtual</option>
+                    <option value="inperson">In Person</option>
+                    <option value="phone">Phone Call</option>
                 </select>
             </div>
 
             <div>
-                <label className="text-sm font-medium">Cousers</label>
-                <select
-                    id="ddlCousers"
-                    multiple
-                    value={collaborators}
-                    onChange={(e) => setCollaborators(Array.from(e.target.selectedOptions, o => o.value))}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded bg-white h-24"
-                >
-                    {usersList.map(u => (
-                        <option key={u.id} value={u.id}>{u.name}</option>
-                    ))}
-                </select>
+                <label className="text-sm font-medium">Appointment Title <span className="text-red-600">*</span></label>
+                <input
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded"
+                />
             </div>
+
             <div>
                 <label className="text-sm font-medium">Description</label>
                 <textarea
@@ -172,6 +90,7 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
                     onChange={(e) => setDescription(e.target.value)}
                     className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none"
                     placeholder="Start Typing the details about the appointment"
+                    rows={4}
                 />
             </div>
 
@@ -179,9 +98,10 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
                 <label className="text-sm font-medium">Remarks</label>
                 <textarea
                     value={remarks}
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none"
                     onChange={(e) => setRemarks(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-20 resize-none"
                     placeholder="about the task..."
+                    rows={3}
                 />
             </div>
 
@@ -224,55 +144,53 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
                 <label className="text-sm font-medium">Complete Address</label>
                 <textarea
                     value={completeAddress}
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none"
                     onChange={(e) => setCompleteAddress(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-20 resize-none"
                     placeholder="Please enter complete address."
+                    rows={3}
                 />
             </div>
 
             <div className="grid grid-cols-1 gap-4">
                 <div>
                     <label className="text-sm font-medium">Owner</label>
-                    <select  id="ddlOwners"
+                    <select
                         value={owner}
                         onChange={(e) => setOwner(e.target.value)}
                         className="w-full mt-2 px-3 py-2 border border-gray-300 rounded bg-white"
                     >
                         <option value="">Nothing selected</option>
-                   
-                   
-                       {usersList.map(u => (
-                   
-                   <option key={u.USER_ID} value={u.USER_ID}>{u.User_Login}</option>
-                   
-                   ))}
+                        {users.map(u => (
+                            <option key={u.id} value={u.id}>{u.name}</option>
+                        ))}
                     </select>
                 </div>
 
-                                <div>
-                                        <label className="text-sm font-medium">Cousers</label>
-                                        <select id="ddlCousers"
-                                                multiple
-                                                value={collaborators}
-                                                onChange={(e) => setCollaborators(Array.from(e.target.selectedOptions, o => o.value))}
-                                                className="w-full mt-2 px-3 py-2 border border-gray-300 rounded bg-white h-24"
-                                        >
-                                        {usersList.map(u => (
-                                        <option key={u.USER_ID} value={u.USER_ID}>{u.User_Login}</option>
-                                            ))}
-                                        </select>
-                                </div>
+                <div>
+                    <label className="text-sm font-medium">Collaborators</label>
+                    <select
+                        multiple
+                        value={collaborators}
+                        onChange={(e) => setCollaborators(Array.from(e.target.selectedOptions, o => o.value))}
+                        className="w-full mt-2 px-3 py-2 border border-gray-300 rounded bg-white h-24"
+                    >
+                        {users.map(u => (
+                            <option key={u.id} value={u.id}>{u.name}</option>
+                        ))}
+                    </select>
+                </div>
 
                 <div>
                     <label className="text-sm font-medium">Assigned Field Executive</label>
-                    <select   id="ddlAssignedFieldExecutive" 
+                    <select
                         value={assignedFieldExecutive}
                         onChange={(e) => setAssignedFieldExecutive(e.target.value)}
                         className="w-full mt-2 px-3 py-2 border border-gray-300 rounded bg-white"
                     >
                         <option value="">Nothing selected</option>
-                        {usersList.map(u => (
-                        <option key={u.USER_ID} value={u.USER_ID}>{u.User_Login}</option>))}
+                        {users.map(u => (
+                            <option key={u.id} value={u.id}>{u.name}</option>
+                        ))}
                     </select>
                 </div>
             </div>
@@ -295,7 +213,7 @@ const AddAppointmentForm = ({ onSubmit, onClose, users = [] }) => {
 
                     <div>
                         <label className="text-sm font-medium">Remarks</label>
-                        <textarea value={remarks} onChange={e => setRemarks(e.target.value)} className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-20 resize-none" />
+                        <textarea value={remarks} onChange={e => setRemarks(e.target.value)} rows={3} className="w-full mt-2 px-3 py-2 border border-gray-300 rounded h-24 resize-none" />
                     </div>
                 </div>
             )}

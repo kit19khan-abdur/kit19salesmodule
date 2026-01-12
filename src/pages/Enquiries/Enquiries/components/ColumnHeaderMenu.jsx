@@ -38,7 +38,7 @@ const ColumnHeaderMenu = ({
   return (
     <div
       ref={menuRef}
-      className="absolute z-50 mt-2 w-44 bg-white border border-gray-200 rounded shadow-lg py-2 text-sm right-0"
+      className="absolute z-50 mt-2 w-44 bg-white border border-gray-200 rounded shadow-lg py-2 text-sm top-[34px] left-0"
     >
       <button
         className="flex items-center w-full px-3 py-2 hover:bg-gray-100"
@@ -60,23 +60,6 @@ const ColumnHeaderMenu = ({
       >
         <Pin className="w-4 h-4 mr-2" /> Pin Column
       </button>
-
-      {/* FILTER INPUT */}
-      <div className="px-3 py-2">
-        <div className="flex items-center mb-1 text-gray-600">
-          <Filter className="w-4 h-4 mr-1" /> Filter
-        </div>
-        <input
-          type="text"
-          value={filterValue}
-          onChange={(e) => {
-            setFilterValue(e.target.value);
-            onFilter(e.target.value);
-          }}
-          placeholder="Type to filter..."
-          className="w-full px-2 py-1 border rounded text-xs focus:outline-none focus:ring"
-        />
-      </div>
 
       <button
         className={`flex items-center w-full px-3 py-2 ${

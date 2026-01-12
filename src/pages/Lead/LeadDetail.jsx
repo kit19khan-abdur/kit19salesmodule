@@ -1,18 +1,63 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Search, Phone, Mail, MessageSquare, Calendar, Plus, FileText, MoreVertical, Grid, List, RefreshCw, ChevronDown, ChevronLeft, ChevronRight, X, LayoutGrid } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import Lead from './Lead';
 
-const LeadDetail = () => {
+const LeadDetail = ({ leads: leadsProp = [], activities: activitiesProp = [], onSelectLead, currentPage: currentPageProp, onPageChange } ) => {
     const [view, setView] = useState('table'); // 'table' or 'grid'
     const [selectedLeads, setSelectedLeads] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(currentPageProp || 1);
+    // Keep local currentPage in sync when parent controls it
+    React.useEffect(() => {
+        if (typeof currentPageProp === 'number' && currentPageProp !== currentPage) {
+            setCurrentPage(currentPageProp);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentPageProp]);
+
+    // Start/stop call timer when call widget is shown/hidden
+    React.useEffect(() => {
+        if (showCallWidget) {
+            // reset and start
+            let seconds = 0;
+            setCallTimer('00:00:00');
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+            }
+            callIntervalRef.current = setInterval(() => {
+                seconds += 1;
+                const hh = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                const mm = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                const ss = String(seconds % 60).padStart(2, '0');
+                setCallTimer(`${hh}:${mm}:${ss}`);
+            }, 1000);
+        } else {
+            // stop and reset
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+            setCallTimer('00:00:00');
+        }
+
+        return () => {
+            if (callIntervalRef.current) {
+                clearInterval(callIntervalRef.current);
+                callIntervalRef.current = null;
+            }
+        };
+    }, [showCallWidget]);
     const [detailView, setDetailView] = useState(null);
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [showAllTabs, setShowAllTabs] = useState(false);
     const [activeTab, setActiveTab] = useState('activities');
-    const [isRightCollapsed, setIsRightCollapsed] = useState(false);
+    const [showCallWidget, setShowCallWidget] = useState(false);
+    const [showCallWidgetMenu, setShowCallWidgetMenu] = useState(false);
+    const [callStatus, setCallStatus] = useState('Requesting');
+    const [callTimer, setCallTimer] = useState('00:00:00');
+    const callIntervalRef = useRef(null);
 
-    const leadsData = [
+    const defaultLeads = [
         { id: 1, name: 'Rajesh Kumar', phone: '+91 98765 43210', email: 'rajesh.kumar@email.com', date: '28 Dec 2024, 10:30 AM', source: 'Website', status: 'Open', type: 'Hot Lead', avatar: 'RK', city: 'Mumbai', state: 'Maharashtra', pincode: '400001' },
         { id: 2, name: 'Priya Sharma', phone: '+91 98765 43211', email: 'priya.sharma@email.com', date: '27 Dec 2024, 02:15 PM', source: 'Referral', status: 'Open', type: 'Warm Lead', avatar: 'PS', city: 'Delhi', state: 'Delhi', pincode: '110001' },
         { id: 3, name: 'Amit Patel', phone: '+91 98765 43212', email: 'amit.patel@email.com', date: '26 Dec 2024, 09:45 AM', source: '-', status: 'Callback', type: '-', avatar: 'AP', city: 'Ahmedabad', state: 'Gujarat', pincode: '380001' },
@@ -23,12 +68,34 @@ const LeadDetail = () => {
         { id: 8, name: 'Kavita Joshi', phone: '+91 98765 43217', email: 'kavita.joshi@email.com', date: '21 Dec 2024, 10:00 AM', source: 'Facebook', status: 'Open', type: 'Cold Lead', avatar: 'KJ', city: 'Jaipur', state: 'Rajasthan', pincode: '302001' },
     ];
 
-    const activities = [
+    const defaultActivities = [
         { type: 'call', action: 'Outbound call made', user: 'John Doe', time: '2 hours ago', icon: Phone },
         { type: 'note', action: 'Note added: Follow up required', user: 'Sarah Smith', time: '5 hours ago', icon: FileText },
         { type: 'email', action: 'Email sent to lead', user: 'John Doe', time: '1 day ago', icon: Mail },
         { type: 'meeting', action: 'Meeting scheduled', user: 'Mike Johnson', time: '2 days ago', icon: Calendar },
     ];
+
+    const leadsSource = (Array.isArray(leadsProp) && leadsProp.length > 0) ? leadsProp : defaultLeads;
+    const activitiesSource = (Array.isArray(activitiesProp) && activitiesProp.length > 0) ? activitiesProp : defaultActivities;
+
+    const normalizeLead = (l) => ({
+        id: l.Id || l.id || l.LeadId || l.leadId || null,
+        name: l.PersonName || l.Name || l.FullName || l.name || l.LeadName || '',
+        phone: l.CsvMobileNo || l.MobileNo || l.Phone || l.Mobile || l.phone || '',
+        email: l.Email || l.email || '',
+        date: l.CreatedDate || l.date || '',
+        source: l.Source || l.source || '',
+        status: l.Status || l.status || '',
+        type: l.Type || l.type || '',
+        avatar: l.avatar || (l.PersonName ? l.PersonName.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : (l.Name ? l.Name.split(' ').map(n => n[0]).slice(0,2).join('').toUpperCase() : '')),
+        city: l.City || l.city || '',
+        state: l.State || l.state || '',
+        pincode: l.Pincode || l.pincode || '',
+        raw: l
+    });
+
+    const leads = leadsSource.map(normalizeLead);
+    const activitiesList = activitiesSource;
 
     const toggleLeadSelection = (id) => {
         setSelectedLeads(prev =>
@@ -37,7 +104,7 @@ const LeadDetail = () => {
     };
 
     const toggleSelectAll = () => {
-        setSelectedLeads(selectedLeads.length === leadsData.length ? [] : leadsData.map(l => l.id));
+        setSelectedLeads(selectedLeads.length === leads.length ? [] : leads.map(l => l.id));
     };
 
     const getStatusColor = (status) => {
@@ -53,284 +120,282 @@ const LeadDetail = () => {
         return <Lead />
     }
 
-    // if (detailView) {
-    //     const lead = leadsData.find(l => l.id === detailView);
+    if (detailView) {
+        const lead = leads.find(l => l.id === detailView);
 
-    //     return (
-    //         <div className="flex h-screen bg-gray-50">
-    //             {/* Left Sidebar - Lead List */}
-    //             <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-    //                 <div className="p-4 border-b border-gray-200">
-    //                     <div className="flex items-center justify-between mb-3">
-    //                         <h2 className="text-lg font-semibold text-gray-800">Leads</h2>
-    //                         <button
-    //                             onClick={() => setDetailView(null)}
-    //                             className="p-1 hover:bg-gray-100 rounded"
-    //                         >
-    //                             <X className="h-5 w-5 text-gray-500" />
-    //                         </button>
-    //                     </div>
-    //                     <div className="relative">
-    //                         <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-    //                         <input
-    //                             type="text"
-    //                             placeholder="Search leads..."
-    //                             className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-    //                         />
-    //                     </div>
-    //                 </div>
+        return (
+            <div className="flex h-screen bg-gray-50">
+                {/* Left Sidebar - Lead List */}
+                <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+                    <div className="p-4 border-b border-gray-200">
+                        <div className="flex items-center justify-between mb-3">
+                            <h2 className="text-lg font-semibold text-gray-800">Leads</h2>
+                            <button
+                                onClick={() => setDetailView(null)}
+                                className="p-1 hover:bg-gray-100 rounded"
+                            >
+                                <X className="h-5 w-5 text-gray-500" />
+                            </button>
+                        </div>
+                        <div className="relative">
+                            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search leads..."
+                                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
 
-    //                 <div className="flex-1 overflow-y-auto">
-    //                     {leadsData.map(l => (
-    //                         <div
-    //                             key={l.id}
-    //                             onClick={() => setDetailView(l.id)}
-    //                             className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${detailView === l.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
-    //                                 }`}
-    //                         >
-    //                             <div className="flex items-start gap-3">
-    //                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
-    //                                     {l.avatar}
-    //                                 </div>
-    //                                 <div className="flex-1 min-w-0">
-    //                                     <div className="flex justify-between items-start mb-1">
-    //                                         <h3 className="font-medium text-gray-900 text-sm truncate">{l.name}</h3>
-    //                                         <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{l.date.split(',')[0]}</span>
-    //                                     </div>
-    //                                     <p className="text-xs text-gray-600 mb-2">{l.phone}</p>
-    //                                     <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(l.status)}`}>
-    //                                         {l.status}
-    //                                     </span>
-    //                                 </div>
-    //                             </div>
-    //                         </div>
-    //                     ))}
-    //                 </div>
-    //             </div>
+                    <div className="flex-1 overflow-y-auto">
+                        {leads.map(l => (
+                            <div
+                                key={l.id}
+                                onClick={() => { setDetailView(l.id); if (onSelectLead) onSelectLead(l.raw); }}
+                                className={`p-4 border-b border-gray-100 cursor-pointer transition-colors ${detailView === l.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : 'hover:bg-gray-50'
+                                    }`}
+                            >
+                                <div className="flex items-start gap-3">
+                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
+                                        {l.avatar}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h3 className="font-medium text-gray-900 text-sm truncate">{l.name}</h3>
+                                            <span className="text-xs text-gray-500 whitespace-nowrap ml-2">{String(l.date || '').split(',')[0]}</span>
+                                        </div>
+                                        <p className="text-xs text-gray-600 mb-2">{l.phone}</p>
+                                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(l.status)}`}>
+                                            {l.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-    //             {/* Main Content Area */}
-    //             <div className="flex-1 overflow-y-auto">
-    //                 <div className="w-full h-full p-6">
-    //                     {/* Header Section */}
-    //                     <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
-    //                         <div className="flex items-start justify-between">
-    //                             <div className="flex items-start gap-4">
-    //                                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-xl">
-    //                                     {lead.avatar}
-    //                                 </div>
-    //                                 <div>
-    //                                     <h1 className="text-2xl font-bold text-gray-900 mb-2">{lead.name}</h1>
-    //                                     <div className="flex items-center gap-4 text-sm text-gray-600">
-    //                                         <div className="flex items-center gap-1.5">
-    //                                             <Phone className="h-4 w-4" />
-    //                                             <span>{lead.phone}</span>
-    //                                         </div>
-    //                                         <div className="flex items-center gap-1.5">
-    //                                             <Mail className="h-4 w-4" />
-    //                                             <span>{lead.email}</span>
-    //                                         </div>
-    //                                     </div>
-    //                                 </div>
-    //                             </div>
-    //                             <div className="text-right">
-    //                                 <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium ${getStatusColor(lead.status)}`}>
-    //                                     {lead.status}
-    //                                 </span>
-    //                                 <p className="text-xs text-gray-500 mt-2">Created: {lead.date}</p>
-    //                             </div>
-    //                         </div>
-    //                     </div>
+                {/* Main Content Area */}
+                <div className="flex-1 overflow-y-auto">
+                    <div className="w-full h-full p-6">
+                        {/* Header Section */}
+                        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-200">
+                            <div className="flex items-start justify-between">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-xl">
+                                        {lead.avatar}
+                                    </div>
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-gray-900 mb-2">{lead.name}</h1>
+                                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                                            <div 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowCallWidget(true);
+                                                    setCallStatus('Requesting');
+                                                    setCallTimer('00:00:00');
+                                                }}
+                                                className="flex items-center gap-1.5 cursor-pointer hover:text-[#088b7e]"
+                                            >
+                                                <Phone className="h-4 w-4" />
+                                                <span>{lead.phone}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1.5">
+                                                <Mail className="h-4 w-4" />
+                                                <span>{lead.email}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <span className={`inline-block px-3 py-1.5 rounded-full text-sm font-medium ${getStatusColor(lead.status)}`}>
+                                        {lead.status}
+                                    </span>
+                                    <p className="text-xs text-gray-500 mt-2">Created: {lead.date}</p>
+                                </div>
+                            </div>
+                        </div>
 
-    //                     <div className={`grid gap-6 transition-all duration-300 ${isRightCollapsed ? 'grid-cols-1' : 'grid-cols-3'}`}>
-    //                         {/* Lead Information Card */}
-    //                         <div className={`space-y-6 transition-all duration-300 ${isRightCollapsed ? 'col-span-1' : 'col-span-2'}`}>
-    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-    //                                 <div className="p-6 border-b border-gray-200">
-    //                                     <h2 className="text-lg font-semibold text-gray-900">Lead Information</h2>
-    //                                 </div>
-    //                                 <div className="p-6">
-    //                                     <div className="grid grid-cols-2 gap-6">
-    //                                         <div>
-    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-    //                                             <p className="mt-1 text-sm font-medium text-gray-900">{lead.phone}</p>
-    //                                         </div>
-    //                                         <div>
-    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
-    //                                             <p className="mt-1 text-sm font-medium text-gray-900">{lead.email}</p>
-    //                                         </div>
-    //                                         <div>
-    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Lead ID</label>
-    //                                             <p className="mt-1 text-sm font-medium text-gray-900">LD-2024-{lead.id.toString().padStart(4, '0')}</p>
-    //                                         </div>
-    //                                         <div>
-    //                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Created Date</label>
-    //                                             <p className="mt-1 text-sm font-medium text-gray-900">{lead.date}</p>
-    //                                         </div>
-    //                                         {showMoreDetails && (
-    //                                             <>
-    //                                                 <div>
-    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">City</label>
-    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.city}</p>
-    //                                                 </div>
-    //                                                 <div>
-    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">State</label>
-    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.state}</p>
-    //                                                 </div>
-    //                                                 <div>
-    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">Pincode</label>
-    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.pincode}</p>
-    //                                                 </div>
-    //                                                 <div>
-    //                                                     <label className="text-xs text-gray-500 uppercase tracking-wide">Source</label>
-    //                                                     <p className="mt-1 text-sm font-medium text-gray-900">{lead.source}</p>
-    //                                                 </div>
-    //                                             </>
-    //                                         )}
-    //                                     </div>
-    //                                     <button
-    //                                         onClick={() => setShowMoreDetails(!showMoreDetails)}
-    //                                         className="mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
-    //                                     >
-    //                                         {showMoreDetails ? 'Hide Details' : 'Show More Details'}
-    //                                         <ChevronDown className={`h-4 w-4 transition-transform ${showMoreDetails ? 'rotate-180' : ''}`} />
-    //                                     </button>
-    //                                 </div>
-    //                             </div>
+                        <div className="grid grid-cols-3 gap-6">
+                            {/* Lead Information Card */}
+                            <div className="col-span-2 space-y-6">
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                                    <div className="p-6 border-b border-gray-200">
+                                        <h2 className="text-lg font-semibold text-gray-900">Lead Information</h2>
+                                    </div>
+                                    <div className="p-6">
+                                        <div className="grid grid-cols-2 gap-6">
+                                            <div>
+                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
+                                                <p 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setShowCallWidget(true);
+                                                        setCallStatus('Requesting');
+                                                        setCallTimer('00:00:00');
+                                                    }}
+                                                    className="mt-1 text-sm font-medium text-gray-900 cursor-pointer hover:text-[#088b7e]"
+                                                >{lead.phone}</p>
+                                            </div>
+                                            <div>
+                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Email</label>
+                                                <p className="mt-1 text-sm font-medium text-gray-900">{lead.email}</p>
+                                            </div>
+                                            <div>
+                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Lead ID</label>
+                                                <p className="mt-1 text-sm font-medium text-gray-900">LD-2024-{lead.id.toString().padStart(4, '0')}</p>
+                                            </div>
+                                            <div>
+                                                <label className="text-xs text-gray-500 uppercase tracking-wide">Created Date</label>
+                                                <p className="mt-1 text-sm font-medium text-gray-900">{lead.date}</p>
+                                            </div>
+                                            {showMoreDetails && (
+                                                <>
+                                                    <div>
+                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">City</label>
+                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.city}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">State</label>
+                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.state}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">Pincode</label>
+                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.pincode}</p>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-xs text-gray-500 uppercase tracking-wide">Source</label>
+                                                        <p className="mt-1 text-sm font-medium text-gray-900">{lead.source}</p>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                        <button
+                                            onClick={() => setShowMoreDetails(!showMoreDetails)}
+                                            className="mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                                        >
+                                            {showMoreDetails ? 'Hide Details' : 'Show More Details'}
+                                            <ChevronDown className={`h-4 w-4 transition-transform ${showMoreDetails ? 'rotate-180' : ''}`} />
+                                        </button>
+                                    </div>
+                                </div>
 
-    //                             {/* Activity Tabs Section */}
-    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-    //                                 <div className="border-b border-gray-200">
-    //                                     <div className="flex gap-6 px-6">
-    //                                         {[
-    //                                             'Activities',
-    //                                             'Calls',
-    //                                             'WhatsApp',
-    //                                             'Meetings',
-    //                                             ...(showAllTabs
-    //                                                 ? ['Physical Appointments', 'Chat', 'Webform']
-    //                                                 : [])
-    //                                         ].map(tab => (
-    //                                             <button
-    //                                                 key={tab}
-    //                                                 onClick={() => setActiveTab(tab.toLowerCase())}
-    //                                                 className={`py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.toLowerCase()
-    //                                                         ? 'border-blue-500 text-blue-600'
-    //                                                         : 'border-transparent text-gray-600 hover:text-gray-900'
-    //                                                     }`}
-    //                                             >
-    //                                                 {tab}
-    //                                             </button>
-    //                                         ))}
+                                {/* Activity Tabs Section */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                                    <div className="border-b border-gray-200">
+                                        <div className="flex gap-6 px-6">
+                                            {[
+                                                'Activities',
+                                                'Calls',
+                                                'WhatsApp',
+                                                'Meetings',
+                                                ...(showAllTabs
+                                                    ? ['Physical Appointments', 'Chat', 'Webform']
+                                                    : [])
+                                            ].map(tab => (
+                                                <button
+                                                    key={tab}
+                                                    onClick={() => setActiveTab(tab.toLowerCase())}
+                                                    className={`py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.toLowerCase()
+                                                            ? 'border-blue-500 text-blue-600'
+                                                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                                                        }`}
+                                                >
+                                                    {tab}
+                                                </button>
+                                            ))}
 
-    //                                         <button
-    //                                             onClick={() => setShowAllTabs(prev => !prev)}
-    //                                             className="text-sm font-medium text-blue-600 hover:text-blue-700 whitespace-nowrap"
-    //                                         >
-    //                                             {showAllTabs ? 'Less' : 'More'}
-    //                                         </button>
-    //                                     </div>
-    //                                 </div>
+                                            <button
+                                                onClick={() => setShowAllTabs(prev => !prev)}
+                                                className="text-sm font-medium text-blue-600 hover:text-blue-700 whitespace-nowrap"
+                                            >
+                                                {showAllTabs ? 'Less' : 'More'}
+                                            </button>
+                                        </div>
+                                    </div>
 
-    //                                 <div className="p-6">
-    //                                     <div className="space-y-4">
-    //                                         {activities.map((activity, idx) => (
-    //                                             <div key={idx} className="flex gap-4">
-    //                                                 <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-    //                                                     <activity.icon className="h-5 w-5 text-blue-600" />
-    //                                                 </div>
-    //                                                 <div className="flex-1">
-    //                                                     <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-    //                                                     <p className="text-xs text-gray-500 mt-0.5">
-    //                                                         by {activity.user} • {activity.time}
-    //                                                     </p>
-    //                                                 </div>
-    //                                             </div>
-    //                                         ))}
-    //                                     </div>
-    //                                 </div>
-    //                             </div>
-    //                         </div>
+                                    <div className="p-6">
+                                        <div className="space-y-4">
+                                            {activitiesList.map((activity, idx) => (
+                                                <div key={idx} className="flex gap-4">
+                                                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                        <activity.icon className="h-5 w-5 text-blue-600" />
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="text-sm font-medium text-gray-900">{activity.action}</p>
+                                                        <p className="text-xs text-gray-500 mt-0.5">
+                                                            by {activity.user} • {activity.time}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-    //                         {/* Right Sidebar - Action Panel */}
-    //                         <div className={`space-y-6 transition-all duration-300 relative ${isRightCollapsed ? 'w-0 overflow-hidden opacity-0' : 'col-span-1 w-auto opacity-100'}`}>
-    //                             {/* Contact Options */}
-    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-    //                                 <div className="flex items-center justify-between mb-4">
-    //                                     <h3 className="text-sm font-semibold text-gray-900">Contact Options</h3>
-    //                                     <button
-    //                                         onClick={() => setIsRightCollapsed(true)}
-    //                                         className="p-1 hover:bg-gray-200 rounded transition"
-    //                                         title="Collapse"
-    //                                     >
-    //                                         <ChevronRight className="w-4 h-4 text-gray-600" />
-    //                                     </button>
-    //                                 </div>
-    //                                 <div className="space-y-3">
-    //                                     <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-    //                                         <Phone className="h-4 w-4" />
-    //                                         Call
-    //                                     </button>
-    //                                     <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
-    //                                         <MessageSquare className="h-4 w-4" />
-    //                                         WhatsApp
-    //                                     </button>
-    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
-    //                                         <Mail className="h-4 w-4" />
-    //                                         Email
-    //                                     </button>
-    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
-    //                                         <MessageSquare className="h-4 w-4" />
-    //                                         SMS
-    //                                     </button>
-    //                                 </div>
-    //                             </div>
+                            {/* Right Sidebar - Action Panel */}
+                            <div className="col-span-1 space-y-6">
+                                {/* Contact Options */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact Options</h3>
+                                    <div className="space-y-3">
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setShowCallWidget(true);
+                                                setCallStatus('Requesting');
+                                                setCallTimer('00:00:00');
+                                            }}
+                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                                        >
+                                            <Phone className="h-4 w-4" />
+                                            Call
+                                        </button>
+                                        <button className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                                            <MessageSquare className="h-4 w-4" />
+                                            WhatsApp
+                                        </button>
+                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
+                                            <Mail className="h-4 w-4" />
+                                            Email
+                                        </button>
+                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-center gap-2 transition-colors">
+                                            <MessageSquare className="h-4 w-4" />
+                                            SMS
+                                        </button>
+                                    </div>
+                                </div>
 
-    //                             {/* Quick Actions */}
-    //                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-    //                                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h3>
-    //                                 <div className="space-y-3">
-    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-    //                                         <Plus className="h-4 w-4" />
-    //                                         Add or Merge Lead
-    //                                     </button>
-    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-    //                                         <Calendar className="h-4 w-4" />
-    //                                         Schedule Meeting
-    //                                     </button>
-    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-    //                                         <FileText className="h-4 w-4" />
-    //                                         Add Note
-    //                                     </button>
-    //                                     <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
-    //                                         <MessageSquare className="h-4 w-4" />
-    //                                         Send Message
-    //                                     </button>
-    //                                 </div>
-    //                             </div>
-    //                         </div>
-
-    //                         {/* Floating Expand Button when Right Sidebar is Collapsed */}
-    //                         {isRightCollapsed && (
-    //                             <button
-    //                                 onClick={() => setIsRightCollapsed(false)}
-    //                                 className="fixed bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition z-10"
-    //                                 style={{
-    //                                     right: '56px',
-    //                                     top: '8%',
-    //                                     transform: 'translateY(-50%)',
-    //                                     padding: '8px'
-    //                                 }}
-    //                                 title="Expand Quick Actions"
-    //                             >
-    //                                 <Plus className="w-5 h-5" />
-    //                             </button>
-    //                         )}
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     );
-    // }
+                                {/* Quick Actions */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                    <h3 className="text-sm font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                                    <div className="space-y-3">
+                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+                                            <Plus className="h-4 w-4" />
+                                            Add or Merge Lead
+                                        </button>
+                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+                                            <Calendar className="h-4 w-4" />
+                                            Schedule Meeting
+                                        </button>
+                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+                                            <FileText className="h-4 w-4" />
+                                            Add Note
+                                        </button>
+                                        <button className="w-full bg-white hover:bg-gray-50 text-gray-700 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-300 flex items-center justify-start gap-2 transition-colors">
+                                            <MessageSquare className="h-4 w-4" />
+                                            Send Message
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     // Table View
     return (
@@ -379,7 +444,7 @@ const LeadDetail = () => {
                                     <th className="w-12 px-4 py-3 text-left">
                                         <input
                                             type="checkbox"
-                                            checked={selectedLeads.length === leadsData.length}
+                                            checked={selectedLeads.length === leads.length}
                                             onChange={toggleSelectAll}
                                             className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                                         />
@@ -394,14 +459,14 @@ const LeadDetail = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {leadsData.map((lead) => (
+                                {leads.map((lead) => (
                                     <tr
                                         key={lead.id}
-                                        onClick={() => setDetailView(lead.id)}
+                                        onClick={() => { setDetailView(lead.id); if (onSelectLead) onSelectLead(lead.raw); }}
                                         className={`cursor-pointer transition-colors ${selectedLeads.includes(lead.id) ? 'bg-blue-50' : 'hover:bg-gray-50'
                                             }`}
                                     >
-                                        <td className="px-4 py-1" onClick={(e) => e.stopPropagation()}>
+                                        <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
                                             <input
                                                 type="checkbox"
                                                 checked={selectedLeads.includes(lead.id)}
@@ -409,7 +474,7 @@ const LeadDetail = () => {
                                                 className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                                             />
                                         </td>
-                                        <td className="px-4 py-1">
+                                        <td className="px-4 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-medium text-sm flex-shrink-0">
                                                     {lead.avatar}
@@ -417,33 +482,41 @@ const LeadDetail = () => {
                                                 <span className="font-medium text-gray-900">{lead.name}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-1">
-                                            <div className="flex items-center gap-2 text-blue-600">
+                                        <td className="px-4 py-4">
+                                            <div 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setShowCallWidget(true);
+                                                    setCallStatus('Requesting');
+                                                    setCallTimer('00:00:00');
+                                                }}
+                                                className="flex items-center gap-2 text-blue-600 cursor-pointer hover:text-[#088b7e]"
+                                            >
                                                 <Phone className="h-4 w-4" />
                                                 <span className="text-sm">{lead.phone}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-1">
+                                        <td className="px-4 py-4">
                                             <div className="flex items-center gap-2 text-gray-700">
                                                 <Mail className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm">{lead.email}</span>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-1">
+                                        <td className="px-4 py-4">
                                             <div className="text-sm">
-                                                {/* <div className="text-xs text-gray-500 uppercase">Date</div> */}
+                                                <div className="text-xs text-gray-500 uppercase">Date</div>
                                                 <div className="text-gray-900 mt-0.5">{lead.date}</div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-1">
+                                        <td className="px-4 py-4">
                                             <span className="text-sm text-gray-700">{lead.source}</span>
                                         </td>
-                                        <td className="px-4 py-1">
+                                        <td className="px-4 py-4">
                                             <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(lead.status)}`}>
                                                 {lead.status}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-1">
+                                        <td className="px-4 py-4">
                                             <span className="text-sm text-gray-700">{lead.type}</span>
                                         </td>
                                     </tr>
@@ -456,7 +529,10 @@ const LeadDetail = () => {
                     <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-end">
                         <div className="flex items-center gap-2 bg-gray-50 rounded-lg p-1 shadow-sm">
                             <button
-                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                onClick={() => {
+                                    const next = Math.max(1, currentPage - 1);
+                                    if (onPageChange) onPageChange(next); else setCurrentPage(next);
+                                }}
                                 disabled={currentPage === 1}
                                 className="p-2 hover:bg-white rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
@@ -465,7 +541,7 @@ const LeadDetail = () => {
                             {[1, 2, 3, 4, 5].map((page) => (
                                 <button
                                     key={page}
-                                    onClick={() => setCurrentPage(page)}
+                                    onClick={() => { if (onPageChange) onPageChange(page); else setCurrentPage(page); }}
                                     className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${currentPage === page
                                         ? 'bg-blue-600 text-white'
                                         : 'text-gray-700 hover:bg-white'
@@ -475,7 +551,7 @@ const LeadDetail = () => {
                                 </button>
                             ))}
                             <button
-                                onClick={() => setCurrentPage(currentPage + 1)}
+                                onClick={() => { const next = currentPage + 1; if (onPageChange) onPageChange(next); else setCurrentPage(next); }}
                                 className="p-2 hover:bg-white rounded transition-colors"
                             >
                                 <ChevronRight className="h-4 w-4 text-gray-600" />
@@ -484,6 +560,101 @@ const LeadDetail = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Call Widget Sticky Popup */}
+            {showCallWidget && (
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-[9999]">
+                    {/* Header */}
+                    <div className="bg-blue-500 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+                        <h3 className="text-lg font-semibold">Call Widget (Kit19 80)</h3>
+                        <div className="flex items-center gap-2">
+                            <button className="p-1 hover:bg-blue-600 rounded">
+                                <ChevronDown className="w-5 h-5" />
+                            </button>
+                            <button
+                                onClick={() => setShowCallWidget(false)}
+                                className="p-2 h-[30px] w-[30px] flex items-center hover:bg-blue-600 rounded-[50%]"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="p-6">
+                        {/* Three dots menu */}
+                        <div className="flex justify-end mb-4 relative">
+                            <button
+                                className="text-gray-400 hover:text-gray-600"
+                                onClick={() => setShowCallWidgetMenu(!showCallWidgetMenu)}
+                            >
+                                <MoreVertical className="w-5 h-5" />
+                            </button>
+
+                            {/* Dropdown menu with icons */}
+                            {showCallWidgetMenu && (
+                                <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg p-4 flex gap-3 z-10">
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FileText className="w-6 h-6 text-gray-600" />
+                                    </button>
+                                    <button className="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50">
+                                        <FaWhatsapp className="w-6 h-6 text-green-600" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Profile Images */}
+                        <div className="flex items-center justify-center gap-8 mb-6">
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 1"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center">
+                                <div className="w-8 h-8 mb-2">
+                                    <svg viewBox="0 0 24 24" fill="none" className="text-gray-400">
+                                        <path d="M3 12h18M12 3v18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div className="relative">
+                                <div className="w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
+                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center overflow-hidden">
+                                        <img
+                                            src="https://i.pinimg.com/736x/23/34/fc/2334fcc0c89347797e568bb1d070cb37.jpg"
+                                            alt="User 2"
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Status and Timer */}
+                        <div className="text-center mb-6">
+                            <h4 className="text-xl font-semibold text-gray-800 mb-2">{callStatus}</h4>
+                            <p className="text-2xl font-mono text-gray-600">{callTimer}</p>
+                        </div>
+
+                        {/* Call Disconnected Message */}
+                        <div className="bg-gray-700 text-white px-4 py-3 rounded text-center">
+                            <span className="text-sm">Call Disconnected ? </span>
+                            <button className="text-blue-400 hover:text-blue-300 font-medium">
+                                Click to report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

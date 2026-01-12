@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { serviceInstance } from '../../../axiosinstance';
-import { getSession } from '../../../getSession';
+import React, { useState } from 'react';
 import { Clock } from 'lucide-react';
+import RichTextEditor from '../../../components/common/RichTextEditor';
 
 const AddFollowupForm = ({ selectedCount = 0 }) => {
     const [formData, setFormData] = useState({
         followupType: '',
-        assignTo: '',
+        assignTo: 'Abhi01 (Abhishek Kumar)',
         nextStatusDate: new Date().toISOString().split('T')[0],
         nextStatusTime: '01:58 AM',
         conversionDate: new Date().toISOString().split('T')[0],
@@ -18,7 +17,7 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
         onSchedule: false
     });
 
-    const defaultFollowupTypes = [
+    const followupTypes = [
         'Select FollowupStatus',
         'Call-Back',
         'Not-Interested',
@@ -31,87 +30,6 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
         'New'
     ];
 
-    // followupOptions: array of { code, text }
-    const [followupOptions, setFollowupOptions] = useState(
-        defaultFollowupTypes.map((t, i) => ({ code: i === 0 ? '' : t, text: t }))
-    );
-
-    // assignable users for "Assign To" dropdown: array of { id, name }
-    const [assignableUsers, setAssignableUsers] = useState([{ id: '', name: 'Select User' }]);
-
-    // Fetch follow-up suggestions from Services.Kit19.com
-    useEffect(() => {
-        const fetchSuggestions = async () => {
-            try {
-                const session = getSession();
-                const payload = {
-                    Token: session.token,
-                    Details: JSON.stringify({ UserId: session.userId || 0 })
-                };
-
-                const resp = await serviceInstance.post('/Suggestion/FollowUpSuggestions', payload);
-                const data = resp?.data;
-                if (data?.Status === 1 && Array.isArray(data.Details)) {
-                    // Map to array of { code, text } using response fields Code & Text when available
-                    const list = data.Details.map(item => {
-                        if (typeof item === 'string') return { code: item, text: item };
-                        // Prefer ID for code and FollowupStatus for text as requested
-                        const code = item?.ID ?? item?.Id ?? item?.Code ?? item?.code ?? '';
-                        const text = item?.FollowupStatus ?? item?.Text ?? item?.TextName ?? item?.Name ?? String(code || '');
-                        return { code: String(code), text: String(text) };
-                    }).filter(it => it && it.text);
-
-                    if (list.length) setFollowupOptions([{ code: '', text: 'Select FollowupStatus' }, ...list]);
-                } else {
-                    console.warn('FollowUpSuggestions fetch failed', data);
-                }
-            } catch (err) {
-                console.error('Error fetching follow up suggestions', err);
-            }
-        };
-
-        fetchSuggestions();
-    }, []);
-
-    // Fetch users for "Assign To" dropdown using Services API: UserCRM/GetUserHierarchyList
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const session = getSession();
-                const payload = {
-                    Token: session.token,
-                    // server expects { UserID: long }
-                    Details: JSON.stringify({ UserID: session.userId || 0 })
-                };
-
-                const resp = await serviceInstance.post('/UserCRM/GetUserHierarchyList', payload);
-                const data = resp?.data;
-                if (data?.Status === 1 && data.Details) {
-                    // normalize possible shapes
-                    let rows = [];
-                    if (Array.isArray(data.Details)) rows = data.Details;
-                    else if (Array.isArray(data.Details?.data)) rows = data.Details.data;
-                    else if (Array.isArray(data.Details?.d)) rows = data.Details.d;
-
-                    const list = rows.map(r => {
-                        // response rows may contain different field names
-                        const id = r?.USER_ID ?? r?.User_ID ?? r?.UserId ?? r?.ID ?? r?.Id ?? r?.UserID ?? '';
-                        const name = r?.User_Login ?? r?.Name ?? r?.FullName ?? r?.UserName ?? r?.LoginName ?? String(id);
-                        return { id: String(id), name: String(name) };
-                    }).filter(it => it && it.id);
-
-                    if (list.length) setAssignableUsers([{ id: '', name: 'Select User' }, ...list]);
-                } else {
-                    console.warn('GetUserHierarchyList fetch failed', data);
-                }
-            } catch (err) {
-                console.error('Error fetching users for lead popup', err);
-            }
-        };
-
-        fetchUsers();
-    }, []);
-
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -120,14 +38,8 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
         }));
     };
 
-    const getSelectedFollowupText = () => {
-        const found = followupOptions.find(o => String(o.code) === String(formData.followupType));
-        return found ? found.text : formData.followupType;
-    };
-
     const renderFormFields = () => {
-        const selectedText = getSelectedFollowupText();
-        switch (selectedText) {
+        switch (formData.followupType) {
             case 'Call-Back':
                 return (
                     <>
@@ -137,11 +49,9 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                                 name="assignTo"
                                 value={formData.assignTo}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 bg-white text-gray-900 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 bg-gray-500 text-white rounded border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                {assignableUsers.map(u => (
-                                    <option key={u.id} value={u.id}>{u.name}</option>
-                                ))}
+                                <option>Abhi01 (Abhishek Kumar)</option>
                             </select>
                         </div>
 
@@ -173,12 +83,12 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                         <div className="mb-4">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Remarks</label>
                             <textarea
+                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                 name="remarks"
                                 value={formData.remarks}
                                 onChange={handleChange}
                                 placeholder="Remarks"
-                                rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                rows="3"
                             />
                         </div>
 
@@ -219,11 +129,9 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                                 name="assignTo"
                                 value={formData.assignTo}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 bg-white text-gray-900 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 bg-gray-500 text-white rounded border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                {assignableUsers.map(u => (
-                                    <option key={u.id} value={u.id}>{u.name}</option>
-                                ))}
+                                <option>Abhi01 (Abhishek Kumar)</option>
                             </select>
                         </div>
 
@@ -267,12 +175,12 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                         <div className="mb-4">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Remarks</label>
                             <textarea
+                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                 name="remarks"
                                 value={formData.remarks}
                                 onChange={handleChange}
                                 placeholder="Remarks"
-                                rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                rows="3"
                             />
                         </div>
 
@@ -313,7 +221,7 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                             value={formData.remarks}
                             onChange={handleChange}
                             placeholder="Remarks"
-                            rows={3}
+                            rows="3"
                             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                         />
                     </div>
@@ -328,11 +236,9 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                                 name="assignTo"
                                 value={formData.assignTo}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 bg-white text-gray-900 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 bg-gray-500 text-white rounded border-0 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
-                                {assignableUsers.map(u => (
-                                    <option key={u.id} value={u.id}>{u.name}</option>
-                                ))}
+                                <option>Abhi01 (Abhishek Kumar)</option>
                             </select>
                         </div>
 
@@ -364,12 +270,12 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                         <div className="mb-4">
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Remarks</label>
                             <textarea
+                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                                 name="remarks"
                                 value={formData.remarks}
                                 onChange={handleChange}
                                 placeholder="Remarks"
-                                rows={3}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                rows="3"
                             />
                         </div>
 
@@ -422,8 +328,8 @@ const AddFollowupForm = ({ selectedCount = 0 }) => {
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    {followupOptions.map((opt) => (
-                        <option key={opt.code} value={opt.code}>{opt.text}</option>
+                    {followupTypes.map((type) => (
+                        <option key={type} value={type}>{type}</option>
                     ))}
                 </select>
             </div>
