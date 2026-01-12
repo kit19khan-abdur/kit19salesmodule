@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, Clock, User, MapPin, TrendingUp, ChevronRight, ChevronLeft, MoreVertical, FileText, Mic2, Mic, ChevronLeftCircle } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, Clock, User, MapPin, TrendingUp, ChevronRight, ChevronLeft, MoreVertical, FileText, Mic2, Mic, ChevronLeftCircle, SquarePen, Edit } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
 import { FaWhatsapp } from "react-icons/fa";
 import nodata from '../../../assets/nodata.gif';
@@ -539,7 +539,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                 <button
                                     onClick={() => setIsEditEnquiryModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
-                                    <FileText className="w-4 h-4" />
+                                    <Edit className="w-4 h-4" />
                                     Edit All Fields
                                 </button>
                                 <button
