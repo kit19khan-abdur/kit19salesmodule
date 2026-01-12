@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import RichTextEditor from '../../../components/common/RichTextEditor';
 import { Grid3x3 } from 'lucide-react';
 import { RxDropdownMenu } from "react-icons/rx";
+import RichTextEditorArea from '../../../components/common/RichTextEditorArea';
 
 const SendMassMailForm = ({ selectedCount = 0 }) => {
     const [formData, setFormData] = useState({
@@ -18,6 +19,9 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
         onSchedule: false
     });
 
+    const [showPlaceholderDropdown, setShowPlaceholderDropdown] = useState(false);
+    const placeholderDropdownRef = useRef(null);
+
     const templates = [
         '-- None --',
         'mailtempbirthday ( Enquiry )',
@@ -26,6 +30,32 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
         'TTQQ ( Enquiry )',
         'best123 ( Enquiry )'
     ];
+
+    const placeholders = [
+        { label: 'Person Name', value: 'PersonName' },
+        { label: 'Company Name', value: 'CompanyName' },
+        { label: 'Email', value: 'Email' },
+        { label: 'Mobile Number', value: 'MobileNo' },
+        { label: 'City', value: 'City' },
+        { label: 'State', value: 'State' },
+        { label: 'Country', value: 'Country' },
+        { label: 'Source', value: 'Source' },
+        { label: 'Enquiry ID', value: 'EnquiryID' },
+        { label: 'Created Date', value: 'CreatedDate' },
+    ];
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (placeholderDropdownRef.current && !placeholderDropdownRef.current.contains(event.target)) {
+                setShowPlaceholderDropdown(false);
+            }
+        };
+
+        if (showPlaceholderDropdown) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [showPlaceholderDropdown]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -40,6 +70,14 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
             ...prev,
             mailMode: mode
         }));
+    };
+
+    const handlePlaceholderSelect = (placeholder) => {
+        setFormData(prev => ({
+            ...prev,
+            subject: prev.subject + `#${placeholder}#`
+        }));
+        setShowPlaceholderDropdown(false);
     };
 
     return (
@@ -64,7 +102,7 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
-                    <option>abhshek.kumar@Support.appmails.in.net</option>
+                    <option>abhishek.kumar@Support.appmails.in.net</option>
                 </select>
             </div>
 
@@ -76,7 +114,7 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
                     onChange={handleChange}
                     className="w-full px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
-                    <option>abhshek.kumar@Support.appmails.in.net</option>
+                    <option>abhishek.kumar@Support.appmails.in.net</option>
                 </select>
             </div>
 
@@ -114,22 +152,42 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
 
             {/* Subject Field */}
             <div className="mb-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center relative" ref={placeholderDropdownRef}>
                     <input
                         type="text"
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
                         placeholder="Subject"
-                        className="flex-1 px-3 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="flex-1 px-3 py-2.5 border border-gray-300 rounded-l focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     />
                     <button
                         type="button"
-                        className="p-2.5 border border-gray-300 rounded hover:bg-gray-50 transition"
+                        onClick={() => setShowPlaceholderDropdown(!showPlaceholderDropdown)}
+                        className="p-2.5 rounded-r rounded-l-none border border-gray-300 rounded hover:bg-gray-50 transition"
                         title="Insert Template Variables"
                     >
                         <RxDropdownMenu className="w-5 h-5 text-gray-600" />
                     </button>
+
+                    {/* Placeholder Dropdown */}
+                    {showPlaceholderDropdown && (
+                        <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                            <div className="py-1">
+                                {placeholders.map((placeholder, index) => (
+                                    <button
+                                        key={index}
+                                        type="button"
+                                        onClick={() => handlePlaceholderSelect(placeholder.value)}
+                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition flex items-center justify-between"
+                                    >
+                                        <span>{placeholder.label}</span>
+                                        <span className="text-xs text-gray-500 font-mono">{placeholder.value}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -161,8 +219,8 @@ const SendMassMailForm = ({ selectedCount = 0 }) => {
                 /* Compose Mail Textarea */
                 <div className="mb-4">
                     <label className="block text-sm text-gray-700 mb-2">Compose Your Message:</label>
-                    <textarea
-                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    <RichTextEditor
+                        className="w-full border border-gray-300 rounded-[10px] focus:outline-none resize-none"
                         name="composeContent"
                         value={formData.composeContent}
                         onChange={handleChange}

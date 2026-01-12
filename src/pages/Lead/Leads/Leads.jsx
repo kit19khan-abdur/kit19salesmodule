@@ -141,6 +141,9 @@ const Leads = () => {
             hasMore={leads.length < totalRecord}
             viewMode={viewMode}
             setViewMode={setViewMode}
+            itemsPerPage={itemsPerPage}
+            totalRecord={totalRecord}
+            setItemsPerPage={setItemsPerPage}
           />
         </div>
       )}

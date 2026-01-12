@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, RefreshCw, Download, X, Check } from 'lucide-react';
+import { Plus, RefreshCw, Download, X, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import AddImportTemplate from '../../pages/Enquiries/Forms/AddImportTemplate';
 
 const ImportData = ({ isOpen, onClose }) => {
@@ -10,6 +10,7 @@ const ImportData = ({ isOpen, onClose }) => {
   const [isFieldDropdownOpen, setIsFieldDropdownOpen] = useState(false);
   const [fieldSearchTerm, setFieldSearchTerm] = useState('');
   const [isAddTemplateModalOpen, setIsAddTemplateModalOpen] = useState(false);
+  const [isInstructionCollapsed, setIsInstructionCollapsed] = useState(false);
 
   const templates = [
     { value: 'predefined', label: 'PredefinedField' },
@@ -219,13 +220,22 @@ const ImportData = ({ isOpen, onClose }) => {
 
       {/* Instructions */}
       <div className="bg-orange-50 border border-orange-200 rounded p-4">
-        <div className="flex items-start gap-2 mb-3">
+        <div 
+          className="flex items-start gap-2 mb-3 cursor-pointer"
+          onClick={() => setIsInstructionCollapsed(!isInstructionCollapsed)}
+        >
           <div className="w-5 h-5 bg-orange-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
             <span className="text-white text-xs font-bold">!</span>
           </div>
-          <h3 className="text-sm font-semibold text-orange-800">Instruction</h3>
+          <h3 className="text-sm font-semibold text-orange-800 flex-1">Instruction</h3>
+          {isInstructionCollapsed ? (
+            <ChevronDown className="w-5 h-5 text-orange-600" />
+          ) : (
+            <ChevronUp className="w-5 h-5 text-orange-600" />
+          )}
         </div>
-        <div className="space-y-2 text-sm text-orange-700">
+        {!isInstructionCollapsed && (
+          <div className="space-y-2 text-sm text-orange-700">
           {importMode === 'bulk-import' ? (
             <>
               <div className="flex items-start gap-2">
@@ -355,6 +365,7 @@ const ImportData = ({ isOpen, onClose }) => {
             </>
           )}
         </div>
+        )}
       </div>
 
       {/* Add Import Template Modal */}

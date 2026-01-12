@@ -15,6 +15,7 @@ import AddFollowupForm from '../../../components/LeadForm/AddFollowupForm';
 import CreateMeetingForm from '../../../components/LeadForm/CreateMeetingForm';
 import AddAppointment from '../../../components/LeadForm/AddAppointment';
 import AddPhysicalAppointmentForm from '../../../components/LeadForm/AddPhysicalAppointmentForm';
+import Swal from 'sweetalert2';
 
 
 const LeadDetails = ({ lead, isLeftCollapsed }) => {
@@ -46,7 +47,6 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
     const [isAddAppointmentModal, setIsAddAppointmentModal] = useState(false);
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
-
     const moreDropdownRef = useRef(null);
     const [draggedItem, setDraggedItem] = useState(null);
     const [tabsOrder, setTabsOrder] = useState([]);
@@ -455,7 +455,14 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
         } else if (dragSource === 'more' && dropSource === 'main') {
             // From more dropdown to main - check limit
             if (tabsOrder.length >= MAX_MAIN_TABS) {
-                alert(`You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`);
+                Swal.fire({
+                icon: 'info',
+                title: 'Maximum Tabs Reached',
+                text: `You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0d93b4'
+            })
+                // alert(`You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`);
                 setDraggedItem(null);
                 return;
             }
@@ -508,7 +515,14 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
 
     const moveToMainTabs = (tab) => {
         if (tabsOrder.length >= MAX_MAIN_TABS) {
-            alert(`You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`);
+            Swal.fire({
+                icon: 'info',
+                title: 'Maximum Tabs Reached',
+                text: `You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`,
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#0d93b4'
+            })
+            // alert(`You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`);
             setContextMenu({ show: false, x: 0, y: 0, tab: null, source: null });
             return;
         }

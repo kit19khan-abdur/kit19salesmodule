@@ -15,6 +15,7 @@ import { FaUsersGear } from "react-icons/fa6";
 import AddAppointmentForm from '../../../components/EnquiriesForms/AddAppointmentForm';
 import SendVoiceForm from '../../../components/EnquiriesForms/SendVoiceForm';
 import MergeLead from '../../../components/LeadForm/MergeLead';
+import EditEnquiryForm from '../../../components/EnquiriesForms/EditEnquiryForm';
 
 const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
@@ -39,6 +40,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
     const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
+    const [isEditEnquiryModal, setIsEditEnquiryModal] = useState(false);
     const [draggedTab, setDraggedTab] = useState(null);
 
     // Initialize tabs order from localStorage or use default
@@ -271,7 +273,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                     <div className={`space-y-6 transition-all duration-300 ${isRightCollapsed ? 'col-span-1' : 'col-span-2'}`}>
                         {/* Primary Information */}
                         <div className="bg-white rounded-lg shadow-sm p-6">
-                            <h2 className="text-lg font-semibold text-gray-800 mb-4">Lead Information</h2>
+                            <h2 className="text-lg font-semibold text-gray-800 mb-4">Enquiry Information</h2>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-sm text-gray-500">Phone</label>
@@ -353,8 +355,8 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                             onDragEnd={handleDragEnd}
                                             onClick={() => setActiveTab(tab)}
                                             className={`py-4 text-sm font-medium capitalize border-b-2 transition cursor-move ${activeTab === tab
-                                                    ? 'border-blue-600 text-blue-600'
-                                                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                                                ? 'border-blue-600 text-blue-600'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700'
                                                 } ${isRightCollapsed ? 'flex-1' : ''} ${draggedTab === tab ? 'opacity-50' : ''
                                                 }`}
                                         >
@@ -534,6 +536,12 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                 </button>
                             </div>
                             <div className="space-y-2">
+                                <button
+                                    onClick={() => setIsEditEnquiryModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+                                    <FileText className="w-4 h-4" />
+                                    Edit All Fields
+                                </button>
                                 <button
                                     onClick={() => {
                                         // Only open if status is "Lead" (IsOpen is false)
@@ -866,6 +874,42 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                 onClose={() => setIsMergeLeadOpen(false)}
                 enquiryData={enquiry}
             />
+
+            {/* Edit Enquiry Modal */}
+            <PopUpModal
+                isOpen={isEditEnquiryModal}
+                onClose={() => setIsEditEnquiryModal(false)}
+                title="Edit Details"
+                size="xl"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsEditEnquiryModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="primary"
+                            onClick={() => {
+                                console.log('Update enquiry');
+                                setIsEditEnquiryModal(false);
+                            }}
+                        >
+                            Update
+                        </Button>
+                    </div>
+                }
+            >
+                <EditEnquiryForm
+                    enquiry={enquiry}
+                    onClose={() => setIsEditEnquiryModal(false)}
+                    onSubmit={(data) => {
+                        console.log('Updated data:', data);
+                        setIsEditEnquiryModal(false);
+                    }}
+                />
+            </PopUpModal>
 
         </div>
     );
