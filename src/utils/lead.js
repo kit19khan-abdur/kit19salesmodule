@@ -1,4 +1,5 @@
 import { serviceInstance, wcfInstance } from "../axiosinstance"
+import { APPOINTMENT_TYPES } from '../config/constants'
 
 export const getLeadList = async (payload) => {
     try {
@@ -166,5 +167,33 @@ export const getScheduleCallAction = async (payload) => {
     } catch (error) {
         console.error('getScheduleCallAction error:', error);
         throw error;
+    }
+}
+
+export const getUserFromHashedList = async (payload) => {
+    try {
+        const response = await serviceInstance.post('Common/GetUserFromHashedList', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getUserFromHashedList error:', error);
+        throw error;
+    }
+}
+
+// Fetch appointment types from backend if available, otherwise return a sensible fallback
+export const getAppointmentTypes = async (payload = {}) => {
+    try {
+        // try a common endpoint - backend may or may not expose this
+        const response = await serviceInstance.post('UserCRM/GetTaskTypeByMode', payload);
+        return response.data;
+    } catch (error) {
+        console.warn('getAppointmentTypes API not available, falling back to constants:', error?.message || error);
+        // Normalize fallback into an array-like shape similar to other helpers
+        const fallback = [
+            { id: 'virtual', name: APPOINTMENT_TYPES.VIRTUAL || 'Virtual', value: 'virtual', text: APPOINTMENT_TYPES.VIRTUAL || 'Virtual' },
+            { id: 'inperson', name: APPOINTMENT_TYPES.PHYSICAL || 'In Person', value: 'inperson', text: APPOINTMENT_TYPES.PHYSICAL || 'In Person' },
+            { id: 'phone', name: 'Phone Call', value: 'phone', text: 'Phone Call' }
+        ];
+        return { Details: fallback };
     }
 }

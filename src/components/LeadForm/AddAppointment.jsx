@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Calendar, Edit3, ChevronDown } from 'lucide-react'
 import RichTextEditor from '../common/RichTextEditor'
+import { getSession } from '../../getSession'
+import { getUserFromHashedList } from '../../utils/lead'
 
 const AddAppointment = () => {
   const [formData, setFormData] = useState({
@@ -17,9 +19,56 @@ const AddAppointment = () => {
 
   const [isCollaboratorsOpen, setIsCollaboratorsOpen] = useState(false)
   const collaboratorsRef = useRef(null)
+  const startInputRef = useRef(null)
+  const endInputRef = useRef(null)
 
-  const owners = ['Abhi01 (Abhishek Kumar)', 'John Doe', 'Jane Smith']
-  const collaboratorOptions = ['User 1', 'User 2', 'User 3', 'User 4']
+  const [owners, setOwners] = useState([])
+  const [collaboratorOptions, setCollaboratorOptions] = useState([])
+  const [isUsersLoading, setIsUsersLoading] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+    const fetchUsers = async () => {
+      setIsUsersLoading(true)
+      try {
+        const { userId, TokenId } = getSession()
+        const details = { UserId: userId || 0 }
+        const payload = {
+          Token: TokenId,
+          Message: '',
+          LoggedUserId: userId,
+          MAC_Address: '',
+          IP_Address: '',
+          Details: details,
+          BroadcastName: ''
+        }
+        const resp = await getUserFromHashedList(payload)
+        let raw = resp?.Details ?? resp?.d ?? resp ?? []
+        if (raw && raw.data) raw = raw.data
+        // If API wraps array in another property try common names
+        if (raw && !Array.isArray(raw)) {
+          raw = raw.ResultList ?? raw.Users ?? raw.UserList ?? raw.Data ?? raw.Items ?? raw
+        }
+        const usersArray = Array.isArray(raw) ? raw : []
+        const mapToOption = (u) => {
+          const id = u.Code ?? u.Id ?? u.ID ?? u.UserId ?? u.Value ?? u.ValueId ?? ''
+          const label = u.Text ?? u.TextN ?? u.Name ?? u.FullName ?? u.DisplayName ?? u.LoginName ?? String(id)
+          return { value: String(id), label: String(label) }
+        }
+        if (mounted) {
+          const options = usersArray.map(mapToOption)
+          setOwners(options)
+          setCollaboratorOptions(options)
+        }
+      } catch (error) {
+        console.error('fetch users error:', error)
+      } finally {
+        if (mounted) setIsUsersLoading(false)
+      }
+    }
+    fetchUsers()
+    return () => { mounted = false }
+  }, [])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -45,6 +94,19 @@ const AddAppointment = () => {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  const formatToDisplay = (val) => {
+    if (!val) return ''
+    const dt = new Date(val)
+    if (isNaN(dt)) return String(val)
+    const dd = String(dt.getDate()).padStart(2, '0')
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+    const m = months[dt.getMonth()] || ''
+    const yyyy = dt.getFullYear()
+    const hh = String(dt.getHours()).padStart(2, '0')
+    const mm = String(dt.getMinutes()).padStart(2, '0')
+    return `${dd}-${m}-${yyyy} ${hh}:${mm}`
+  }
 
   return (
     <div className="p-4 max-h-[70vh] overflow-y-auto">
@@ -107,12 +169,28 @@ const AddAppointment = () => {
         </label>
         <div className="relative">
           <input
+            type="text"
+            readOnly
+            value={formData.startDateTime ? formatToDisplay(formData.startDateTime) : ''}
+            onClick={() => startInputRef.current && (startInputRef.current.showPicker ? startInputRef.current.showPicker() : startInputRef.current.click())}
+            placeholder="Select date and time"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+          />
+          <button
+            type="button"
+            onClick={() => startInputRef.current && (startInputRef.current.showPicker ? startInputRef.current.showPicker() : startInputRef.current.click())}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            aria-label="Open date picker"
+          >
+            <Calendar className="w-4 h-4" />
+          </button>
+          <input
+            ref={startInputRef}
             type="datetime-local"
             value={formData.startDateTime}
             onChange={(e) => handleChange('startDateTime', e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="absolute inset-0 opacity-0 pointer-events-none"
           />
-          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         </div>
       </div>
 
@@ -123,12 +201,28 @@ const AddAppointment = () => {
         </label>
         <div className="relative">
           <input
+            type="text"
+            readOnly
+            value={formData.endDateTime ? formatToDisplay(formData.endDateTime) : ''}
+            onClick={() => endInputRef.current && (endInputRef.current.showPicker ? endInputRef.current.showPicker() : endInputRef.current.click())}
+            placeholder="Select date and time"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+          />
+          <button
+            type="button"
+            onClick={() => endInputRef.current && (endInputRef.current.showPicker ? endInputRef.current.showPicker() : endInputRef.current.click())}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            aria-label="Open date picker"
+          >
+            <Calendar className="w-4 h-4" />
+          </button>
+          <input
+            ref={endInputRef}
             type="datetime-local"
             value={formData.endDateTime}
             onChange={(e) => handleChange('endDateTime', e.target.value)}
-            className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="absolute inset-0 opacity-0 pointer-events-none"
           />
-          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
         </div>
       </div>
 
@@ -170,10 +264,10 @@ const AddAppointment = () => {
           onChange={(e) => handleChange('owner', e.target.value)}
           className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="">Select Owner</option>
+          <option value="">{isUsersLoading ? 'Loading...' : 'Select Owner'}</option>
           {owners.map((owner) => (
-            <option key={owner} value={owner}>
-              {owner}
+            <option key={owner.value} value={owner.value}>
+              {owner.label}
             </option>
           ))}
         </select>
@@ -193,7 +287,7 @@ const AddAppointment = () => {
             <span className={formData.collaborators.length === 0 ? 'text-gray-500' : 'text-gray-900'}>
               {formData.collaborators.length === 0
                 ? 'Nothing selected'
-                : `Selected: ${formData.collaborators.join(', ')}`}
+                : `Selected: ${collaboratorOptions.filter(o => formData.collaborators.includes(o.value)).map(o => o.label).join(', ')}`}
             </span>
             <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isCollaboratorsOpen ? 'rotate-180' : ''}`} />
           </button>
@@ -202,17 +296,16 @@ const AddAppointment = () => {
             <div className="absolute z-10 w-full mt-1 bg-white border border-blue-500 rounded shadow-lg max-h-48 overflow-y-auto">
               {collaboratorOptions.map((collaborator) => (
                 <label
-                  key={collaborator}
-                  className={`flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer ${formData.collaborators.includes(collaborator) ? 'bg-blue-500 text-white hover:bg-blue-600' : ''
-                    }`}
+                  key={collaborator.value}
+                  className={`flex items-center px-3 py-2 hover:bg-gray-50 cursor-pointer ${formData.collaborators.includes(collaborator.value) ? 'bg-blue-500 text-white hover:bg-blue-600' : ''}`}
                 >
                   <input
                     type="checkbox"
-                    checked={formData.collaborators.includes(collaborator)}
-                    onChange={() => toggleCollaborator(collaborator)}
+                    checked={formData.collaborators.includes(collaborator.value)}
+                    onChange={() => toggleCollaborator(collaborator.value)}
                     className="mr-2 rounded"
                   />
-                  <span className="text-sm">{collaborator}</span>
+                  <span className="text-sm">{collaborator.label}</span>
                 </label>
               ))}
             </div>

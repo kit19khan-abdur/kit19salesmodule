@@ -18,11 +18,30 @@ const ScheduleCallForm = ({ lead, onSave, onCancel }) => {
     const saveAsync = async () => {
       try {
         const { userId, parentId, TokenId } = getSession();
+        const formatScheduleTime = (val) => {
+          if (!val) return '';
+          // Expecting input like 'YYYY-MM-DDTHH:mm' (value from datetime-local)
+          const [datePart, timePart] = String(val).split('T');
+          if (!datePart || !timePart) return String(val);
+          const [year, month, day] = datePart.split('-');
+          const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const m = months[parseInt(month, 10) - 1] || month;
+          // timePart may include seconds; keep only HH:mm
+          const hhmm = timePart.split(':').slice(0,2).join(':');
+          return `${day}-${m}-${year} ${hhmm}`;
+        };
+
         const details = {
           UserId: userId || 0,
           ParentId: parentId || 0,
           Mode: 'NEW_RECORD',
-          OperationJSON: JSON.stringify({ LeadId: lead?.LeadId || lead?.ID || lead?.Id || lead?.id, Phone: selectedPhone, Label: labelName, ScheduleTime: scheduleTime })
+          OperationJSON: JSON.stringify({
+            LabelName: labelName,
+            ScheduleTime: formatScheduleTime(scheduleTime),
+            EntityName: 'lead',
+            EntityId: String(lead?.LeadId || lead?.ID || lead?.Id || lead?.id || 0),
+            MobileNo: selectedPhone
+          })
         };
         const payload = {
           Token: TokenId,
@@ -56,7 +75,7 @@ const ScheduleCallForm = ({ lead, onSave, onCancel }) => {
       try {
         const { userId, TokenId } = getSession();
         const details = {
-          Mode: 'LABELS',
+          Mode: 'SELECT',
           Id: lead?.LeadId || lead?.ID || lead?.Id || 0,
           SettingJSON: '',
           UserId: userId || 0
@@ -71,14 +90,58 @@ const ScheduleCallForm = ({ lead, onSave, onCancel }) => {
           BroadcastName: ''
         };
         const resp = await getScheduleCallAction(payload);
-        let raw = resp?.Details ?? resp?.d ?? resp ?? [];
-        if (raw && raw.data) raw = raw.data;
-        const arr = Array.isArray(raw) ? raw : [];
-        // map possible fields to { value, label }
-        const opts = arr.map((it, idx) => ({
-          value: String(it.Id ?? it.ID ?? it.Value ?? it.ValueId ?? idx),
-          label: it.Name ?? it.Label ?? it.ActionName ?? it.Value ?? it.Text ?? `Option ${idx+1}`
-        }));
+          let raw = resp?.Details ?? resp?.d ?? resp ?? [];
+          if (raw && raw.data) raw = raw.data;
+          const parseJsonSafe = (s) => {
+            if (!s || typeof s !== 'string') return null;
+            const trimmed = s.trim();
+            if (!(trimmed.startsWith('{') || trimmed.startsWith('['))) return null;
+            try { return JSON.parse(trimmed); } catch (e) { return null; }
+          };
+          let opts = [];
+          if (Array.isArray(raw) && raw.length > 0) {
+            // If each item has a Text JSON payload, try to parse and extract useful lists
+            for (let i = 0; i < raw.length; i++) {
+              const it = raw[i];
+              // If item.Text is JSON string, parse it
+              const parsed = parseJsonSafe(it.Text || it.TextN || it.Value || it.SettingJSON || '');
+              if (parsed) {
+                // If parsed has leftTabs (common in UI config), use that
+                if (Array.isArray(parsed.leftTabs)) {
+                  opts = parsed.leftTabs.map((t, idx) => ({ value: String(t.name ?? idx), label: String(t.text ?? t.name ?? `Option ${idx+1}`) }));
+                  break;
+                }
+                // If parsed is an array, map it
+                if (Array.isArray(parsed)) {
+                  opts = parsed.map((p, idx) => ({ value: String(p.Id ?? p.id ?? p.value ?? idx), label: String(p.Name ?? p.name ?? p.label ?? p.text ?? `Option ${idx+1}`) }));
+                  break;
+                }
+              }
+            }
+            // If opts still empty, map raw items directly
+            if (opts.length === 0) {
+              opts = raw.map((it, idx) => ({
+                value: String(it.Id ?? it.ID ?? it.Value ?? it.ValueId ?? idx),
+                label: String(it.Name ?? it.Label ?? it.ActionName ?? it.Value ?? it.Text ?? `Option ${idx+1}`)
+              }));
+            }
+          } else if (raw && typeof raw === 'object') {
+            // single object case - Text may contain JSON describing options
+            const parsed = parseJsonSafe(raw.Text || raw.TextN || raw.SettingJSON || raw.Value || '');
+            if (parsed) {
+              if (Array.isArray(parsed.leftTabs)) {
+                opts = parsed.leftTabs.map((t, idx) => ({ value: String(t.name ?? idx), label: String(t.text ?? t.name ?? `Option ${idx+1}`) }));
+              } else if (Array.isArray(parsed)) {
+                opts = parsed.map((p, idx) => ({ value: String(p.Id ?? p.id ?? p.value ?? idx), label: String(p.Name ?? p.name ?? p.label ?? p.text ?? `Option ${idx+1}`) }));
+              } else {
+                // If parsed is an object but not an array, stringify a useful label
+                opts = [{ value: String(parsed.Id ?? parsed.id ?? raw.Id ?? 0), label: String(parsed.Name ?? parsed.Title ?? raw.Text ?? 'Option 1') }];
+              }
+            } else {
+              // fallback: use raw object fields
+              opts = [{ value: String(raw.Id ?? raw.ID ?? 0), label: String(raw.Text ?? raw.Name ?? 'Option 1') }];
+            }
+          }
         if (mounted) {
           setLabelOptions(opts);
           if (!labelName && opts.length > 0) setLabelName(String(opts[0].value));

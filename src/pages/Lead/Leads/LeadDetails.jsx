@@ -1098,7 +1098,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                             variant='primary'
                             onClick={() => { }}
                         >
-                            Create Meeting
+                            Save
                         </Button>
                     </div>
                 }
