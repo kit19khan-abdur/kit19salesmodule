@@ -103,7 +103,7 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
   const handleSaveField = (fieldName) => {
     console.log(`Saving ${fieldName}:`, formData[fieldName]);
     alert(`${fieldName} saved successfully!`);
-  };
+  }; 
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -171,16 +171,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     placeholder="Name (Required)"
                     required
                   />
-                  {formData.name && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('name')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save name"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
 
                 {/* Mobile and Email Row */}
@@ -207,16 +197,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                             placeholder={`Mobile ${index + 1} ${index === 0 ? '(Required)' : ''}`}
                             required={index === 0}
                           />
-                          {mobile.number && (
-                            <button
-                              type="button"
-                              onClick={() => handleSaveField(`mobile${index + 1}`)}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition z-10"
-                              title="Save mobile"
-                            >
-                              <Save className="w-4 h-4" />
-                            </button>
-                          )}
                         </div>
                         {index === 0 && formData.mobiles.length < 3 && (
                           <button
@@ -258,16 +238,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                             placeholder={`Email ${index + 1} ${index === 0 ? '(Required)' : ''}`}
                             required={index === 0}
                           />
-                          {email && (
-                            <button
-                              type="button"
-                              onClick={() => handleSaveField(`email${index + 1}`)}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition z-10"
-                              title="Save email"
-                            >
-                              <Save className="w-4 h-4" />
-                            </button>
-                          )}
                         </div>
                         {index === 0 && formData.emails.length < 3 && (
                           <button
@@ -311,16 +281,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     <option value="Referral">Referral</option>
                     <option value="Partner Event 2026">Partner Event 2026</option>
                   </select>
-                  {formData.source && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('source')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save source"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
@@ -361,16 +321,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     <option value="Phone">Phone</option>
                     <option value="Email">Email</option>
                   </select>
-                  {formData.medium && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('medium')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save medium"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
                 <div className="relative">
                   <select
@@ -383,16 +333,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     <option value="Partner Enrollment">Partner Enrollment</option>
                     <option value="Product Launch">Product Launch</option>
                   </select>
-                  {formData.campaign && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('campaign')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save campaign"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -406,16 +346,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none pr-10"
                   placeholder="Initial Remarks"
                 />
-                {formData.initialRemarks && (
-                  <button
-                    type="button"
-                    onClick={() => handleSaveField('initialRemarks')}
-                    className="absolute right-2 top-2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                    title="Save remarks"
-                  >
-                    <Save className="w-4 h-4" />
-                  </button>
-                )}
               </div>
 
               {/* Enquiry Tags */}
@@ -430,16 +360,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 mb-2 pr-10"
                     placeholder="Search tags"
                   />
-                  {formData.tags && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('tags')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save tags"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
                 <div className="bg-green-50 border border-green-200 rounded px-3 py-2 text-xs text-green-700">
                   Please press comma, tab, or enter key for generating the tag name, or you can also generate a tag by copy and paste with comma separated value.
@@ -479,16 +399,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 pr-10"
                   placeholder="Company"
                 />
-                {formData.company && (
-                  <button
-                    type="button"
-                    onClick={() => handleSaveField('company')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                    title="Save company"
-                  >
-                    <Save className="w-4 h-4" />
-                  </button>
-                )}
               </div>
 
               {/* Country and State */}
@@ -505,16 +415,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     <option value="USA">USA</option>
                     <option value="UK">UK</option>
                   </select>
-                  {formData.country && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('country')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save country"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
                 <div className="relative">
                   <select
@@ -528,16 +428,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     <option value="Delhi">Delhi</option>
                     <option value="Karnataka">Karnataka</option>
                   </select>
-                  {formData.state && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('state')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save state"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -555,16 +445,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     <option value="Delhi">Delhi</option>
                     <option value="Bangalore">Bangalore</option>
                   </select>
-                  {formData.city && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('city')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save city"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
                 <div className="relative">
                   <input
@@ -575,16 +455,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                     className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 pr-10"
                     placeholder="Pin Code"
                   />
-                  {formData.pinCode && (
-                    <button
-                      type="button"
-                      onClick={() => handleSaveField('pinCode')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                      title="Save pin code"
-                    >
-                      <Save className="w-4 h-4" />
-                    </button>
-                  )}
                 </div>
               </div>
 
@@ -598,16 +468,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none pr-10"
                   placeholder="Residential Address"
                 />
-                {formData.residentialAddress && (
-                  <button
-                    type="button"
-                    onClick={() => handleSaveField('residentialAddress')}
-                    className="absolute right-2 top-2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                    title="Save residential address"
-                  >
-                    <Save className="w-4 h-4" />
-                  </button>
-                )}
               </div>
 
               {/* Official Address */}
@@ -620,16 +480,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                   className="w-full px-3 py-2.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none pr-10"
                   placeholder="Official Address"
                 />
-                {formData.officialAddress && (
-                  <button
-                    type="button"
-                    onClick={() => handleSaveField('officialAddress')}
-                    className="absolute right-2 top-2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                    title="Save official address"
-                  >
-                    <Save className="w-4 h-4" />
-                  </button>
-                )}
               </div>
             </div>
             </div>
@@ -677,16 +527,6 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
                       <option value="34594-Chintan.Gujrati">34594-Chintan.Gujrati (Chintan Gujrati)</option>
                       <option value="34594-Shubham.Giri">34594-Shubham.Giri (Shubham Giri)</option>
                     </select>
-                    {formData.selectedUser && (
-                      <button
-                        type="button"
-                        onClick={() => handleSaveField('selectedUser')}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-green-600 hover:text-green-700 hover:bg-green-50 rounded transition"
-                        title="Save user"
-                      >
-                        <Save className="w-4 h-4" />
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
