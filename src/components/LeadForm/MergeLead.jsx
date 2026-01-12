@@ -5,7 +5,7 @@ import AddFollowupForm from '../../pages/Enquiries/Forms/AddFollowupForm';
 import PopUpModal from '../PopUpModal/PopUpModal';
 import Button from '../common/Button';
 
-const MergeLead = ({ isOpen, onClose, enquiryData }) => {
+const MergeLead = ({ isOpen, onClose, enquiryData, page }) => {
   const [selectedLeadId, setSelectedLeadId] = useState('136961');
   const [selectedFields, setSelectedFields] = useState({});
   const [showFollowupForm, setShowFollowupForm] = useState(false);
@@ -34,86 +34,86 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
   ];
 
   const fieldsList = [
-    { 
-      id: 'name', 
+    {
+      id: 'name',
       enquiry: { label: 'Karthick', value: 'Karthick' },
       lead: { label: 'Abdur', value: 'Abdur' },
       placeholder: 'Name'
     },
-    { 
-      id: 'company', 
+    {
+      id: 'company',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Company'
     },
-    { 
-      id: 'phone', 
+    {
+      id: 'phone',
       enquiry: { label: '9790690380', value: '9790690380' },
       lead: { label: '919790690380', value: '919790690380' },
       placeholder: 'Phone'
     },
-    { 
-      id: 'mobile1', 
+    {
+      id: 'mobile1',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Mobile1'
     },
-    { 
-      id: 'mobile2', 
+    {
+      id: 'mobile2',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Mobile2'
     },
-    { 
-      id: 'email', 
+    {
+      id: 'email',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Email'
     },
-    { 
-      id: 'email1', 
+    {
+      id: 'email1',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Email1'
     },
-    { 
-      id: 'email2', 
+    {
+      id: 'email2',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Email2'
     },
-    { 
-      id: 'country', 
+    {
+      id: 'country',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Country'
     },
-    { 
-      id: 'state', 
+    {
+      id: 'state',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'State'
     },
-    { 
-      id: 'city', 
+    {
+      id: 'city',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'City'
     },
-    { 
-      id: 'pincode', 
+    {
+      id: 'pincode',
       enquiry: { label: '0', value: '0' },
       lead: { label: '', value: '' },
       placeholder: 'Pincode'
     },
-    { 
-      id: 'residentialAddress', 
+    {
+      id: 'residentialAddress',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Residential Address'
     },
-    { 
-      id: 'officeAddress', 
+    {
+      id: 'officeAddress',
       enquiry: { label: '', value: '' },
       lead: { label: '', value: '' },
       placeholder: 'Office Address'
@@ -186,7 +186,7 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
             >
               <ChevronLeft className="w-5 h-5 text-gray-600" />
             </button>
-            <h2 className="text-xl font-semibold text-gray-800">Merge Enquiry to Lead</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Merge {page === 'lead' ? 'Lead' : 'Enquiry'} to Lead</h2>
           </div>
           <button
             onClick={onClose}
@@ -196,10 +196,59 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
           </button>
         </div>
 
+        {page === "lead" && (
+          <div className="px-6 py-4  flex justify-center border-b border-gray-200">
+            <div className="flex flex-col gap-3">
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <input
+                  type="radio"
+                  name="mergeOption"
+                  defaultChecked
+                  className="w-4 h-4 text-green-600"
+                />
+                Keep Lead 1 and Delete Lead 2
+              </label>
+
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <input
+                  type="radio"
+                  name="mergeOption"
+                  className="w-4 h-4 text-green-600"
+                />
+                Keep Lead 2 and Delete Lead 1
+              </label>
+            </div>
+          </div>
+        )}
+
+        {/* Lead No & Search */}
+        {page === "lead" && (
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">
+                Lead No.
+              </span>
+              <span className="px-3 py-1 bg-green-600 text-white rounded-full text-sm font-semibold">
+                {enquiryData?.EnquiryId || "588958"}
+              </span>
+            </div>
+
+            <div className="flex items-center ml-auto max-w-md w-full">
+              <input
+                type="text"
+                placeholder="Search lead no"
+                className="flex-1 border border-gray-300 rounded-l px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <button className="bg-green-600 px-4 py-2 rounded-r text-white hover:bg-green-700 transition">
+                🔍
+              </button>
+            </div>
+          </div>
+        )}
         {/* Enquiry ID Badge */}
-        <div className="px-6 py-4 border-b border-gray-200">
+        {page !== "lead" && (<div className="px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-600">Enquiry ID.</span>
+            <span className="text-sm font-medium text-gray-600">{page === 'lead' ? 'Lead' : 'Enquiry'} ID.</span>
             <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
               {enquiryData?.EnquiryId || '370139811'}
             </span>
@@ -215,7 +264,7 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
               ))}
             </select>
           </div>
-        </div>
+        </div>)}
 
         {/* Three Column Layout */}
         <div className="relative h-[calc(100vh-220px)] overflow-y-auto">
@@ -240,7 +289,7 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
                     className="w-4 h-4"
                   />
                   <label htmlFor="enquiry-details" className="font-semibold text-gray-800">
-                    Enquiry Details
+                    {page === 'lead' ? 'Lead' : 'Enquiry'} Details
                   </label>
                 </div>
               </div>
@@ -291,8 +340,8 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
           {/* Fields Section - All in aligned rows */}
           <div className="relative">
             {fieldsList.map((field, index) => (
-              <div 
-                key={field.id} 
+              <div
+                key={field.id}
                 className="grid grid-cols-3 border-b border-gray-100 hover:bg-gray-50 transition-colors"
               >
                 {/* Enquiry Field */}
@@ -363,7 +412,7 @@ const MergeLead = ({ isOpen, onClose, enquiryData }) => {
             Cancel
           </button>
           <button className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition font-medium">
-            Merge to Lead
+            Merge {page === 'lead' ? 'Lead' : 'to Lead'}
           </button>
           <button
             onClick={() => setShowFollowupForm(true)}

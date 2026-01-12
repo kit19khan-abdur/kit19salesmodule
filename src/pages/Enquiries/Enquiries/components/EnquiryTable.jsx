@@ -1790,6 +1790,7 @@ const EnquiryTable = ({
             <MergeLead
                 isOpen={isMergeLeadOpen}
                 onClose={() => setIsMergeLeadOpen(false)}
+                page={'enquiry'}
                 enquiryData={enquiries}
             />
 

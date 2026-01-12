@@ -872,6 +872,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
             <MergeLead
                 isOpen={isMergeLeadOpen}
                 onClose={() => setIsMergeLeadOpen(false)}
+                page={'enquiry'}
                 enquiryData={enquiry}
             />
 

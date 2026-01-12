@@ -6,7 +6,6 @@ import {
     NotebookPen, CloudUpload, Filter, Upload, Download, ChevronUp,
     ArrowUp, ArrowDown, Pin
 } from 'lucide-react';
-import { GoGitBranch } from 'react-icons/go';
 import { FaWhatsapp } from 'react-icons/fa';
 import { TfiLayoutColumn3 } from 'react-icons/tfi';
 import RowActionMenu from '../../../../components/RowActionMenu';
@@ -19,6 +18,21 @@ import ScheduleCallForm from './ScheduleCallForm';
 import ImportData from '../../../../components/ImportData/ImportData';
 import Button from '../../../../components/common/Button';
 import ColumnHeaderMenu from '../../../Enquiries/Enquiries/components/ColumnHeaderMenu';
+import AddFollowupForm from '../../../../components/LeadForm/AddFollowupForm';
+import CreateMeetingForm from '../../../../components/LeadForm/CreateMeetingForm';
+import AddAppointment from '../../../../components/LeadForm/AddAppointment';
+import AddPhysicalAppointmentForm from '../../../../components/LeadForm/AddPhysicalAppointmentForm';
+import SendVoiceForm from '../../../../components/LeadForm/SendVoiceForm';
+import AddNotes from '../../../../components/LeadForm/AddNotes';
+import UploadData from '../../../../components/LeadForm/UploadData';
+import AddTask from '../../../../components/LeadForm/AddTask';
+import AddDeal from '../../../../components/LeadForm/AddDeal';
+import WebForm from '../../../../components/LeadForm/WebForm';
+import EditLeadForm from '../../../../components/LeadForm/EditLeadForm';
+import WhatsAppForm from '../../../../components/LeadForm/WhatsAppForm';
+import MailForm from '../../../Enquiries/Forms/MailForm';
+import SMSForm from '../../../Enquiries/Forms/SMSForm';
+import MergeLead from '../../../../components/LeadForm/MergeLead';
 
 const LeadTable = ({
     leads,
@@ -73,6 +87,25 @@ const LeadTable = ({
     const toolbarMenuRef = useRef(null);
     const columnSearchRef = useRef(null);
     const totalPages = Math.ceil(totalRecord / parseInt(itemsPerPage));
+
+    // -------------------------------------Modal States-------------------------------------
+    const [isAddLeadModal, setIsAddLeadModal] = useState(false);
+    const [isCreateMeetingModal, setIsCreateMeetingModal] = useState(false);
+    const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
+    const [isAddAppointmentModal, setIsAddAppointmentModal] = useState(false);
+    const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
+    const [isAddNotesModal, setIsAddNotesModal] = useState(false);
+    const [isUploadDataModal, setIsUploadDataModal] = useState(false);
+    const [isAddTaskModal, setIsAddTaskModal] = useState(false);
+    const [isAddDealModal, setIsAddDealModal] = useState(false);
+    const [isWebFormModal, setIsWebFormModal] = useState(false);
+    const [isEditLeadModal, setIsEditLeadModal] = useState(false);
+    const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+    const [isMailModalOpen, setIsMailModalOpen] = useState(false);
+    const [isSMSModalOpen, setIsSMSModalOpen] = useState(false);
+    const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
+
+    // -------------------------------------------Modals Ends----------------------------------
 
     // Debug: log headerMenu changes to trace unexpected opens
     useEffect(() => {
@@ -908,7 +941,7 @@ const LeadTable = ({
                                                             className="w-6 h-6 cursor-pointer text-gray-600 hover:text-blue-600"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                // Handle mail action
+                                                                setIsMailModalOpen(true)
                                                             }}
                                                         />
                                                     </span>
@@ -917,7 +950,7 @@ const LeadTable = ({
                                                             className="w-6 h-6 cursor-pointer text-gray-600 hover:text-green-600"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                // Handle WhatsApp action
+                                                                setIsWhatsAppModalOpen(true)
                                                             }}
                                                         />
                                                     </span>
@@ -926,7 +959,7 @@ const LeadTable = ({
                                                             className="w-6 h-6 cursor-pointer text-gray-600 hover:text-[#d154f4]"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                // Handle SMS action
+                                                                setIsSMSModalOpen(true)
                                                             }}
                                                         />
                                                     </span>
@@ -935,7 +968,7 @@ const LeadTable = ({
                                                             className="w-6 h-6 cursor-pointer text-gray-600 hover:text-[#4eeba2]"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                // Handle SMS action
+                                                                setIsAddNotesModal(true)
                                                             }}
                                                         />
                                                     </span>
@@ -969,16 +1002,30 @@ const LeadTable = ({
                                                     menuId={`row-action-menu-${lead.ID}`}
                                                     onAction={action => {
                                                         setRowMenu({ show: false, rowId: null });
-                                                        if (action === 'edit') {
-                                                            alert(`Edit lead: ${lead.PersonName}`);
+                                                        if (action === 'addFollowUp') {
+                                                            setIsAddLeadModal(true)
+                                                        } else if (action === 'merge') {
+                                                            setIsMergeLeadOpen(true)
+                                                        } else if (action === 'edit') {
+                                                            setIsEditLeadModal(true)
+                                                        } else if (action === 'addTask') {
+                                                            setIsAddTaskModal(true)
+                                                        } else if (action === 'addDeal') {
+                                                            setIsAddDealModal(true)
+                                                        } else if (action === 'delete') {
+                                                            // Handle delete action
+                                                        } else if (action === 'physical') {
+                                                            setIsAddPhysicalAppointmentModal(true)
                                                         } else if (action === 'sendVoice') {
-                                                            alert(`Send voice to: ${lead.PersonName}`);
-                                                        } else if (action === 'meeting') {
-                                                            alert(`Create meeting with: ${lead.PersonName}`);
+                                                            setIsSendVoiceModal(true)
+                                                        } else if (action === 'uploadDoc') {
+                                                            setIsUploadDataModal(true)
                                                         } else if (action === 'appointment') {
-                                                            alert(`Add appointment for: ${lead.PersonName}`);
-                                                        } else {
-                                                            alert(`Action: ${action} for ${lead.PersonName}`);
+                                                            setIsAddAppointmentModal(true)
+                                                        } else if (action === 'meeting') {
+                                                            setIsCreateMeetingModal(true)
+                                                        } else if (action === 'webform') {
+                                                            setIsWebFormModal(true)
                                                         }
                                                     }}
                                                 />
@@ -1228,6 +1275,7 @@ const LeadTable = ({
                     </div>
                 </div>
             )}
+
             <PopUpModal
                 isOpen={isImportDataModal}
                 onClose={() => setIsImportDataModal(false)}
@@ -1252,6 +1300,362 @@ const LeadTable = ({
             >
                 <ImportData onClose={() => setIsImportDataModal(false)} onSubmit={() => console.log('Submit data')} />
             </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddLeadModal}
+                onClose={() => setIsAddLeadModal(false)}
+                title="Add Lead"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddLeadModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddFollowupForm selectedCount={leads} />
+            </PopUpModal>
+
+
+            <PopUpModal
+                isOpen={isCreateMeetingModal}
+                onClose={() => setIsCreateMeetingModal(false)}
+                title="Create Meeting"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsCreateMeetingModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <CreateMeetingForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddAppointmentModal}
+                onClose={() => setIsAddAppointmentModal(false)}
+                title="Add Appointment"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddAppointmentModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <AddAppointment />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddPhysicalAppointmentModal}
+                onClose={() => setIsAddPhysicalAppointmentModal(false)}
+                title="Add Physical Appointment"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddPhysicalAppointmentModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <AddPhysicalAppointmentForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isSendVoiceModal}
+                onClose={() => setIsSendVoiceModal(false)}
+                title="Send Voice"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsSendVoiceModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <SendVoiceForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddNotesModal}
+                onClose={() => setIsAddNotesModal(false)}
+                title="Add Note"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddNotesModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddNotes />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isUploadDataModal}
+                onClose={() => setIsUploadDataModal(false)}
+                title="Upload Data"
+                size="lg"
+                footer={
+                    <div className="flex justify-end w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsUploadDataModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                }
+            >
+                <UploadData />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddTaskModal}
+                onClose={() => setIsAddTaskModal(false)}
+                title="Add Task"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddTaskModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddTask />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddDealModal}
+                onClose={() => setIsAddDealModal(false)}
+                title="Add Deal"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddDealModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddDeal />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isWebFormModal}
+                onClose={() => setIsWebFormModal(false)}
+                title="Add WebForm"
+                size="sm"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsWebFormModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <WebForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isEditLeadModal}
+                onClose={() => setIsEditLeadModal(false)}
+                title="Edit Lead"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsEditLeadModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <EditLeadForm lead={leads} onClose={() => setIsEditLeadModal(false)} onSubmit={(updatedLead) => {
+                    // Handle the updated lead data here
+                    console.log('Updated Lead:', updatedLead);
+                    setIsEditLeadModal(false);
+                }} />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isWhatsAppModalOpen}
+                onClose={() => setIsWhatsAppModalOpen(false)}
+                title="WhatsApp Message"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsWhatsAppModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <WhatsAppForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMailModalOpen}
+                onClose={() => setIsMailModalOpen(false)}
+                title="Mail Message"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMailModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <MailForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isSMSModalOpen}
+                onClose={() => setIsSMSModalOpen(false)}
+                title="SMS Message"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsSMSModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <SMSForm />
+            </PopUpModal>
+
+            <MergeLead
+                isOpen={isMergeLeadOpen}
+                onClose={() => setIsMergeLeadOpen(false)}
+                page={'lead'}
+                enquiryData={leads}
+            />
         </div>
     );
 };
