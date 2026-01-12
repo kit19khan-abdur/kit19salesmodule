@@ -95,7 +95,7 @@ const LeadList = ({
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
   }, [hasMore, isLoading, onLoadMore]);
-  
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (toolbarMenuRef.current && !toolbarMenuRef.current.contains(event.target)) {
@@ -204,13 +204,6 @@ const LeadList = ({
                         <option>100</option>
                       </select>
                     </div>
-                    {/* <button
-                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
-                      onClick={() => setShowToolbarMenu(false)}
-                    >
-                      <Filter className="w-4 h-4 text-gray-600" />
-                      <span>Filter</span>
-                    </button> */}
                     <button
                       className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
                       onClick={() => {
@@ -390,18 +383,7 @@ const LeadList = ({
                     </button>
                   </>
 
-                  {showScheduleModal && (
-                    <PopUpModal isOpen={showScheduleModal} onClose={() => setShowScheduleModal(false)} title="Schedule Call">
-                      <ScheduleCallForm
-                        lead={scheduleLead}
-                        onCancel={() => setShowScheduleModal(false)}
-                        onSave={(data) => {
-                          console.debug('scheduled call', data, 'for', scheduleLead);
-                          setShowScheduleModal(false);
-                        }}
-                      />
-                    </PopUpModal>
-                  )}
+
                 </div>
                 <div className="flex-1 min-w-0" onClick={() => onSelectLead(lead)}>
                   <div className="flex justify-between items-start mb-1">
@@ -457,6 +439,18 @@ const LeadList = ({
       >
         <ImportData onClose={() => setIsImportDataModal(false)} onSubmit={() => console.log('Submit data')} />
       </PopUpModal>
+      {showScheduleModal && (
+        <PopUpModal isOpen={showScheduleModal} onClose={() => setShowScheduleModal(false)} title="Schedule Call">
+          <ScheduleCallForm
+            lead={scheduleLead}
+            onCancel={() => setShowScheduleModal(false)}
+            onSave={(data) => {
+              console.debug('scheduled call', data, 'for', scheduleLead);
+              setShowScheduleModal(false);
+            }}
+          />
+        </PopUpModal>
+      )}
     </div>
   );
 };

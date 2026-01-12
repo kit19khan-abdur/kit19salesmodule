@@ -100,10 +100,7 @@ const AddEnquiryForm = ({ onClose, onSubmit }) => {
     }
   };
 
-  const handleSaveField = (fieldName) => {
-    console.log(`Saving ${fieldName}:`, formData[fieldName]);
-    alert(`${fieldName} saved successfully!`);
-  }; 
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

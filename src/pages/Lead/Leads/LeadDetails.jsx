@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp, Undo2, ChevronLeftCircle } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp, Undo2, ChevronLeftCircle, SquarePen, Edit } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
 import { FaWhatsapp, FaRegMoneyBillAlt } from "react-icons/fa";
 import { HiOutlineDocumentText } from "react-icons/hi2";
@@ -16,6 +16,8 @@ import CreateMeetingForm from '../../../components/LeadForm/CreateMeetingForm';
 import AddAppointment from '../../../components/LeadForm/AddAppointment';
 import AddPhysicalAppointmentForm from '../../../components/LeadForm/AddPhysicalAppointmentForm';
 import Swal from 'sweetalert2';
+import SendVoiceForm from '../../../components/LeadForm/SendVoiceForm';
+import AddNotes from '../../../components/LeadForm/AddNotes';
 
 
 const LeadDetails = ({ lead, isLeftCollapsed }) => {
@@ -24,7 +26,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [activities, setActivities] = useState([]);
     const [callLogs, setCallLogs] = useState([]);
     const [tasks, setTasks] = useState([]);
-     const { userId, TokenId, parentId} = getSession();
+    const { userId, TokenId, parentId} = getSession();
     const [appointments, setAppointments] = useState([]);
     const [webforms, setWebforms] = useState([]);
     const [pipelineHistory, setPipelineHistory] = useState([]);
@@ -42,11 +44,17 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [callStatus, setCallStatus] = useState('Requesting');
     const [callTimer, setCallTimer] = useState('00:00:00');
     const callIntervalRef = useRef(null);
+
+    // -------------------------------------Modal States-------------------------------------
     const [isAddLeadModal, setIsAddLeadModal] = useState(false);
     const [isCreateMeetingModal, setIsCreateMeetingModal] = useState(false);
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
     const [isAddAppointmentModal, setIsAddAppointmentModal] = useState(false);
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
+    const [isAddNotesModal, setIsAddNotesModal] = useState(false);
+
+    // -------------------------------------------Modals Ends----------------------------------
+
     const moreDropdownRef = useRef(null);
     const [draggedItem, setDraggedItem] = useState(null);
     const [tabsOrder, setTabsOrder] = useState([]);
@@ -936,7 +944,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <GoGitBranch className="w-4 h-4" />
-                                    Add Or Merge Leads
+                                    Add FollowUp
                                 </button>
                                 <button
                                     onClick={() => setIsCreateMeetingModal(true)}
@@ -967,7 +975,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     Send Voice
                                 </button>
                                 <button
-                                    onClick={() => setIsSendVoiceModal(true)}
+                                    onClick={() => setIsAddNotesModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <NotebookPen className="w-4 h-4" />
@@ -981,7 +989,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     Upload Document
                                 </button>
                                 <button
-                                    onClick={() => setIsSendVoiceModal(true)}
+                                    onClick={() => setIsAddNotesModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <BookCheck className="w-4 h-4" />
@@ -1014,6 +1022,13 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                 >
                                     <HiOutlineDocumentText className="w-4 h-4" />
                                     Add Invoice
+                                </button>
+                                <button
+                                    onClick={() => setIsSendVoiceModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <Edit className="w-4 h-4" />
+                                    Edit All Fields
                                 </button>
                                 <button
                                     onClick={() => setIsSendVoiceModal(true)}
@@ -1143,6 +1158,55 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                 }
             >
                 <AddPhysicalAppointmentForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isSendVoiceModal}
+                onClose={() => setIsSendVoiceModal(false)}
+                title="Send Voice"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsSendVoiceModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Create Meeting
+                        </Button>
+                    </div>
+                }
+            >
+                <SendVoiceForm />
+            </PopUpModal>
+            <PopUpModal
+                isOpen={isAddNotesModal}
+                onClose={() => setIsAddNotesModal(false)}
+                title="Add Note"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddNotesModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddNotes />
             </PopUpModal>
 
             {/* Call Widget Sticky Popup */}
