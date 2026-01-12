@@ -33,6 +33,7 @@ import WhatsAppForm from '../../../../components/LeadForm/WhatsAppForm';
 import MailForm from '../../../Enquiries/Forms/MailForm';
 import SMSForm from '../../../Enquiries/Forms/SMSForm';
 import MergeLead from '../../../../components/LeadForm/MergeLead';
+import Modal from '../../../../components/common/Modal';
 
 const LeadTable = ({
     leads,
@@ -104,7 +105,7 @@ const LeadTable = ({
     const [isMailModalOpen, setIsMailModalOpen] = useState(false);
     const [isSMSModalOpen, setIsSMSModalOpen] = useState(false);
     const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
-
+    const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, leadId: null });
     // -------------------------------------------Modals Ends----------------------------------
 
     // Debug: log headerMenu changes to trace unexpected opens
@@ -972,13 +973,14 @@ const LeadTable = ({
                                                             }}
                                                         />
                                                     </span>
+                                                    {/* {console.log(`lead`, lead)} */}
                                                     <span title="Delete">
                                                         <Trash2
                                                             className="w-6 h-6 cursor-pointer text-gray-600 hover:text-red-600"
                                                             onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                // Handle delete action
-                                                            }}
+                                                            e.stopPropagation();
+                                                            setDeleteConfirmModal({ show: true, leadId: lead.ID });
+                                                        }}
                                                         />
                                                     </span>
                                                     <span
@@ -1275,6 +1277,38 @@ const LeadTable = ({
                     </div>
                 </div>
             )}
+
+                        {/* Delete Confirmation Modal */}
+                        <Modal
+                            isOpen={deleteConfirmModal.show}
+                            onClose={() => setDeleteConfirmModal({ show: false, leadId: null })}
+                            title="Delete Lead"
+                            size="sm"
+                            showCloseButton={false}
+                            footer={
+                                <>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setDeleteConfirmModal({ show: false, leadId: null })}
+                                    >
+                                        No
+                                    </Button>
+                                    <Button
+                                        variant="danger"
+                                        onClick={() => {
+                                            alert(`Confirmed deletion (no handler wired). Lead ID: ${deleteConfirmModal.leadId}`);
+                                            setDeleteConfirmModal({ show: false, leadId: null });
+                                        }}
+                                    >
+                                        Yes
+                                    </Button>
+                                </>
+                            }
+                        >
+                            <p className="text-gray-700">
+                                Are you sure you want to delete Lead Id: <strong>{deleteConfirmModal.leadId}</strong>?
+                            </p>
+                        </Modal>
 
             <PopUpModal
                 isOpen={isImportDataModal}
