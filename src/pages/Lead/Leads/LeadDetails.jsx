@@ -30,6 +30,7 @@ import MergeLead from '../../../components/LeadForm/MergeLead';
 
 
 const LeadDetails = ({ lead, isLeftCollapsed }) => {
+    // console.log(`leadDetail`, lead)
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [activeTab, setActiveTab] = useState('activities');
     const [activities, setActivities] = useState([]);
@@ -737,6 +738,22 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     <div>
                                         <label className="text-sm text-gray-500">Type</label>
                                         <p className="text-gray-900 text-sm">{lead.FollowupStatus || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-gray-500">Remarks</label>
+                                        <p className="text-gray-900 text-sm">{lead.Remarks || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-gray-500">Last FollowUped On</label>
+                                        <p className="text-gray-900 text-sm">{lead.LastFollowupedOn || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-gray-500">Assigned To</label>
+                                        <p className="text-gray-900 text-sm">{lead.assigneduser || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="text-sm text-gray-500">Last FollowUp By</label>
+                                        <p className="text-gray-900 text-sm">{lead.LastFollowupCreatedByName || 'N/A'}</p>
                                     </div>
                                 </div>
                             )}
