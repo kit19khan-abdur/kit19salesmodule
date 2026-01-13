@@ -88,7 +88,8 @@ const LeadTable = ({
         creationDetails: true,
         source: true,
         LastFollowupedOn: true,
-        FollowupStatus: true
+        FollowupStatus: true,
+        Remarks: true,
     });
     const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
     const [headerMenu, setHeaderMenu] = useState({ show: false, col: null });
@@ -378,12 +379,12 @@ const LeadTable = ({
     }, [showCallWidget]);
 
     return (
-        <div className="flex flex-col h-full bg-white">
+        <div className="flex flex-col h-full overflow-x-auto bg-white">
             {/* Header */}
             <div className="px-6 py-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
+                        <h1 className="text-2xl font-bold uppercase text-gray-900">Leads</h1>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="relative">
@@ -588,6 +589,18 @@ const LeadTable = ({
                                                 <span className="text-white">✓</span>
                                             )}
                                         </button>
+                                        <button
+                                            onClick={() => handleColumnToggle('Remarks')}
+                                            className={`w-full px-4 py-2.5 text-left text-sm transition flex items-center justify-between ${visibleColumns.Remarks
+                                                ? 'text-white bg-blue-400 hover:bg-blue-500'
+                                                : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            <span>Remarks</span>
+                                            {visibleColumns.Remarks && (
+                                                <span className="text-white">✓</span>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -742,7 +755,7 @@ const LeadTable = ({
                                 />
                             </th>
                             {visibleColumns.leadDetails && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Lead Details
                                         {pinnedColumn === 'leadDetails' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -780,7 +793,7 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.mobileNo && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Mobile No
                                         {pinnedColumn === 'mobileNo' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -818,7 +831,7 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.emailId && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Email ID
                                         {pinnedColumn === 'emailId' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -856,7 +869,7 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.creationDetails && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Creation Details
                                         {pinnedColumn === 'creationDetails' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -894,18 +907,23 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.source && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     Source
                                 </th>
                             )}
                             {visibleColumns.FollowupStatus && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     Status
                                 </th>
                             )}
                             {visibleColumns.LastFollowupedOn && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     LastFollowuped On
+                                </th>
+                            )}
+                            {visibleColumns.Remarks && (
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                    Remarks
                                 </th>
                             )}
                         </tr>
@@ -960,7 +978,7 @@ const LeadTable = ({
                                                     </div>
                                                     <div className="flex items-center gap-2 mb-1">
                                                         <span
-                                                            className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600"
+                                                            className="text-nowrap font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600"
                                                             onClick={() => {
                                                                 setSelectedLeadForDrawer(lead);
                                                                 setIsDrawerOpen(true);
@@ -1080,7 +1098,7 @@ const LeadTable = ({
                                                 }}
                                                 className="flex cursor-pointer hover:text-[#088b7e] items-center gap-1 text-blue-600 font-medium"
                                             >
-                                                <span>{lead.MobileNo ? lead.MobileNo : '-'}</span>
+                                                <span className='text-nowrap'>{lead.MobileNo ? lead.MobileNo : '-'}</span>
                                             </div>
                                         </td>
                                     )}
@@ -1101,7 +1119,7 @@ const LeadTable = ({
                                             <div className="text-xs">
                                                 <div className="mb-1">
                                                     {/* <span className="font-semibold text-gray-700">Date</span> */}
-                                                    <span className="ml-2 text-gray-600">{lead.CreatedOn ? lead.CreatedOn : '-'}</span>
+                                                    <span className="text-nowrap ml-2 text-gray-600">{lead.CreatedOn ? lead.CreatedOn : '-'}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -1110,8 +1128,9 @@ const LeadTable = ({
                                         <td className="px-4 py-2 text-sm text-gray-700">{lead.SourceName || '-'}</td>
                                     )}
                                     {/* {console.log(`visibleColumns`, visibleColumns)} */}
-                                    {visibleColumns.FollowupStatus && <td className="px-4 py-2 text-sm text-gray-700">{lead.FollowupStatus || '-'}</td>}
-                                    {visibleColumns.LastFollowupedOn && <td className="px-4 py-2 text-sm text-gray-700">{lead.LastFollowupedOn || '-'}</td>}
+                                    {visibleColumns.FollowupStatus && <td className="px-4 py-2 text-sm text-gray-700 text-nowrap">{lead.FollowupStatus || '-'}</td>}
+                                    {visibleColumns.LastFollowupedOn && <td className="px-4 py-2 text-sm text-gray-700 text-nowrap">{lead.LastFollowupedOn || '-'}</td>}
+                                    {visibleColumns.Remarks && <td className="px-4 py-2 text-sm text-gray-700 text-nowrap">{lead.Remarks || '-'}</td>}
                                 </tr>
                             ))}
                         </tbody>
