@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Edit, Trash2, Mic, BookCheck, ListChevronsDownUp, Spotlight, CloudUpload } from 'lucide-react';
+import { Edit, Trash2, Mic, BookCheck, ListChevronsDownUp, Spotlight, CloudUpload, CalendarCheck2 } from 'lucide-react';
 import { FaRegMoneyBillAlt, FaUsers } from "react-icons/fa";
 import { FaUsersGear } from "react-icons/fa6";
 import { SiJfrogpipelines } from 'react-icons/si';
@@ -37,18 +37,19 @@ const RowActionMenu = ({ show, anchorRef, onClose, onAction, menuId }) => {
       ref={menuRef}
       onClick={(e) => e.stopPropagation()}
     >
-      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('edit')}><Spotlight className="w-4 h-4 mr-2" />Add FollowUp</button>
-      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('edit')}><GoGitBranch className="w-4 h-4 mr-2" />Merge Leads</button>
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('addFollowUp')}><Spotlight className="w-4 h-4 mr-2" />Add FollowUp</button>
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('merge')}><GoGitBranch className="w-4 h-4 mr-2" />Merge Leads</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('edit')}><Edit className="w-4 h-4 mr-2" />Edit all fields</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('addTask')}><BookCheck className="w-4 h-4 mr-2" />Add Task</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('addDeal')}><SiJfrogpipelines className="w-4 h-4 mr-2" />Add Deal</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('sendVoice')}><Mic className="w-4 h-4 mr-2" />Send Voice</button>
-      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('meeting')}><CloudUpload className="w-4 h-4 mr-2" />Upload Document</button>
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('uploadDoc')}><CloudUpload className="w-4 h-4 mr-2" />Upload Document</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('meeting')}><FaUsersGear className="w-4 h-4 mr-2" />Create Meeting</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('taxSetting')}><FaRegMoneyBillAlt className="w-4 h-4 mr-2" />Add Tax Setting</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('quotation')}><GrDocumentConfig className="w-4 h-4 mr-2" />Add Quotation</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('invoice')}><HiOutlineDocumentText className="w-4 h-4 mr-2" />Add Invoice</button>
-      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('appointment')}><FaUsers className="w-4 h-4 mr-2" />Add Physical Appointment</button>
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('physical')}><CalendarCheck2 className="w-4 h-4 mr-2" />Add Physical Appointment</button>
+      <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('appointment')}><FaUsers className="w-4 h-4 mr-2" />Add Appointment</button>
       <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => onAction('webform')}><ListChevronsDownUp className="w-4 h-4 mr-2" />Web Form</button>
       {/* <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50" onClick={() => onAction('delete')}><Trash2 className="w-4 h-4 mr-2" />Delete</button> */}
     </div>

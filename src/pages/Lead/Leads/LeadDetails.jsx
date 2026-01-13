@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp, Undo2, ChevronLeftCircle, SquarePen, Edit } from 'lucide-react';
+import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, MapPin, ChevronRight, MoreVertical, FileText, Mic, EllipsisVertical, NotebookPen, CloudUpload, BookCheck, CalendarCheck, Video, ListChevronsDownUp, Undo2, ChevronLeftCircle, SquarePen, Edit, Spotlight } from 'lucide-react';
 import { GoGitBranch } from "react-icons/go";
 import { FaWhatsapp, FaRegMoneyBillAlt } from "react-icons/fa";
 import { HiOutlineDocumentText } from "react-icons/hi2";
@@ -18,6 +18,15 @@ import AddPhysicalAppointmentForm from '../../../components/LeadForm/AddPhysical
 import Swal from 'sweetalert2';
 import SendVoiceForm from '../../../components/LeadForm/SendVoiceForm';
 import AddNotes from '../../../components/LeadForm/AddNotes';
+import UploadData from '../../../components/LeadForm/UploadData';
+import AddTask from '../../../components/LeadForm/AddTask';
+import AddDeal from '../../../components/LeadForm/AddDeal';
+import WebForm from '../../../components/LeadForm/WebForm';
+import EditLeadForm from '../../../components/LeadForm/EditLeadForm';
+import WhatsAppForm from '../../../components/LeadForm/WhatsAppForm';
+import MailForm from '../../Enquiries/Forms/MailForm';
+import SMSForm from '../../Enquiries/Forms/SMSForm';
+import MergeLead from '../../../components/LeadForm/MergeLead';
 
 
 const LeadDetails = ({ lead, isLeftCollapsed }) => {
@@ -26,7 +35,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [activities, setActivities] = useState([]);
     const [callLogs, setCallLogs] = useState([]);
     const [tasks, setTasks] = useState([]);
-    const { userId, TokenId, parentId} = getSession();
+    const { userId, TokenId, parentId } = getSession();
     const [appointments, setAppointments] = useState([]);
     const [webforms, setWebforms] = useState([]);
     const [pipelineHistory, setPipelineHistory] = useState([]);
@@ -35,14 +44,11 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [notes, setNotes] = useState([]);
     const [documents, setDocuments] = useState([]);
     const [showMoreDropdown, setShowMoreDropdown] = useState(false);
-    const [isSMSModalOpen, setIsSMSModalOpen] = useState(false);
-    const [isMailModalOpen, setIsMailModalOpen] = useState(false);
-    const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
-    const [isRightCollapsed, setIsRightCollapsed] = useState(false);
     const [isContactOptionsCollapsed, setIsContactOptionsCollapsed] = useState(false);
     const [showCallWidget, setShowCallWidget] = useState(false);
     const [callStatus, setCallStatus] = useState('Requesting');
     const [callTimer, setCallTimer] = useState('00:00:00');
+    const [isRightCollapsed, setIsRightCollapsed] = useState(false);
     const callIntervalRef = useRef(null);
 
     // -------------------------------------Modal States-------------------------------------
@@ -53,6 +59,16 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
     const [isAddNotesModal, setIsAddNotesModal] = useState(false);
     const [noteText, setNoteText] = useState('');
+    const [isUploadDataModal, setIsUploadDataModal] = useState(false);
+    const [isAddTaskModal, setIsAddTaskModal] = useState(false);
+    const [isAddDealModal, setIsAddDealModal] = useState(false);
+    const [isWebFormModal, setIsWebFormModal] = useState(false);
+    const [isEditLeadModal, setIsEditLeadModal] = useState(false);
+    const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+    const [isMailModalOpen, setIsMailModalOpen] = useState(false);
+    const [isSMSModalOpen, setIsSMSModalOpen] = useState(false);
+    const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
+    
 
     // -------------------------------------------Modals Ends----------------------------------
 
@@ -72,7 +88,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     useEffect(() => {
         const savedOrder = localStorage.getItem('leadDetailTabsOrder');
         const savedMoreOrder = localStorage.getItem('leadDetailMoreTabsOrder');
-        
+
         if (savedOrder) {
             try {
                 setTabsOrder(JSON.parse(savedOrder));
@@ -110,22 +126,22 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
 
         const fetchActivities = async () => {
             try {
-               
+
                 const details = {
-            LeadID: lead.LeadId || lead.ID || lead.Id || lead.id,
+                    LeadID: lead.LeadId || lead.ID || lead.Id || lead.id,
                     Start: 0,
                     Limit: 10
-        };
+                };
 
-        const payload = {
-            Token: TokenId,
-            Message: "",
-            LoggedUserId: userId,
-            MAC_Address: "",
-            IP_Address: "102.16.32.189",
-            Details: details,
-            BroadcastName: ""
-        };
+                const payload = {
+                    Token: TokenId,
+                    Message: "",
+                    LoggedUserId: userId,
+                    MAC_Address: "",
+                    IP_Address: "102.16.32.189",
+                    Details: details,
+                    BroadcastName: ""
+                };
                 const response = await getLeadActivities(payload);
                 // API returns an object with a Details array (see sample). Handle several shapes.
                 let raw = response?.Details ?? response?.d ?? response ?? [];
@@ -154,22 +170,22 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
         const fetchCallLog = async () => {
             try {
                 const entityId = lead.LeadId || lead.ID || lead.Id || lead.id;
-                 const details = {
-           EntityName: 'Lead',
-            EntityID: entityId,
-            Start: 0,
-            Limit: 10
-        };
+                const details = {
+                    EntityName: 'Lead',
+                    EntityID: entityId,
+                    Start: 0,
+                    Limit: 10
+                };
 
-        const payload = {
-            Token: TokenId,
-            Message: "",
-            LoggedUserId: userId,
-            MAC_Address: "",
-            IP_Address: "102.16.32.189",
-            Details: details,
-            BroadcastName: ""
-        };
+                const payload = {
+                    Token: TokenId,
+                    Message: "",
+                    LoggedUserId: userId,
+                    MAC_Address: "",
+                    IP_Address: "102.16.32.189",
+                    Details: details,
+                    BroadcastName: ""
+                };
                 const response = await getCallLogt(payload);
                 // Response.d may be a JSON string (as in other details), parse if needed
                 if (response && response.d) {
@@ -239,7 +255,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     const response = await getFollowupsByLeadId(payload);
                     let data = response?.Details ?? response?.d ?? response ?? [];
                     if (data && typeof data === 'string') {
-                        try { data = JSON.parse(data); } catch(e) { /* keep as-is */ }
+                        try { data = JSON.parse(data); } catch (e) { /* keep as-is */ }
                     }
                     if (data && data.data) data = data.data;
                     setFollowups(Array.isArray(data) ? data : []);
@@ -269,7 +285,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     const response = await getNotesByLeadId(payload);
                     let data = response?.Details ?? response?.d ?? response ?? [];
                     if (data && typeof data === 'string') {
-                        try { data = JSON.parse(data); } catch(e) { /* keep as-is */ }
+                        try { data = JSON.parse(data); } catch (e) { /* keep as-is */ }
                     }
                     if (data && data.data) data = data.data;
                     setNotes(Array.isArray(data) ? data : []);
@@ -299,7 +315,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     const response = await getDocumentsByLeadId(payload);
                     let data = response?.Details ?? response?.d ?? response ?? [];
                     if (data && typeof data === 'string') {
-                        try { data = JSON.parse(data); } catch(e) { /* keep as-is */ }
+                        try { data = JSON.parse(data); } catch (e) { /* keep as-is */ }
                     }
                     if (data && data.data) data = data.data;
                     setDocuments(Array.isArray(data) ? data : []);
@@ -354,7 +370,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     const response = await getTawkToChatLogsByLeadId(payload);
                     let data = response?.Details ?? response?.d ?? response ?? [];
                     if (data && typeof data === 'string') {
-                        try { data = JSON.parse(data); } catch(e) { /* keep as-is */ }
+                        try { data = JSON.parse(data); } catch (e) { /* keep as-is */ }
                     }
                     if (data && data.data) data = data.data;
                     setChatLogs(Array.isArray(data) ? data : []);
@@ -466,12 +482,12 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
             // From more dropdown to main - check limit
             if (tabsOrder.length >= MAX_MAIN_TABS) {
                 Swal.fire({
-                icon: 'info',
-                title: 'Maximum Tabs Reached',
-                text: `You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`,
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#0d93b4'
-            })
+                    icon: 'info',
+                    title: 'Maximum Tabs Reached',
+                    text: `You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`,
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#0d93b4'
+                })
                 // alert(`You can only have maximum ${MAX_MAIN_TABS} tabs in the main tab bar`);
                 setDraggedItem(null);
                 return;
@@ -553,7 +569,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
             if (contextMenuElement && contextMenuElement.contains(event.target)) {
                 return;
             }
-            
+
             if (moreDropdownRef.current && !moreDropdownRef.current.contains(event.target)) {
                 setShowMoreDropdown(false);
             }
@@ -642,7 +658,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                 <div>
                                     <h1 className="text-2xl font-bold text-gray-900 mb-1">{lead.PersonName}</h1>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                                        <span 
+                                        <span
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setShowCallWidget(true);
@@ -663,7 +679,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-[24px]" style={{ alignItems: 'flex-end' }}>
-                                        {/* <div className={`px-3 py-1 rounded-full text-sm font-medium ${lead.IsOpen ? 'bg-green-100 text-green-700' : 'bg-gray-600 text-white'}`}>
+                                    {/* <div className={`px-3 py-1 rounded-full text-sm font-medium ${lead.IsOpen ? 'bg-green-100 text-green-700' : 'bg-gray-600 text-white'}`}>
                                             {lead.IsOpen ? 'Open' : 'Closed'}
                                         </div> */}
                                     <div className="text-sm text-gray-500">{lead.CreatedOn}</div>
@@ -682,7 +698,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-sm text-gray-500">Phone</label>
-                                    <p 
+                                    <p
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setShowCallWidget(true);
@@ -945,8 +961,15 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     onClick={() => setIsAddLeadModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
-                                    <GoGitBranch className="w-4 h-4" />
+                                    <Spotlight className="w-4 h-4" />
                                     Add FollowUp
+                                </button>
+                                <button
+                                    onClick={() => setIsMergeLeadOpen(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
+                                >
+                                    <GoGitBranch className="w-4 h-4" />
+                                    Merge Lead
                                 </button>
                                 <button
                                     onClick={() => setIsCreateMeetingModal(true)}
@@ -984,21 +1007,21 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     Add Note
                                 </button>
                                 <button
-                                    onClick={() => setIsSendVoiceModal(true)}
+                                    onClick={() => setIsUploadDataModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <CloudUpload className="w-4 h-4" />
                                     Upload Document
                                 </button>
                                 <button
-                                    onClick={() => setIsAddNotesModal(true)}
+                                    onClick={() => setIsAddTaskModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <BookCheck className="w-4 h-4" />
                                     Add Task
                                 </button>
                                 <button
-                                    onClick={() => setIsSendVoiceModal(true)}
+                                    onClick={() => setIsAddDealModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <SiJfrogpipelines className="w-4 h-4" />
@@ -1026,14 +1049,14 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     Add Invoice
                                 </button>
                                 <button
-                                    onClick={() => setIsSendVoiceModal(true)}
+                                    onClick={() => setIsEditLeadModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <Edit className="w-4 h-4" />
                                     Edit All Fields
                                 </button>
                                 <button
-                                    onClick={() => setIsSendVoiceModal(true)}
+                                    onClick={() => setIsWebFormModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm"
                                 >
                                     <ListChevronsDownUp className="w-4 h-4" />
@@ -1061,7 +1084,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     )}
                 </div>
             </div>
-              <PopUpModal
+            <PopUpModal
                 isOpen={isAddLeadModal}
                 onClose={() => setIsAddLeadModal(false)}
                 title="Add Lead"
@@ -1076,7 +1099,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                         </Button>
                         <Button
                             variant='primary'
-                            onClick={() => {}}
+                            onClick={() => { }}
                         >
                             Save
                         </Button>
@@ -1231,6 +1254,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
             >
                 <SendVoiceForm ref={sendVoiceRef} lead={lead} />
             </PopUpModal>
+
             <PopUpModal
                 isOpen={isAddNotesModal}
                 onClose={() => setIsAddNotesModal(false)}
@@ -1303,6 +1327,211 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
             >
                 <AddNotes value={noteText} onChange={setNoteText} />
             </PopUpModal>
+
+            <PopUpModal
+                isOpen={isUploadDataModal}
+                onClose={() => setIsUploadDataModal(false)}
+                title="Upload Data"
+                size="lg"
+                footer={
+                    <div className="flex justify-end w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsUploadDataModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                    </div>
+                }
+            >
+                <UploadData />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddTaskModal}
+                onClose={() => setIsAddTaskModal(false)}
+                title="Add Task"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddTaskModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddTask />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isAddDealModal}
+                onClose={() => setIsAddDealModal(false)}
+                title="Add Deal"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsAddDealModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddDeal />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isWebFormModal}
+                onClose={() => setIsWebFormModal(false)}
+                title="Add WebForm"
+                size="sm"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsWebFormModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <WebForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isEditLeadModal}
+                onClose={() => setIsEditLeadModal(false)}
+                title="Edit Lead"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsEditLeadModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <EditLeadForm lead={lead} onClose={() => setIsEditLeadModal(false)} onSubmit={(updatedLead) => {
+                    // Handle the updated lead data here
+                    console.log('Updated Lead:', updatedLead);
+                    setIsEditLeadModal(false);
+                }} />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isWhatsAppModalOpen}
+                onClose={() => setIsWhatsAppModalOpen(false)}
+                title="WhatsApp Message"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsWhatsAppModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <WhatsAppForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMailModalOpen}
+                onClose={() => setIsMailModalOpen(false)}
+                title="Mail Message"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMailModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <MailForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isSMSModalOpen}
+                onClose={() => setIsSMSModalOpen(false)}
+                title="SMS Message"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsSMSModalOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <SMSForm />
+            </PopUpModal>
+
+            <MergeLead
+                isOpen={isMergeLeadOpen}
+                onClose={() => setIsMergeLeadOpen(false)}
+                page={'lead'}
+                enquiryData={lead}
+            />
 
             {/* Call Widget Sticky Popup */}
             {showCallWidget && (
