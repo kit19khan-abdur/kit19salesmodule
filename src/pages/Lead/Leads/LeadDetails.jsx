@@ -7,7 +7,7 @@ import { FaUsersGear } from "react-icons/fa6";
 import { SiJfrogpipelines } from "react-icons/si";
 import { GrDocumentConfig } from "react-icons/gr";
 import nodata from '../../../assets/nodata.gif';
-import { getLeadActivities, getCallLogt, getTaskHistoryListByUserId_new, getWebformDetailsByLeadId, getPipelineHistoryByLeadID, getTawkToChatLogsByLeadId, getFollowupsByLeadId, getNotesByLeadId, getDocumentsByLeadId } from '../../../utils/lead';
+import { getLeadActivities, getCallLogt, getTaskHistoryListByUserId_new, getWebformDetailsByLeadId, getPipelineHistoryByLeadID, getTawkToChatLogsByLeadId, getFollowupsByLeadId, getNotesByLeadId, getDocumentsByLeadId, addNotes, sendVoiceEnquiryOrLead } from '../../../utils/lead';
 import { getSession } from '../../../getSession';
 import PopUpModal from '../../../components/PopUpModal/PopUpModal';
 import Button from '../../../components/common/Button';
@@ -52,11 +52,13 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
     const [isAddAppointmentModal, setIsAddAppointmentModal] = useState(false);
     const [isSendVoiceModal, setIsSendVoiceModal] = useState(false);
     const [isAddNotesModal, setIsAddNotesModal] = useState(false);
+    const [noteText, setNoteText] = useState('');
 
     // -------------------------------------------Modals Ends----------------------------------
 
     const moreDropdownRef = useRef(null);
     const [draggedItem, setDraggedItem] = useState(null);
+    const sendVoiceRef = useRef(null);
     const [tabsOrder, setTabsOrder] = useState([]);
     const [moreTabsOrder, setMoreTabsOrder] = useState([]);
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0, tab: null, source: null });
@@ -1175,14 +1177,59 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                         </Button>
                         <Button
                             variant='primary'
-                            onClick={() => { }}
+                            onClick={async () => {
+                                try {
+                                    if (!sendVoiceRef.current || !sendVoiceRef.current.getFormData) {
+                                        console.warn('SendVoiceForm ref not available');
+                                        return;
+                                    }
+                                    const form = sendVoiceRef.current.getFormData();
+                                    const details = {
+                                        SendVoice: {
+                                            MobileNo: form.MobileNo || '',
+                                            MobileNo1: form.MobileNo1 || '',
+                                            MobileNo2: form.MobileNo2 || '',
+                                            Route: form.Route || '',
+                                            AppFlow: form.AppFlow || '',
+                                            DnidNo: form.DnidNo || '',
+                                            Duration: form.Duration || '',
+                                            Voice_Source: form.Voice_Source || '',
+                                            EntityName: form.EntityName || 'lead',
+                                            EntityId: form.EntityId || ''
+                                        },
+                                        ParentId: parentId || 0
+                                    };
+
+                                    const payload = {
+                                        Token: TokenId,
+                                        Message: "",
+                                        LoggedUserId: userId,
+                                        MAC_Address: "",
+                                        IP_Address: "",
+                                        Details: details,
+                                        BroadcastName: ""
+                                    };
+
+                                    const resp = await sendVoiceEnquiryOrLead(payload);
+                                    if (resp && (resp.Status === 1 || resp.status === 1)) {
+                                        Swal.fire({ icon: 'success', title: 'Sent', text: 'Voice sent successfully.' });
+                                        setIsSendVoiceModal(false);
+                                    } else {
+                                        console.error('sendVoice failed', resp);
+                                        Swal.fire({ icon: 'error', title: 'Error', text: resp?.Message || 'Failed to send voice.' });
+                                    }
+                                } catch (error) {
+                                    console.error('send voice error', error);
+                                    Swal.fire({ icon: 'error', title: 'Error', text: 'An error occurred while sending voice.' });
+                                }
+                            }}
                         >
-                            Create Meeting
+                            Save
                         </Button>
                     </div>
                 }
             >
-                <SendVoiceForm />
+                <SendVoiceForm ref={sendVoiceRef} lead={lead} />
             </PopUpModal>
             <PopUpModal
                 isOpen={isAddNotesModal}
@@ -1199,14 +1246,62 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                         </Button>
                         <Button
                             variant='primary'
-                            onClick={() => { }}
+                            onClick={async () => {
+                                try {
+                                    const payload = {
+                                        Token: TokenId,
+                                        Message: "",
+                                        LoggedUserId: userId,
+                                        MAC_Address: "",
+                                        IP_Address: "",
+                                        Details: {
+                                            LeadID: lead.ID || lead.LeadId || lead.Id || lead.id,
+                                            Notes: noteText,
+                                            ParentId: parentId,
+                                            UserId: userId
+                                        },
+                                        BroadcastName: ""
+                                    };
+                                    const resp = await addNotes(payload);
+                                    // On success close modal and refresh notes
+                                    setIsAddNotesModal(false);
+                                    setNoteText('');
+                                    // fetch latest notes
+                                    try {
+                                        const notesPayload = {
+                                            Token: TokenId,
+                                            Message: "",
+                                            LoggedUserId: userId,
+                                            MAC_Address: "",
+                                            IP_Address: "",
+                                            Details: {
+                                                leadid: lead.ID,
+                                                parentid: parentId,
+                                                userid: userId
+                                            },
+                                            BroadcastName: ""
+                                        };
+                                        const notesResp = await getNotesByLeadId(notesPayload);
+                                        let data = notesResp?.Details ?? notesResp?.d ?? notesResp ?? [];
+                                        if (data && typeof data === 'string') {
+                                            try { data = JSON.parse(data); } catch(e) { }
+                                        }
+                                        if (data && data.data) data = data.data;
+                                        setNotes(Array.isArray(data) ? data : []);
+                                    } catch (err) {
+                                        console.error('refresh notes error:', err);
+                                    }
+                                } catch (error) {
+                                    console.error('add note error:', error);
+                                }
+                            }}
                         >
                             Save
                         </Button>
                     </div>
                 }
             >
-                <AddNotes />
+                <AddNotes value={noteText} onChange={setNoteText} />
             </PopUpModal>
 
             {/* Call Widget Sticky Popup */}

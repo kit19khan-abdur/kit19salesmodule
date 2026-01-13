@@ -180,6 +180,55 @@ export const getUserFromHashedList = async (payload) => {
     }
 }
 
+export const addNotes = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/AddNotes', payload);
+        return response.data;
+    } catch (error) {
+        console.error('addNotes error:', error);
+        throw error;
+    }
+}
+
+export const getDIDNumbers = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetDIDNumbers', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getDIDNumbers error:', error);
+        throw error;
+    }
+}
+
+export const getAppNames = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetAppNames', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getAppNames error:', error);
+        throw error;
+    }
+}
+
+export const getMeetingSettingList = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/GetMeetingSettingList', payload);
+        return response.data;
+    } catch (error) {
+        console.error('getMeetingSettingList error:', error);
+        throw error;
+    }
+}
+
+export const sendVoiceEnquiryOrLead = async (payload) => {
+    try {
+        const response = await serviceInstance.post('UserCRM/SendVoiceEnquiryOrLead', payload);
+        return response.data;
+    } catch (error) {
+        console.error('sendVoiceEnquiryOrLead error:', error);
+        throw error;
+    }
+}
 // Fetch appointment types from backend if available, otherwise return a sensible fallback
 export const getAppointmentTypes = async (payload = {}) => {
     try {

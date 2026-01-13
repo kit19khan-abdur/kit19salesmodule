@@ -1,10 +1,19 @@
-import React, { useState } from 'react'
-import RichTextEditor from '../common/RichTextEditor'
+import React, { useState, useEffect } from 'react'
 import RichTextEditorArea from '../common/RichTextEditorArea';
 
-const AddNotes = () => {
-    const [noteText, setNoteText] = useState('');
+// Accepts controlled props: `value` and `onChange`.
+const AddNotes = ({ value = '', onChange = () => {} }) => {
+    const [noteText, setNoteText] = useState(value);
 
+    useEffect(() => {
+        setNoteText(value);
+    }, [value]);
+
+    const handleChange = (e) => {
+        const v = e.target.value;
+        setNoteText(v);
+        onChange(v);
+    }
 
     return (
         <div>
@@ -16,10 +25,7 @@ const AddNotes = () => {
                     <RichTextEditorArea
                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none`}
                         value={noteText}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            setNoteText(value);
-                        }}
+                        onChange={handleChange}
                         placeholder="Enter your note here..."
                         rows="8"
                     />

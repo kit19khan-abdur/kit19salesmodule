@@ -1,11 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
+import { getMeetingSettingList } from '../../utils/lead';
+import { getSession } from '../../getSession';
 
 const CreateMeetingForm = () => {
   const [meetingTemplate, setMeetingTemplate] = useState('');
   const [meetingName, setMeetingName] = useState('');
   const [startDateTime, setStartDateTime] = useState('');
   const [endDateTime, setEndDateTime] = useState('');
+  const startRef = useRef(null);
+  const endRef = useRef(null);
+
+  const formatToDisplay = (val) => {
+    if (!val) return '';
+    // expect input like 'YYYY-MM-DDTHH:mm'
+    const [datePart, timePart] = String(val).split('T');
+    if (!datePart) return val;
+    const [year, month, day] = datePart.split('-').map(Number);
+    const [hour = '00', minute = '00'] = (timePart || '').split(':');
+    if (!year || !month || !day) return val;
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const display = `${String(day).padStart(2,'0')}-${months[month-1]}-${year} ${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
+    return display;
+  };
+
+  const openPicker = (ref) => {
+    try {
+      if (!ref || !ref.current) return;
+      const el = ref.current;
+      if (typeof el.showPicker === 'function') {
+        el.showPicker();
+      } else {
+        el.focus();
+        el.click();
+      }
+    } catch (e) {
+      // ignore
+    }
+  };
   const [timezone, setTimezone] = useState('GMT +5:30');
   const [isRecurring, setIsRecurring] = useState(false);
   const [repeatType, setRepeatType] = useState('');
@@ -21,12 +53,46 @@ const CreateMeetingForm = () => {
   const [showCoHostSuggestions, setShowCoHostSuggestions] = useState(false);
   const [participants, setParticipants] = useState('');
 
-  const templates = [
+  const fallbackTemplates = [
     'Sales Meeting Template',
     'Follow-up Meeting Template',
     'Demo Meeting Template',
     'Client Meeting Template'
   ];
+
+  const [templates, setTemplates] = useState(fallbackTemplates);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchSettings = async () => {
+      try {
+        const session = getSession();
+        const payload = {
+          Token: session.token,
+          Message: "",
+          LoggedUserId: session.userId,
+          MAC_Address: "",
+          IP_Address: "",
+          Details: { ismeeting: "", userId: session.userId }
+        };
+        const resp = await getMeetingSettingList(payload);
+        const list = resp?.Details || resp || [];
+        const normalize = (item) => {
+          if (!item) return '';
+          if (typeof item === 'string') return item;
+          return item.MeetingSettingName || item.Name || item.MeetingName || item.Title || item.Text || item.SettingName || item.DisplayName || JSON.stringify(item);
+        };
+        if (mounted && Array.isArray(list) && list.length) {
+          setTemplates(list.map(normalize));
+        }
+      } catch (err) {
+        // keep fallback templates on error
+        console.warn('Failed to load meeting settings:', err?.message || err);
+      }
+    };
+    fetchSettings();
+    return () => { mounted = false };
+  }, []);
 
   const hosts = [
     'Abhi01',
@@ -89,12 +155,24 @@ const CreateMeetingForm = () => {
         </label>
         <div className="relative">
           <input
+            type="text"
+            readOnly
+            value={formatToDisplay(startDateTime)}
+            onClick={() => openPicker(startRef)}
+            placeholder="Select start date and time"
+            className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer bg-white"
+          />
+          <input
+            ref={startRef}
             type="datetime-local"
             value={startDateTime}
             onChange={(e) => setStartDateTime(e.target.value)}
-            className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            // overlay the native input so clicks on the field or icon open the picker
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, zIndex: 2, cursor: 'pointer' }}
           />
-          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Calendar className="w-5 h-5 text-gray-400" />
+          </div>
         </div>
       </div>
 
@@ -105,12 +183,23 @@ const CreateMeetingForm = () => {
         </label>
         <div className="relative">
           <input
+            type="text"
+            readOnly
+            value={formatToDisplay(endDateTime)}
+            onClick={() => openPicker(endRef)}
+            placeholder="Select end date and time"
+            className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer bg-white"
+          />
+          <input
+            ref={endRef}
             type="datetime-local"
             value={endDateTime}
             onChange={(e) => setEndDateTime(e.target.value)}
-            className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, zIndex: 2, cursor: 'pointer' }}
           />
-          <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Calendar className="w-5 h-5 text-gray-400" />
+          </div>
         </div>
       </div>
 
