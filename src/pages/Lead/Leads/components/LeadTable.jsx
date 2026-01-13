@@ -18,7 +18,6 @@ import ScheduleCallForm from './ScheduleCallForm';
 import ImportData from '../../../../components/ImportData/ImportData';
 import Button from '../../../../components/common/Button';
 import ColumnHeaderMenu from '../../../Enquiries/Enquiries/components/ColumnHeaderMenu';
-import AddFollowupForm from '../../../../components/LeadForm/AddFollowupForm';
 import CreateMeetingForm from '../../../../components/LeadForm/CreateMeetingForm';
 import AddAppointment from '../../../../components/LeadForm/AddAppointment';
 import AddPhysicalAppointmentForm from '../../../../components/LeadForm/AddPhysicalAppointmentForm';
@@ -34,6 +33,17 @@ import MailForm from '../../../Enquiries/Forms/MailForm';
 import SMSForm from '../../../Enquiries/Forms/SMSForm';
 import MergeLead from '../../../../components/LeadForm/MergeLead';
 import Modal from '../../../../components/common/Modal';
+import AddFollowupForm from '../../../Enquiries/Forms/AddFollowupForm';
+import SendSMS from '../../../../components/LeadMass/SendSMS';
+import SendMail from '../../../../components/LeadMass/SendMail';
+import VoiceBroadCast from '../../../../components/LeadMass/VoiceBroadCast';
+import UpdateForm from '../../../../components/LeadMass/UpdateForm';
+import AddTaskForm from '../../../../components/LeadMass/AddTaskForm';
+import AddAppointmentForm from '../../../../components/LeadMass/AddAppointmentForm';
+import MarkettingSequence from '../../../../components/LeadMass/MarkettingSequence';
+import SendInternationalSMS from '../../../../components/LeadMass/SendInternationalSMS';
+import AddRemoveTag from '../../../../components/LeadMass/AddRemoveTag';
+import AddCallList from '../../../../components/LeadMass/AddCallList';
 
 const LeadTable = ({
     leads,
@@ -78,7 +88,8 @@ const LeadTable = ({
         creationDetails: true,
         source: true,
         LastFollowupedOn: true,
-        FollowupStatus: true
+        FollowupStatus: true,
+        Remarks: true,
     });
     const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
     const [headerMenu, setHeaderMenu] = useState({ show: false, col: null });
@@ -107,6 +118,24 @@ const LeadTable = ({
     const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
     const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, leadId: null });
     // -------------------------------------------Modals Ends----------------------------------
+
+
+    // ---------------------------------------Mass Operation-----------------------------------
+    const [isMassAddFollowupModal, setIsMassAddFollowupModal] = useState(false);
+    const [isMassSendSMS, setIsMassSendSMS] = useState(false);
+    const [isMassSendMail, setIsMassSendMail] = useState(false);
+    const [isMassSendVoiceBroadCast, setIsMassSendVoiceBroadCast] = useState(false);
+    const [isMassUpdateLead, setIsMassUpdateLead] = useState(false);
+    const [isMassAddTask, setIsMassAddTask] = useState(false);
+    const [isMassAddAppointment, setIsMassAddAppointment] = useState(false);
+    const [isMassMsrketingSequence, setIsMassMarketingSequence] = useState(false);
+    const [isSendInternationalSMS, setIsSendInternationalSMS] = useState(false);
+    const [isMassAddTag, setIsMassAddTag] = useState(false);
+    const [isAddTag, setIsAddTag] = useState(false);
+    const [isMassAddCallList, setIsMassAddCallList] = useState(false);
+    const [isDeleteMassConfirmModal, setDeleteMassConfirmModal] = useState({ show: false, leadId: null });
+
+    // ---------------------------------------End Mass Operation-------------------------------
 
     // Debug: log headerMenu changes to trace unexpected opens
     useEffect(() => {
@@ -350,12 +379,12 @@ const LeadTable = ({
     }, [showCallWidget]);
 
     return (
-        <div className="flex flex-col h-full bg-white">
+        <div className="flex flex-col h-full overflow-x-auto bg-white">
             {/* Header */}
             <div className="px-6 py-4 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
+                        <h1 className="text-2xl font-bold uppercase text-gray-900">Leads</h1>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="relative">
@@ -560,6 +589,18 @@ const LeadTable = ({
                                                 <span className="text-white">✓</span>
                                             )}
                                         </button>
+                                        <button
+                                            onClick={() => handleColumnToggle('Remarks')}
+                                            className={`w-full px-4 py-2.5 text-left text-sm transition flex items-center justify-between ${visibleColumns.Remarks
+                                                ? 'text-white bg-blue-400 hover:bg-blue-500'
+                                                : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            <span>Remarks</span>
+                                            {visibleColumns.Remarks && (
+                                                <span className="text-white">✓</span>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             )}
@@ -573,40 +614,34 @@ const LeadTable = ({
                 <div className="px-6 py-3 border-b border-gray-200 bg-white flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={() => console.log('Add Lead', selectedLeads)}
+                            onClick={() => setIsMassAddFollowupModal(true)}
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
                         >
-                            Add Lead
+                            AssignTo
                         </button>
                         <button
-                            onClick={() => console.log('Send SMS to', selectedLeads)}
+                            onClick={() => setIsMassSendSMS(true)}
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
                         >
                             Send SMS
                         </button>
                         <button
-                            onClick={() => console.log('Send Mail to', selectedLeads)}
+                            onClick={() => setIsMassSendMail(true)}
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
                         >
                             Send Mail
                         </button>
                         <button
-                            onClick={() => console.log('Update', selectedLeads)}
+                            onClick={() => setIsMassSendVoiceBroadCast(true)}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
+                        >
+                            Voice Broadcast
+                        </button>
+                        <button
+                            onClick={() => setIsMassUpdateLead(true)}
                             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
                         >
                             Update
-                        </button>
-                        <button
-                            onClick={() => console.log('Marketing Sequence', selectedLeads)}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                        >
-                            Marketing Sequence
-                        </button>
-                        <button
-                            onClick={() => console.log('Send International SMS', selectedLeads)}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
-                        >
-                            Send InternationalSMS
                         </button>
 
                         {/* More Actions Dropdown */}
@@ -624,34 +659,46 @@ const LeadTable = ({
                                 <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                                     <div className="py-1">
                                         <button
-                                            onClick={() => { console.log('Add Call List', selectedLeads); setShowMoreActions(false); }}
-                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            Add Call List
-                                        </button>
-                                        <button
-                                            onClick={() => { console.log('Add Tag', selectedLeads); setShowMoreActions(false); }}
-                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            Add Tag
-                                        </button>
-                                        <button
-                                            onClick={() => { console.log('Remove Tag', selectedLeads); setShowMoreActions(false); }}
-                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                        >
-                                            Remove Tag
-                                        </button>
-                                        <button
-                                            onClick={() => { console.log('Add Task', selectedLeads); setShowMoreActions(false); }}
+                                            onClick={() => { setIsMassAddTask(true); setShowMoreActions(false); }}
                                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         >
                                             Add Task
                                         </button>
                                         <button
-                                            onClick={() => { console.log('Add Appointment', selectedLeads); setShowMoreActions(false); }}
+                                            onClick={() => { setIsMassAddAppointment(true); setShowMoreActions(false); }}
                                             className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         >
                                             Add Appointment
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsMassMarketingSequence(true); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Marketing Sequence
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsSendInternationalSMS(true); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Send International SMS
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsMassAddTag(true); setIsAddTag(true); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Add Tag
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsMassAddTag(true); setIsAddTag(false); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Remove Tag
+                                        </button>
+                                        <button
+                                            onClick={() => { setIsMassAddCallList(true); setShowMoreActions(false); }}
+                                            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                        >
+                                            Add Call List
                                         </button>
                                     </div>
                                 </div>
@@ -667,7 +714,7 @@ const LeadTable = ({
                             {selectedLeads.length} leads selected.
                         </span>
                         <button
-                            onClick={() => console.log('Delete', selectedLeads)}
+                            onClick={() => setDeleteMassConfirmModal({ show: true, leadId: null })}
                             className="text-red-600 hover:text-red-700 transition flex items-center gap-2"
                             title="Delete"
                         >
@@ -708,7 +755,7 @@ const LeadTable = ({
                                 />
                             </th>
                             {visibleColumns.leadDetails && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Lead Details
                                         {pinnedColumn === 'leadDetails' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -746,7 +793,7 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.mobileNo && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Mobile No
                                         {pinnedColumn === 'mobileNo' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -784,7 +831,7 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.emailId && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Email ID
                                         {pinnedColumn === 'emailId' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -822,7 +869,7 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.creationDetails && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     <div className="flex items-center gap-1">
                                         Creation Details
                                         {pinnedColumn === 'creationDetails' && <Pin className="w-3 h-3 text-blue-600" />}
@@ -860,18 +907,23 @@ const LeadTable = ({
                                 </th>
                             )}
                             {visibleColumns.source && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     Source
                                 </th>
                             )}
                             {visibleColumns.FollowupStatus && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     Status
                                 </th>
                             )}
                             {visibleColumns.LastFollowupedOn && (
-                                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
                                     LastFollowuped On
+                                </th>
+                            )}
+                            {visibleColumns.Remarks && (
+                                <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
+                                    Remarks
                                 </th>
                             )}
                         </tr>
@@ -926,7 +978,7 @@ const LeadTable = ({
                                                     </div>
                                                     <div className="flex items-center gap-2 mb-1">
                                                         <span
-                                                            className="font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600"
+                                                            className="text-nowrap font-semibold text-gray-900 text-sm cursor-pointer hover:text-blue-600"
                                                             onClick={() => {
                                                                 setSelectedLeadForDrawer(lead);
                                                                 setIsDrawerOpen(true);
@@ -978,9 +1030,9 @@ const LeadTable = ({
                                                         <Trash2
                                                             className="w-6 h-6 cursor-pointer text-gray-600 hover:text-red-600"
                                                             onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setDeleteConfirmModal({ show: true, leadId: lead.ID });
-                                                        }}
+                                                                e.stopPropagation();
+                                                                setDeleteConfirmModal({ show: true, leadId: lead.ID });
+                                                            }}
                                                         />
                                                     </span>
                                                     <span
@@ -1046,7 +1098,7 @@ const LeadTable = ({
                                                 }}
                                                 className="flex cursor-pointer hover:text-[#088b7e] items-center gap-1 text-blue-600 font-medium"
                                             >
-                                                <span>{lead.MobileNo ? lead.MobileNo : '-'}</span>
+                                                <span className='text-nowrap'>{lead.MobileNo ? lead.MobileNo : '-'}</span>
                                             </div>
                                         </td>
                                     )}
@@ -1067,7 +1119,7 @@ const LeadTable = ({
                                             <div className="text-xs">
                                                 <div className="mb-1">
                                                     {/* <span className="font-semibold text-gray-700">Date</span> */}
-                                                    <span className="ml-2 text-gray-600">{lead.CreatedOn ? lead.CreatedOn : '-'}</span>
+                                                    <span className="text-nowrap ml-2 text-gray-600">{lead.CreatedOn ? lead.CreatedOn : '-'}</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -1076,8 +1128,9 @@ const LeadTable = ({
                                         <td className="px-4 py-2 text-sm text-gray-700">{lead.SourceName || '-'}</td>
                                     )}
                                     {/* {console.log(`visibleColumns`, visibleColumns)} */}
-                                    {visibleColumns.FollowupStatus && <td className="px-4 py-2 text-sm text-gray-700">{lead.FollowupStatus || '-'}</td>}
-                                    {visibleColumns.LastFollowupedOn && <td className="px-4 py-2 text-sm text-gray-700">{lead.LastFollowupedOn || '-'}</td>}
+                                    {visibleColumns.FollowupStatus && <td className="px-4 py-2 text-sm text-gray-700 text-nowrap">{lead.FollowupStatus || '-'}</td>}
+                                    {visibleColumns.LastFollowupedOn && <td className="px-4 py-2 text-sm text-gray-700 text-nowrap">{lead.LastFollowupedOn || '-'}</td>}
+                                    {visibleColumns.Remarks && <td className="px-4 py-2 text-sm text-gray-700 text-nowrap">{lead.Remarks || '-'}</td>}
                                 </tr>
                             ))}
                         </tbody>
@@ -1278,37 +1331,37 @@ const LeadTable = ({
                 </div>
             )}
 
-                        {/* Delete Confirmation Modal */}
-                        <Modal
-                            isOpen={deleteConfirmModal.show}
-                            onClose={() => setDeleteConfirmModal({ show: false, leadId: null })}
-                            title="Delete Lead"
-                            size="sm"
-                            showCloseButton={false}
-                            footer={
-                                <>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setDeleteConfirmModal({ show: false, leadId: null })}
-                                    >
-                                        No
-                                    </Button>
-                                    <Button
-                                        variant="danger"
-                                        onClick={() => {
-                                            alert(`Confirmed deletion (no handler wired). Lead ID: ${deleteConfirmModal.leadId}`);
-                                            setDeleteConfirmModal({ show: false, leadId: null });
-                                        }}
-                                    >
-                                        Yes
-                                    </Button>
-                                </>
-                            }
+            {/* Delete Confirmation Modal */}
+            <Modal
+                isOpen={deleteConfirmModal.show}
+                onClose={() => setDeleteConfirmModal({ show: false, leadId: null })}
+                title="Delete Lead"
+                size="sm"
+                showCloseButton={false}
+                footer={
+                    <>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteConfirmModal({ show: false, leadId: null })}
                         >
-                            <p className="text-gray-700">
-                                Are you sure you want to delete Lead Id: <strong>{deleteConfirmModal.leadId}</strong>?
-                            </p>
-                        </Modal>
+                            No
+                        </Button>
+                        <Button
+                            variant="danger"
+                            onClick={() => {
+                                alert(`Confirmed deletion (no handler wired). Lead ID: ${deleteConfirmModal.leadId}`);
+                                setDeleteConfirmModal({ show: false, leadId: null });
+                            }}
+                        >
+                            Yes
+                        </Button>
+                    </>
+                }
+            >
+                <p className="text-gray-700">
+                    Are you sure you want to delete Lead Id: <strong>{deleteConfirmModal.leadId}</strong>?
+                </p>
+            </Modal>
 
             <PopUpModal
                 isOpen={isImportDataModal}
@@ -1690,6 +1743,318 @@ const LeadTable = ({
                 page={'lead'}
                 enquiryData={leads}
             />
+
+
+            {/* ------------------------------------------------Mass Operation Modal---------------------- */}
+
+            <PopUpModal
+                isOpen={isMassAddFollowupModal}
+                onClose={() => setIsMassAddFollowupModal(false)}
+                title="Add AssignTo"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassAddFollowupModal(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddFollowupForm selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassSendSMS}
+                onClose={() => setIsMassSendSMS(false)}
+                title="Send SMS"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassSendSMS(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <SendSMS selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassSendMail}
+                onClose={() => setIsMassSendMail(false)}
+                title="Send Mail"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassSendMail(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <SendMail selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassSendVoiceBroadCast}
+                onClose={() => setIsMassSendVoiceBroadCast(false)}
+                title="Send Voice BroadCast"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassSendVoiceBroadCast(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <VoiceBroadCast selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassUpdateLead}
+                onClose={() => setIsMassUpdateLead(false)}
+                title="Mass Update Lead"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassUpdateLead(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <UpdateForm selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassAddTask}
+                onClose={() => setIsMassAddTask(false)}
+                title="Mass Add Task"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassAddTask(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddTaskForm selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassAddAppointment}
+                onClose={() => setIsMassAddAppointment(false)}
+                title="Mass Add Appointment"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassAddAppointment(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddAppointmentForm selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassMsrketingSequence}
+                onClose={() => setIsMassMarketingSequence(false)}
+                title="Mass Marketing Sequence"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassMarketingSequence(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <MarkettingSequence selectedCount={selectedLeads?.length + 1}/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isSendInternationalSMS}
+                onClose={() => setIsSendInternationalSMS(false)}
+                title="Send International SMS"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsSendInternationalSMS(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <SendInternationalSMS/>
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassAddTag}
+                onClose={() => setIsMassAddTag(false)}
+                title={isAddTag ? "Mass Add Tag" : "Mass Remove Tag"}
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassAddTag(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddRemoveTag mode={isAddTag ? 'add' : 'remove'} selectedCount={selectedLeads?.length + 1} />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={isMassAddCallList}
+                onClose={() => setIsMassAddCallList(false)}
+                title="Mass Add Call List"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setIsMassAddCallList(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='primary'
+                            onClick={() => { }}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddCallList selectedCount={selectedLeads?.length + 1} />
+            </PopUpModal>
+
+            <Modal
+                isOpen={isDeleteMassConfirmModal.show}
+                onClose={() => setDeleteMassConfirmModal({ show: false, leadId: null })}
+                title="Mass Delete Lead"
+                size="sm"
+                showCloseButton={false}
+                footer={
+                    <>
+                        <Button
+                            variant="outline"
+                            onClick={() => setDeleteMassConfirmModal({ show: false, leadId: null })}
+                        >
+                            No
+                        </Button>
+                        <Button
+                            variant="danger"
+                            onClick={() => {
+                                setDeleteMassConfirmModal({ show: false, leadId: null });
+                            }}
+                        >
+                            Yes
+                        </Button>
+                    </>
+                }
+            >
+                <p className="text-gray-700">
+                    You are about to perform a mass delete action on <strong>{selectedLeads?.length + 1}</strong> selected record(s).
+                </p>
+            </Modal>
+
+            {/* ------------------------------------------------End Mass Operation Modal---------------------- */}
+
+
         </div>
     );
 };
