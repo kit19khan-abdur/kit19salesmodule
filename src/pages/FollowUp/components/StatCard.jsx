@@ -30,7 +30,8 @@ const StatCard = ({ config, count, isActive, onClick }) => {
             </div>
             {isActive && (
                 <motion.div
-                    layoutId="activeIndicator"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
                     className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-white rounded-full mb-2"
                 />
             )}

@@ -22,7 +22,7 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
     const settingsOptions = [
         { id: 'close', icon: X, label: 'Close', color: 'text-gray-600 hover:bg-gray-100' },
         { id: 'filter', icon: Filter, label: 'Filter', color: 'text-orange-500 hover:bg-orange-50' },
-        { id: 'export', icon: FunnelPlus, label: 'Custom Filter', color: 'text-orange-500 hover:bg-orange-50' },
+        { id: 'export', icon: FunnelPlus, label: 'Custom Filter', color: 'text-emerald-500 hover:bg-emerald-50' },
         { id: 'upload', icon: CloudUpload, label: 'Upload', color: 'text-blue-500 hover:bg-blue-50' },
     ];
 
