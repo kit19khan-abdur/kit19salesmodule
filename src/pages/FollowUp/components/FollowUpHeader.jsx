@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, SlidersHorizontal, Download, Bell, Settings, X, Filter, Upload, FunnelPlus , CloudUpload } from 'lucide-react';
+import { Search, SlidersHorizontal, Download, Bell, Settings, X, Filter, Upload, FunnelPlus, CloudUpload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import salesfunnel from '../../../assets/salesfunnel.jpg';
 import moneybag from '../../../assets/moneybag.svg';
@@ -35,7 +35,7 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
     };
 
     return (
-        <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-gray-200/50">
+        <header className="sticky -top-[4px] z-40 bg-white/70 backdrop-blur-xl border-b border-gray-200/50">
             <div className="px-8 py-4">
                 <div className="flex items-center justify-between">
                     {/* Left Side */}
@@ -96,13 +96,13 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
                         {/* Action Buttons - Hide when menu is open */}
                         {!showSettingsMenu && (
                             <>
-                                <button className="p-3 relative rounded-2xl border border-gray-200 hover:bg-gray-50 transition-colors">
-                                    <img src={salesfunnel} className="w-5 h-5 text-gray-600" />
-                                    <span className="absolute top-2 right-0 text-[10px] w-4 bg-rose-500 text-[#fff] rounded-full">0</span>
+                                <button className="p-3 flex relative rounded-2xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                                    <img src={salesfunnel} className="w-5 h-5 text-gray-600" />0
+                                    {/* <span className="absolute top-2 right-0 text-[10px] w-4 bg-emerald-500 text-[#fff] rounded-full">0</span> */}
                                 </button>
-                                <button className="p-3 relative rounded-2xl border border-gray-200 hover:bg-gray-50 transition-colors">
-                                    <img src={moneybag} className="w-5 h-5 text-gray-600" />
-                                    <span className="absolute top-2 right-0 text-[10px] w-4 bg-rose-500 text-[#fff] rounded-full">0</span>
+                                <button className="p-3 flex relative rounded-2xl border border-gray-200 hover:bg-gray-50 transition-colors">
+                                    <img src={moneybag} className="w-5 h-5 text-gray-600" />0
+                                    {/* <span className="absolute top-2 right-0 text-[10px] w-4 bg-emerald-500 text-[#fff] rounded-full">0</span> */}
                                 </button>
                                 <button className="p-3 rounded-2xl border border-gray-200 hover:bg-gray-50 transition-colors relative">
                                     <Download className="w-5 h-5 text-gray-600" />
@@ -111,13 +111,12 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
                         )}
 
                         {/* Settings Button */}
-                        <button 
+                        <button
                             onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                            className={`p-3 relative rounded-2xl transition-all ${
-                                showSettingsMenu 
-                                    ? 'bg-gray-200 text-gray-700' 
+                            className={`p-3 relative rounded-2xl transition-all ${showSettingsMenu
+                                    ? 'bg-gray-200 text-gray-700'
                                     : 'bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:shadow-lg hover:shadow-violet-500/30'
-                            }`}
+                                }`}
                         >
                             <Settings className={`w-5 h-5 ${showSettingsMenu ? '' : 'animate-spin'}`} style={{ animationDuration: '3s' }} />
                         </button>

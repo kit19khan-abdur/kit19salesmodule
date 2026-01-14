@@ -3,17 +3,16 @@ import { motion } from 'framer-motion';
 
 const StatCard = ({ config, count, isActive, onClick }) => {
     const Icon = config.icon;
-    
+
     return (
         <motion.div
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
             onClick={onClick}
-            className={`relative cursor-pointer rounded-2xl p-5 transition-all duration-300 ${
-                isActive 
-                    ? `bg-gradient-to-br ${config.gradient} text-white shadow-xl` 
+            className={`relative cursor-pointer rounded-2xl p-5 transition-all duration-300 ${isActive
+                    ? `bg-gradient-to-br ${config.gradient} text-white shadow-xl`
                     : 'bg-white hover:shadow-lg border border-gray-100'
-            }`}
+                }`}
         >
             <div className="flex items-start justify-between">
                 <div>

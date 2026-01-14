@@ -23,17 +23,16 @@ const FollowupPagination = ({ currentPage, setCurrentPage, totalPages }) => {
                             <button
                                 key={page}
                                 onClick={() => setCurrentPage(page)}
-                                className={`w-10 h-10 rounded-xl font-semibold transition-all hover:scale-110 active:scale-95 ${
-                                    currentPage === page
+                                className={`w-10 h-10 rounded-xl font-semibold transition-all hover:scale-110 active:scale-95 ${currentPage === page
                                         ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/40'
                                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
+                                    }`}
                             >
                                 {page}
                             </button>
                         ))}
                         <span className="px-1 text-gray-400 font-medium">•••</span>
-                        <button 
+                        <button
                             onClick={() => setCurrentPage(totalPages)}
                             className="min-w-[3.5rem] h-10 px-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold transition-all hover:scale-105 active:scale-95"
                         >

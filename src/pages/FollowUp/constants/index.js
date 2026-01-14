@@ -49,7 +49,9 @@ export const sampleFollowups = [
     { id: 5, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:44:45', createdDate: '13 Jan 2026 16:44:45', contactNo: '0', relatedTo: '+918224839854', assignedTo: 'Mukesh Kumar', status: 'dueToday' },
     { id: 6, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:44:32', createdDate: '13 Jan 2026 16:44:32', contactNo: '0', relatedTo: '+919967535353', assignedTo: 'Mukesh Kumar', status: 'scheduled' },
     { id: 7, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:44:18', createdDate: '13 Jan 2026 16:44:18', contactNo: '0', relatedTo: '+919867579170', assignedTo: 'Mukesh Kumar', status: 'noFollowup' },
-    { id: 8, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:41:55', createdDate: '13 Jan 2026 16:41:55', contactNo: '0', relatedTo: '+919819866142', assignedTo: 'Mukesh Kumar', status: 'overdue' },
+    { id: 8, type: 'Scheduled Work', dueDate: '13 Jan 2026', dueTime: '17:48:18', createdDate: '14 Jan 2026 16:44:18', contactNo: '0', relatedTo: '+919867673170', assignedTo: 'Mukesh Kumar', status: 'noFollowup' },
+    { id: 9, type: 'Tomorrow Work', dueDate: '13 Jan 2026', dueTime: '16:48:18', createdDate: '13 Jan 2026 16:44:18', contactNo: '0', relatedTo: '+919867679170', assignedTo: 'Mukesh Kumar', status: 'noFollowup' },
+    { id: 10, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:41:55', createdDate: '13 Jan 2026 16:41:55', contactNo: '0', relatedTo: '+919819866142', assignedTo: 'Mukesh Kumar', status: 'overdue' },
 ];
 
 // Quick Actions Configuration

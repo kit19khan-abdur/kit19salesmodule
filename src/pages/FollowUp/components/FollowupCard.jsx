@@ -59,9 +59,9 @@ const ActionMenu = ({ show, onClose, onAction, followup }) => {
             {quickActions.map((action) => (
                 <button
                     key={action.id}
-                    onClick={() => { 
-                        onAction(action.id, followup); 
-                        onClose(); 
+                    onClick={() => {
+                        onAction(action.id, followup);
+                        onClose();
                     }}
                     className={`w-full text-nowrap flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${action.color}`}
                 >
@@ -99,7 +99,7 @@ const FollowupListRow = ({ followup, onAction }) => {
         >
             {/* Status Bar */}
             <div className={`h-1 bg-gradient-to-r ${config.gradient} rounded-t-2xl`} />
-            
+
             {/* Row Content */}
             <div className="px-5 py-4 flex items-center gap-6">
                 {/* Type & Status */}
@@ -119,7 +119,7 @@ const FollowupListRow = ({ followup, onAction }) => {
                 {/* Contact Info */}
                 <div className="flex items-center gap-3 min-w-[220px]">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                        {followup.relatedTo.slice(-2)}
+                        <img src="https://kit19.com/assets/custom/img/img_avatar.png" className='rounded-full' alt="person" />
                     </div>
                     <div>
                         <p className="font-semibold text-gray-900">{followup.relatedTo}</p>
@@ -146,13 +146,13 @@ const FollowupListRow = ({ followup, onAction }) => {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                    <button 
+                    <button
                         onClick={() => onAction('followup', followup)}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-600 transition-colors"
                     >
                         <Plus className="w-4 h-4" /> Add Followup
                     </button>
-                    <button 
+                    <button
                         onClick={() => onAction('view', followup)}
                         className="p-2 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                     >
@@ -214,7 +214,7 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
         >
             {/* Status Bar */}
             <div className={`h-1.5 bg-gradient-to-r ${config.gradient} rounded-t-2xl`} />
-            
+
             {/* Card Content */}
             <div className="p-5">
                 {/* Header */}
@@ -255,7 +255,7 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
                 <div className="space-y-3 mb-4">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-slate-50">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                            {followup.relatedTo.slice(-2)}
+                            <img src="https://kit19.com/assets/custom/img/img_avatar.png" className='rounded-full' alt="person" />
                         </div>
                         <div className="flex-1">
                             <p className="font-semibold text-gray-900">{followup.relatedTo}</p>
@@ -280,13 +280,13 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
 
                 {/* Quick Actions Bar */}
                 <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                    <button 
+                    <button
                         onClick={() => onAction('followup', followup)}
                         className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-600 transition-colors"
                     >
                         <Plus className="w-4 h-4" /> Add Followup
                     </button>
-                    <button 
+                    <button
                         onClick={() => onAction('view', followup)}
                         className="p-2.5 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                     >

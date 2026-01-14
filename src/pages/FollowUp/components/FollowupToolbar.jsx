@@ -1,28 +1,27 @@
 import React from 'react';
 import { ArrowUpDown } from 'lucide-react';
 
-const FollowupToolbar = ({ 
-    activeFilters = [], 
-    setActiveFilters, 
+const FollowupToolbar = ({
+    activeFilters = [],
+    setActiveFilters,
     allFiltersActive,
     onAllFiltersClick,
-    viewMode, 
-    setViewMode, 
-    filteredCount, 
-    totalRecords 
+    viewMode,
+    setViewMode,
+    filteredCount,
+    totalRecords
 }) => {
     return (
         <div className="px-2 flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
                 <button
                     onClick={onAllFiltersClick}
-                    className={`px-5 py-2.5 rounded-xl font-medium transition-all ${
-                        allFiltersActive
-                            ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
-                            : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                    }`}
+                    className={`px-5 py-2.5 rounded-xl font-medium transition-all ${allFiltersActive
+                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
+                        : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                        }`}
                 >
-                    {allFiltersActive ? 'Unselect All' : 'Select All'}
+                    {allFiltersActive ? 'Remove All' : 'Select All'}
                 </button>
                 <span className="text-sm text-gray-500">
                     Showing <strong className="text-gray-900">{filteredCount}</strong> of <strong className="text-gray-900">{totalRecords.toLocaleString()}</strong>

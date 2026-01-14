@@ -76,7 +76,7 @@ const FollowUpPage = () => {
     return (
         <div className="min-h-screen bg-[#f8fafc]">
             {/* Sidebar Accent */}
-            <div className="fixed left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-600 via-purple-600 to-fuchsia-600" />
+            <div className="fixed left-0 -top-[4px] bottom-0 w-1 bg-gradient-to-b from-violet-600 via-purple-600 to-fuchsia-600" />
 
             {/* Main Container */}
             <div className="">
