@@ -1,0 +1,63 @@
+import { AlertTriangle, Timer, Calendar, XCircle } from 'lucide-react';
+
+// Status Configuration
+export const statusConfig = {
+    overdue: { 
+        label: 'Overdue', 
+        icon: AlertTriangle, 
+        gradient: 'from-rose-500 to-pink-600', 
+        bg: 'bg-rose-500', 
+        light: 'bg-rose-50', 
+        text: 'text-rose-600', 
+        ring: 'ring-rose-500' 
+    },
+    dueToday: { 
+        label: 'Due Today', 
+        icon: Timer, 
+        gradient: 'from-amber-500 to-orange-600', 
+        bg: 'bg-amber-500', 
+        light: 'bg-amber-50', 
+        text: 'text-amber-600', 
+        ring: 'ring-amber-500' 
+    },
+    scheduled: { 
+        label: 'Scheduled', 
+        icon: Calendar, 
+        gradient: 'from-emerald-500 to-teal-600', 
+        bg: 'bg-emerald-500', 
+        light: 'bg-emerald-50', 
+        text: 'text-emerald-600', 
+        ring: 'ring-emerald-500' 
+    },
+    noFollowup: { 
+        label: 'No Follow-up', 
+        icon: XCircle, 
+        gradient: 'from-slate-500 to-gray-600', 
+        bg: 'bg-slate-500', 
+        light: 'bg-slate-50', 
+        text: 'text-slate-600', 
+        ring: 'ring-slate-500' 
+    },
+};
+
+// Sample Data
+export const sampleFollowups = [
+    { id: 1, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:45:42', createdDate: '13 Jan 2026 16:45:42', contactNo: '0', relatedTo: '+917011006348', assignedTo: 'Mukesh Kumar', status: 'overdue' },
+    { id: 2, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:45:28', createdDate: '13 Jan 2026 16:45:28', contactNo: '0', relatedTo: '+917210999694', assignedTo: 'Mukesh Kumar', status: 'dueToday' },
+    { id: 3, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:45:15', createdDate: '13 Jan 2026 16:45:15', contactNo: '0', relatedTo: '+916397388715', assignedTo: 'Mukesh Kumar', status: 'scheduled' },
+    { id: 4, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:44:59', createdDate: '13 Jan 2026 16:44:59', contactNo: '0', relatedTo: '+917240001234', assignedTo: 'Mukesh Kumar', status: 'overdue' },
+    { id: 5, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:44:45', createdDate: '13 Jan 2026 16:44:45', contactNo: '0', relatedTo: '+918224839854', assignedTo: 'Mukesh Kumar', status: 'dueToday' },
+    { id: 6, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:44:32', createdDate: '13 Jan 2026 16:44:32', contactNo: '0', relatedTo: '+919967535353', assignedTo: 'Mukesh Kumar', status: 'scheduled' },
+    { id: 7, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:44:18', createdDate: '13 Jan 2026 16:44:18', contactNo: '0', relatedTo: '+919867579170', assignedTo: 'Mukesh Kumar', status: 'noFollowup' },
+    { id: 8, type: 'Call-Back', dueDate: '13 Jan 2026', dueTime: '16:41:55', createdDate: '13 Jan 2026 16:41:55', contactNo: '0', relatedTo: '+919819866142', assignedTo: 'Mukesh Kumar', status: 'overdue' },
+];
+
+// Quick Actions Configuration
+export const quickActions = [
+    { id: 'followup', icon: 'CheckCircle2', label: 'Add Followup', color: 'text-emerald-500 hover:bg-emerald-50' },
+    { id: 'mail', icon: 'Mail', label: 'Send Mail', color: 'text-blue-500 hover:bg-blue-50' },
+    { id: 'sms', icon: 'MessageSquare', label: 'Send SMS', color: 'text-purple-500 hover:bg-purple-50' },
+    { id: 'voice', icon: 'Phone', label: 'Send Voice', color: 'text-orange-500 hover:bg-orange-50' },
+    { id: 'notes', icon: 'FileText', label: 'Add Notes', color: 'text-cyan-500 hover:bg-cyan-50' },
+    { id: 'upload', icon: 'Upload', label: 'Upload Doc', color: 'text-pink-500 hover:bg-pink-50' },
+];
