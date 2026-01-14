@@ -1149,7 +1149,7 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                     </div>
                 }
             >
-                <CreateMeetingForm />
+                    <CreateMeetingForm lead={lead} />
             </PopUpModal>
 
             <PopUpModal
