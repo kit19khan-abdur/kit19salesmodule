@@ -14,6 +14,7 @@ const ColumnHeaderMenu = ({
 }) => {
   const menuRef = useRef(null);
   const [filterValue, setFilterValue] = useState('');
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
     if (!show) return;
@@ -22,7 +23,7 @@ const ColumnHeaderMenu = ({
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target) &&
-        anchorRef.current &&
+        anchorRef?.current &&
         !anchorRef.current.contains(event.target)
       ) {
         onClose();
@@ -33,12 +34,34 @@ const ColumnHeaderMenu = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [show, onClose, anchorRef]);
 
+  useEffect(() => {
+    if (show && anchorRef?.current) {
+      const rect = anchorRef.current.getBoundingClientRect();
+      const menuWidth = 176; // w-44 = 11rem = 176px
+      const viewportWidth = window.innerWidth;
+      
+      let left = rect.left + window.scrollX;
+      
+      // Check if menu would overflow on the right side
+      if (rect.left + menuWidth > viewportWidth) {
+        // Position menu to the left of the anchor
+        left = rect.right - menuWidth + window.scrollX;
+      }
+      
+      setMenuPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: left
+      });
+    }
+  }, [show, anchorRef]);
+
   if (!show) return null;
 
   return (
     <div
       ref={menuRef}
-      className="absolute z-50 mt-2 w-44 bg-white border border-gray-200 rounded shadow-lg py-2 text-sm top-[34px] left-0"
+      className="fixed z-50 w-44 bg-white border border-gray-200 rounded shadow-lg py-2 text-sm"
+      style={{ top: menuPosition.top, left: menuPosition.left }}
     >
       <button
         className="flex items-center w-full px-3 py-2 hover:bg-gray-100"

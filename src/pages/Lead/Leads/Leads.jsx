@@ -48,6 +48,7 @@ const Leads = () => {
   // Fetch leads function - you'll need to implement the API call
   const fetchLeads = async (loadMore = false, page = 1) => {
     setIsLoading(true);
+    setLeads([])
     const pageNum = page || currentPage || 1;
     const limit = parseInt(itemsPerPage) || 20;
     const startNo = loadMore ? startIndex : (pageNum - 1) * limit;
@@ -58,11 +59,9 @@ const Leads = () => {
       StartNo: startNo,
       EndNo: endNo,
       UserId: userId || '',
-      SearchName: '',
+      SearchName: searchText || '',
       ParentId: parentId || '',
-      FilterText: searchText || '',
       OrderStr: '',
-      TextSearch: searchText || '',
       NotFollowUp: 0
     };
 

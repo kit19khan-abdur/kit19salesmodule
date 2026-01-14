@@ -239,7 +239,7 @@ const MergeLead = ({ isOpen, onClose, enquiryData, page }) => {
                 placeholder="Search lead no"
                 className="flex-1 border border-gray-300 rounded-l px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-              <button className="bg-green-600 px-4 py-2 rounded-r text-white hover:bg-green-700 transition">
+              <button className="bg-green-600 px-4 py-[6.5px] rounded-r text-white hover:bg-green-700 transition">
                 🔍
               </button>
             </div>

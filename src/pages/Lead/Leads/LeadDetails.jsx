@@ -711,12 +711,20 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                     <p className="text-gray-900 font-medium">{lead.EmailID || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="text-sm text-gray-500">Lead ID</label>
-                                    <p className="text-gray-900 font-medium">{lead.ID}</p>
+                                    <label className="text-sm text-gray-500">Lead No</label>
+                                    <p className="text-gray-900 font-medium">{lead.LeadNo}</p>
                                 </div>
                                 <div>
                                     <label className="text-sm text-gray-500">Created Date</label>
                                     <p className="text-gray-900 font-medium">{lead.CreatedOn}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-500">Source</label>
+                                    <p className="text-gray-900 font-medium">{lead.SourceName}</p>
+                                </div>
+                                <div>
+                                    <label className="text-sm text-gray-500">Followup Status</label>
+                                    <p className="text-gray-900 font-medium">{lead.FollowupStatus}</p>
                                 </div>
                             </div>
 
@@ -726,19 +734,11 @@ const LeadDetails = ({ lead, isLeftCollapsed }) => {
                                 className="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
                             >
                                 {showMoreDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                {showMoreDetails ? 'Show Less' : 'Show More Details'}
+                                {showMoreDetails ? 'Show Less' : 'Show More'}
                             </button>
 
                             {showMoreDetails && (
                                 <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-sm text-gray-500">Source</label>
-                                        <p className="text-gray-900 text-sm">{lead.SourceName || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="text-sm text-gray-500">Type</label>
-                                        <p className="text-gray-900 text-sm">{lead.FollowupStatus || 'N/A'}</p>
-                                    </div>
                                     <div>
                                         <label className="text-sm text-gray-500">Remarks</label>
                                         <p className="text-gray-900 text-sm">{lead.Remarks || 'N/A'}</p>

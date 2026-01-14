@@ -17,6 +17,7 @@ import Dashboard from './pages/Dashboard';
 import PipelinePage from './pages/PipelinePage';
 import ExampleUsage from './components/PopUpModal/ExampleUsage';
 import Leads from './pages/Lead/Leads/Leads';
+import FollowupPage from './pages/FollowUp/FollowupPage';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -65,7 +66,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Dashboard />} />
         <Route path="/enquiries" element={<Enquiries />} />
         <Route path="/leads" element={<Leads />} />
-        <Route path="/exampleusage" element={<ExampleUsage />} />
+        <Route path="/followups" element={<FollowupPage />} />
         <Route path="/conversions" element={<div className="text-2xl font-bold">Conversions</div>} />
         <Route path="/segments" element={<div className="text-2xl font-bold">Segmentation</div>} />
         <Route path="/call-list" element={<div className="text-2xl font-bold">Call List</div>} />

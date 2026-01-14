@@ -742,8 +742,8 @@ const LeadTable = ({
             </div>
 
             {/* Table */}
-            <div className="flex-1 overflow-auto">
-                <table className="w-full border-collapse">
+            <div className="flex-1 overflow-auto overflow-x-auto">
+                <table className="w-full min-w-max border-collapse">
                     <thead className="bg-gray-50 sticky top-0 z-10">
                         <tr className="border-b border-gray-200">
                             <th className="px-3 py-3 text-left">
@@ -908,22 +908,154 @@ const LeadTable = ({
                             )}
                             {visibleColumns.source && (
                                 <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Source
+                                    <div className="flex items-center gap-1">
+                                        Source
+                                        {pinnedColumn === 'source' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'Source' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['source'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'source'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'source' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'source'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'source'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['source'] }}
+                                        onSortAsc={() => handleSortAsc('Source')}
+                                        onSortDesc={() => handleSortDesc('Source')}
+                                        onPin={() => handlePinColumn('source')}
+                                        onHide={() => handleHideColumn('source')}
+                                        onFilter={(value) => handleFilterColumn('Source', value)}
+                                        canHide={true}
+                                    />
                                 </th>
                             )}
                             {visibleColumns.FollowupStatus && (
                                 <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Status
+                                    <div className="flex items-center gap-1">
+                                        Status
+                                        {pinnedColumn === 'FollowupStatus' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'FollowupStatus' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['FollowupStatus'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'FollowupStatus'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'FollowupStatus' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'FollowupStatus'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'FollowupStatus'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['FollowupStatus'] }}
+                                        onSortAsc={() => handleSortAsc('FollowupStatus')}
+                                        onSortDesc={() => handleSortDesc('FollowupStatus')}
+                                        onPin={() => handlePinColumn('FollowupStatus')}
+                                        onHide={() => handleHideColumn('FollowupStatus')}
+                                        onFilter={(value) => handleFilterColumn('FollowupStatus', value)}
+                                        canHide={true}
+                                    />
                                 </th>
                             )}
                             {visibleColumns.LastFollowupedOn && (
                                 <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    LastFollowuped On
+                                    <div className="flex items-center gap-1">
+                                        LastFollowuped On
+                                        {pinnedColumn === 'LastFollowupedOn' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'LastFollowupedOn' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['LastFollowupedOn'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'LastFollowupedOn'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'LastFollowupedOn' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'LastFollowupedOn'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'LastFollowupedOn'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['LastFollowupedOn'] }}
+                                        onSortAsc={() => handleSortAsc('LastFollowupedOn')}
+                                        onSortDesc={() => handleSortDesc('LastFollowupedOn')}
+                                        onPin={() => handlePinColumn('LastFollowupedOn')}
+                                        onHide={() => handleHideColumn('LastFollowupedOn')}
+                                        onFilter={(value) => handleFilterColumn('LastFollowupedOn', value)}
+                                        canHide={true}
+                                    />
                                 </th>
                             )}
                             {visibleColumns.Remarks && (
                                 <th className="text-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700">
-                                    Remarks
+                                    <div className="flex items-center gap-1">
+                                        Remarks
+                                        {pinnedColumn === 'Remarks' && <Pin className="w-3 h-3 text-blue-600" />}
+                                        {sortConfig.key === 'Remarks' && (
+                                            sortConfig.direction === 'asc'
+                                                ? <ArrowUp className="w-3 h-3 text-blue-600" />
+                                                : <ArrowDown className="w-3 h-3 text-blue-600" />
+                                        )}
+                                    </div>
+                                    <span
+                                        ref={el => headerIconRefs.current['Remarks'] = el}
+                                        className="inline-block ml-1 align-middle cursor-pointer"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            setHeaderMenu(headerMenu.show && headerMenu.col === 'Remarks'
+                                                ? { show: false, col: null }
+                                                : { show: true, col: 'Remarks' });
+                                        }}
+                                    >
+                                        {headerMenu.show && headerMenu.col === 'Remarks'
+                                            ? <ChevronUp className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />
+                                            : <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-gray-700" />}
+                                    </span>
+                                    <ColumnHeaderMenu
+                                        show={headerMenu.show && headerMenu.col === 'Remarks'}
+                                        onClose={() => setHeaderMenu({ show: false, col: null })}
+                                        anchorRef={{ current: headerIconRefs.current['Remarks'] }}
+                                        onSortAsc={() => handleSortAsc('Remarks')}
+                                        onSortDesc={() => handleSortDesc('Remarks')}
+                                        onPin={() => handlePinColumn('Remarks')}
+                                        onHide={() => handleHideColumn('Remarks')}
+                                        onFilter={(value) => handleFilterColumn('Remarks', value)}
+                                        canHide={true}
+                                    />
                                 </th>
                             )}
                         </tr>
