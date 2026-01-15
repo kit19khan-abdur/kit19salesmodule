@@ -1,38 +1,57 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   FiHome, FiUsers, FiUserPlus, FiCalendar, FiPhone, FiTarget,
   FiCheckSquare, FiMapPin, FiActivity, FiStar, FiTrello, FiClock,
   FiFileText, FiDollarSign, FiCreditCard, FiBook,
-  FiLogOut
+  FiLogOut, FiChevronDown, FiChevronRight
 } from 'react-icons/fi';
+import { HiOutlineRocketLaunch } from "react-icons/hi2";
 import clsx from 'clsx';
 import { THEME } from '../../config/constants';
+import { IoMdSync } from "react-icons/io";
+import { CopyPlus, ListFilterPlus, Merge } from 'lucide-react';
 
 const Sidebar = ({ isOpen, setIsOpen, collapsed = false, setCollapsed = null, isLocked = false, onMouseEnter, onMouseLeave }) => {
   const location = useLocation();
   const navigate = useNavigate()
   const username = localStorage.getItem('FName') || 'User';
+  const [expandedMenus, setExpandedMenus] = useState({});
 
   const logout = () => {
     localStorage.clear()
     navigate('/login')
   }
 
+  const toggleMenu = (menuName) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [menuName]: !prev[menuName]
+    }));
+  };
+
   const navigation = [
     { name: 'Dashboard', href: '/', icon: FiHome },
     { name: 'Enquiries', href: '/enquiries', icon: FiUsers },
     { name: 'Leads', href: '/leads', icon: FiUserPlus },
-    { name: 'Follow-ups', href: '/followups', icon: FiCalendar },
-    { name: 'Conversions', href: '/conversions', icon: FiTarget },
+    { name: 'Merge Duplicate', href: '/merge', icon: Merge },
+    { name: 'Conversions', href: '/conversions', icon: IoMdSync },
+    { name: 'Follow-ups', href: '/followups', icon: HiOutlineRocketLaunch },
     { name: 'Segmentation', href: '/segments', icon: FiUsers },
     { name: 'Call List', href: '/call-list', icon: FiPhone },
     { name: 'Tasks', href: '/tasks', icon: FiCheckSquare },
     { name: 'Appointments', href: '/appointments', icon: FiCalendar },
     { name: 'Physical Appointments', href: '/physical-appointments', icon: FiMapPin },
-    { name: 'Activities', href: '/activities', icon: FiActivity },
-    { name: 'Custom Events', href: '/custom-events', icon: FiStar },
-    { name: 'Pipeline', href: '/pipeline', icon: FiTrello },
+    { name: 'Lead Activities', href: '/activities', icon: FiActivity },
+    { 
+      name: 'Custom Events', 
+      icon: FiStar,
+      subItems: [
+        { name: 'Create Event', href: '/custom-events/create', icon: CopyPlus },
+        { name: 'Webhook Events', href: '/custom-events/webhook', icon: ListFilterPlus }
+      ]
+    },
+    { name: 'Pipeline Deal', href: '/pipeline', icon: FiTrello },
     { name: 'Pipeline History', href: '/pipeline-history', icon: FiClock },
     { name: 'Quotations', href: '/quotations', icon: FiFileText },
     { name: 'Invoices', href: '/invoices', icon: FiFileText },
@@ -82,6 +101,57 @@ const Sidebar = ({ isOpen, setIsOpen, collapsed = false, setCollapsed = null, is
           <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
+              const hasSubItems = item.subItems && item.subItems.length > 0;
+              const isExpanded = expandedMenus[item.name];
+              const isSubItemActive = hasSubItems && item.subItems.some(sub => location.pathname === sub.href);
+              
+              if (hasSubItems) {
+                return (
+                  <div key={item.name}>
+                    <button
+                      onClick={() => toggleMenu(item.name)}
+                      title={item.name}
+                      className={clsx(
+                        'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full',
+                        !isOpen ? 'justify-center' : '',
+                        isSubItemActive ? 'text-white' : 'text-gray-700'
+                      )}
+                      style={isSubItemActive ? { backgroundColor: THEME.primary } : {}}
+                    >
+                      <item.icon className="w-5 h-5 shrink-0" style={isSubItemActive ? { color: '#fff' } : { color: '#4a5568' }} />
+                      <span className={clsx(!isOpen ? 'hidden' : 'flex-1 text-left text-gray-700', isSubItemActive && 'text-white')}>{item.name}</span>
+                      {isOpen && (
+                        isExpanded ? 
+                          <FiChevronDown className="w-4 h-4 shrink-0" style={isSubItemActive ? { color: '#fff' } : { color: '#4a5568' }} /> : 
+                          <FiChevronRight className="w-4 h-4 shrink-0" style={isSubItemActive ? { color: '#fff' } : { color: '#4a5568' }} />
+                      )}
+                    </button>
+                    {isExpanded && isOpen && (
+                      <div className="ml-4 mt-1 space-y-1">
+                        {item.subItems.map((subItem) => {
+                          const isSubActive = location.pathname === subItem.href;
+                          return (
+                            <Link
+                              key={subItem.name}
+                              to={subItem.href}
+                              title={subItem.name}
+                              className={clsx(
+                                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                                isSubActive ? 'text-white bg-opacity-80' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                              )}
+                              style={isSubActive ? { backgroundColor: THEME.primary } : {}}
+                            >
+                              <subItem.icon className="w-4 h-4 shrink-0" style={isSubActive ? { color: '#fff' } : { color: '#4a5568' }} />
+                              <span className={clsx('text-gray-700', isSubActive && 'text-white')}>{subItem.name}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              
               return (
                 <Link
                   key={item.name}

@@ -1,4 +1,4 @@
-import { AlertTriangle, Timer, Calendar, XCircle } from 'lucide-react';
+import { AlertTriangle, Timer, Calendar, XCircle, BellRing } from 'lucide-react';
 
 // Status Configuration
 export const statusConfig = {
@@ -31,7 +31,7 @@ export const statusConfig = {
     },
     noFollowup: { 
         label: 'No Follow-up', 
-        icon: XCircle, 
+        icon: BellRing, 
         gradient: 'from-slate-500 to-gray-600', 
         bg: 'bg-slate-500', 
         light: 'bg-slate-50', 
