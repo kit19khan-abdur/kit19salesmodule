@@ -5,38 +5,38 @@ export const statusConfig = {
     overdue: { 
         label: 'Overdue', 
         icon: AlertTriangle, 
-        gradient: 'from-rose-500 to-pink-600', 
-        bg: 'bg-rose-500', 
+        gradient: 'from-rose-300 to-pink-400', 
+        bg: 'bg-rose-400', 
         light: 'bg-rose-50', 
-        text: 'text-rose-600', 
-        ring: 'ring-rose-500' 
+        text: 'text-rose-500', 
+        ring: 'ring-rose-400' 
     },
     dueToday: { 
         label: 'Due Today', 
         icon: Timer, 
-        gradient: 'from-amber-500 to-orange-600', 
-        bg: 'bg-amber-500', 
+        gradient: 'from-amber-300 to-orange-400', 
+        bg: 'bg-amber-400', 
         light: 'bg-amber-50', 
-        text: 'text-amber-600', 
-        ring: 'ring-amber-500' 
+        text: 'text-amber-500', 
+        ring: 'ring-amber-400' 
     },
     scheduled: { 
         label: 'Scheduled', 
         icon: Calendar, 
-        gradient: 'from-emerald-500 to-teal-600', 
-        bg: 'bg-emerald-500', 
+        gradient: 'from-emerald-300 to-teal-400', 
+        bg: 'bg-emerald-400', 
         light: 'bg-emerald-50', 
-        text: 'text-emerald-600', 
-        ring: 'ring-emerald-500' 
+        text: 'text-emerald-500', 
+        ring: 'ring-emerald-400' 
     },
     noFollowup: { 
         label: 'No Follow-up', 
         icon: BellRing, 
-        gradient: 'from-slate-500 to-gray-600', 
-        bg: 'bg-slate-500', 
+        gradient: 'from-slate-300 to-gray-400', 
+        bg: 'bg-slate-400', 
         light: 'bg-slate-50', 
-        text: 'text-slate-600', 
-        ring: 'ring-slate-500' 
+        text: 'text-slate-500', 
+        ring: 'ring-slate-400' 
     },
 };
 
