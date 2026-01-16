@@ -17,7 +17,7 @@ import PipelinePage from './pages/PipelinePage';
 import Leads from './pages/Lead/Leads/Leads';
 import MergeDuplicate from './pages/MergeDuplicate/MergeDuplicate';
 import Conversion from './pages/Conversion/Conversion';
-import FollowUpPage from './pages/FollowUp/FollowupPage';
+import FollowUpPage from './pages/FollowUpPage/FollowUpPage'
 
 // Create React Query client
 const queryClient = new QueryClient({
