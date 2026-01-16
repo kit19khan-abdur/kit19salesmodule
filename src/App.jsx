@@ -15,9 +15,9 @@ import {Enquiries, Login} from './pages';
 import Dashboard from './pages/Dashboard';
 import PipelinePage from './pages/PipelinePage';
 import Leads from './pages/Lead/Leads/Leads';
-import FollowUpPage from './pages/FollowUp/FollowUpPage.jsx';
 import MergeDuplicate from './pages/MergeDuplicate/MergeDuplicate';
 import Conversion from './pages/Conversion/Conversion';
+import FollowUpPage from './pages/FollowUp/FollowUpPage';
 
 // Create React Query client
 const queryClient = new QueryClient({
