@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Phone, Mail, Building2, MapPin, Calendar, DollarSign, User, Package, MessageSquare } from 'lucide-react';
+import { ChevronDown, ChevronRight, Phone, Mail, Building2, MapPin, Calendar, DollarSign, User, Package, MessageSquare, Notebook, NotebookPen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ConversionRow = ({ conversion, index }) => {
@@ -151,7 +151,7 @@ const ConversionRow = ({ conversion, index }) => {
                                 <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
                                     <div className="flex items-center gap-2 mb-2">
                                         <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center">
-                                            <MessageSquare className="w-4 h-4 text-purple-600" />
+                                            <Notebook className="w-4 h-4 text-purple-600" />
                                         </div>
                                     </div>
                                     <p className="text-xs text-gray-500 mb-1">Remarks</p>

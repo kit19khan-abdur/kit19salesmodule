@@ -5,7 +5,6 @@ import { Toaster } from 'react-hot-toast';
 import { ConfigProvider } from 'antd';
 import { antdTheme } from './antd-config';
 import 'antd/dist/reset.css';
-import { getToken } from './getSession';
 import Task from './pages/Task/Task';
 
 // Layout
@@ -15,7 +14,6 @@ import MainLayout from './components/layout/MainLayout';
 import {Enquiries, Login} from './pages';
 import Dashboard from './pages/Dashboard';
 import PipelinePage from './pages/PipelinePage';
-import ExampleUsage from './components/PopUpModal/ExampleUsage';
 import Leads from './pages/Lead/Leads/Leads';
 import FollowUpPage from './pages/FollowUp/FollowUpPage';
 import MergeDuplicate from './pages/MergeDuplicate/MergeDuplicate';
