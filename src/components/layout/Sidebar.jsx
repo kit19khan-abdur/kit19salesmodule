@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
+import {
   FiHome, FiUsers, FiUserPlus, FiCalendar, FiPhone, FiTarget,
   FiCheckSquare, FiMapPin, FiActivity, FiStar, FiTrello, FiClock,
   FiFileText, FiDollarSign, FiCreditCard, FiBook,
@@ -43,8 +43,8 @@ const Sidebar = ({ isOpen, setIsOpen, collapsed = false, setCollapsed = null, is
     { name: 'Appointments', href: '/appointments', icon: FiCalendar },
     { name: 'Physical Appointments', href: '/physical-appointments', icon: FiMapPin },
     { name: 'Lead Activities', href: '/activities', icon: FiActivity },
-    { 
-      name: 'Custom Events', 
+    {
+      name: 'Custom Events',
       icon: FiStar,
       subItems: [
         { name: 'Create Event', href: '/custom-events/create', icon: CopyPlus },
@@ -104,7 +104,7 @@ const Sidebar = ({ isOpen, setIsOpen, collapsed = false, setCollapsed = null, is
               const hasSubItems = item.subItems && item.subItems.length > 0;
               const isExpanded = expandedMenus[item.name];
               const isSubItemActive = hasSubItems && item.subItems.some(sub => location.pathname === sub.href);
-              
+
               if (hasSubItems) {
                 return (
                   <div key={item.name}>
@@ -121,8 +121,8 @@ const Sidebar = ({ isOpen, setIsOpen, collapsed = false, setCollapsed = null, is
                       <item.icon className="w-5 h-5 shrink-0" style={isSubItemActive ? { color: '#fff' } : { color: '#4a5568' }} />
                       <span className={clsx(!isOpen ? 'hidden' : 'flex-1 text-left text-gray-700', isSubItemActive && 'text-white')}>{item.name}</span>
                       {isOpen && (
-                        isExpanded ? 
-                          <FiChevronDown className="w-4 h-4 shrink-0" style={isSubItemActive ? { color: '#fff' } : { color: '#4a5568' }} /> : 
+                        isExpanded ?
+                          <FiChevronDown className="w-4 h-4 shrink-0" style={isSubItemActive ? { color: '#fff' } : { color: '#4a5568' }} /> :
                           <FiChevronRight className="w-4 h-4 shrink-0" style={isSubItemActive ? { color: '#fff' } : { color: '#4a5568' }} />
                       )}
                     </button>
@@ -151,7 +151,7 @@ const Sidebar = ({ isOpen, setIsOpen, collapsed = false, setCollapsed = null, is
                   </div>
                 );
               }
-              
+
               return (
                 <Link
                   key={item.name}

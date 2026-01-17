@@ -69,21 +69,18 @@ const SegmentationRow = ({ segment, index, onView, onEdit, onDelete, onToggleSta
                     whileTap={{ scale: 0.95 }}
                     onClick={handleToggleStatus}
                     disabled={isToggling}
-                    className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-                        segment.status === 'active' 
-                            ? 'bg-gradient-to-r from-emerald-500 to-teal-600' 
+                    className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${segment.status === 'active'
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-600'
                             : 'bg-gray-300'
-                    }`}
+                        }`}
                 >
                     <span
-                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 ease-in-out ${
-                            segment.status === 'active' ? 'translate-x-[36px]' : 'translate-x-1'
-                        }`}
+                        className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 ease-in-out ${segment.status === 'active' ? 'translate-x-[36px]' : 'translate-x-1'
+                            }`}
                     />
                 </motion.button>
-                <p className={`text-xs font-semibold mt-1 ${
-                    segment.status === 'active' ? 'text-emerald-600' : 'text-gray-500'
-                }`}>
+                <p className={`text-xs font-semibold mt-1 ${segment.status === 'active' ? 'text-emerald-600' : 'text-gray-500'
+                    }`}>
                     {segment.status === 'active' ? 'Active' : 'Inactive'}
                 </p>
             </td>
@@ -139,8 +136,8 @@ const SegmentationRow = ({ segment, index, onView, onEdit, onDelete, onToggleSta
                         <AnimatePresence>
                             {isMenuOpen && (
                                 <>
-                                    <div 
-                                        className="fixed inset-0 z-10" 
+                                    <div
+                                        className="fixed inset-0 z-10"
                                         onClick={() => setIsMenuOpen(false)}
                                     />
                                     <motion.div

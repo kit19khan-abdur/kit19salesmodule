@@ -3,23 +3,23 @@ import { ArrowUpDown } from 'lucide-react';
 import SegmentationRow from './SegmentationRow';
 import { tableColumns } from '../constants';
 
-const SegmentationTable = ({ 
-    segments, 
-    onSort, 
-    sortConfig, 
-    onView, 
-    onEdit, 
+const SegmentationTable = ({
+    segments,
+    onSort,
+    sortConfig,
+    onView,
+    onEdit,
     onDelete,
-    onToggleStatus 
+    onToggleStatus
 }) => {
     const handleSort = (column) => {
         if (!column.sortable) return;
-        
-        const newDirection = 
-            sortConfig.key === column.key && sortConfig.direction === 'asc' 
-                ? 'desc' 
+
+        const newDirection =
+            sortConfig.key === column.key && sortConfig.direction === 'asc'
+                ? 'desc'
                 : 'asc';
-        
+
         onSort({ key: column.key, direction: newDirection });
     };
 
@@ -32,19 +32,17 @@ const SegmentationTable = ({
                             {tableColumns.map((column) => (
                                 <th
                                     key={column.key}
-                                    className={`px-6 py-4 text-left ${
-                                        column.sortable ? 'cursor-pointer select-none' : ''
-                                    }`}
+                                    className={`px-6 py-4 text-left ${column.sortable ? 'cursor-pointer select-none' : ''
+                                        }`}
                                     onClick={() => handleSort(column)}
                                 >
                                     <div className="flex items-center gap-2 text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                         {column.label}
                                         {column.sortable && (
-                                            <ArrowUpDown className={`w-3.5 h-3.5 transition-colors ${
-                                                sortConfig.key === column.key 
-                                                    ? 'text-indigo-600' 
+                                            <ArrowUpDown className={`w-3.5 h-3.5 transition-colors ${sortConfig.key === column.key
+                                                    ? 'text-indigo-600'
                                                     : 'text-gray-400'
-                                            }`} />
+                                                }`} />
                                         )}
                                     </div>
                                 </th>
