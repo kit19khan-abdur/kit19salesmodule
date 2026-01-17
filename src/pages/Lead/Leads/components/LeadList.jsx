@@ -45,6 +45,7 @@ const LeadList = ({
   const [scheduleLead, setScheduleLead] = useState(null);
   const [selectedLeads, setSelectedLeads] = useState([]);
   const [showToolbarMenu, setShowToolbarMenu] = useState(false);
+  const [selectAllLeads, setSelectAllLeads] = useState(false);
   const toolbarMenuRef = useRef(null);
   const [showMoreActions, setShowMoreActions] = useState(false);
   const moreActionsRef = useRef(null);
@@ -93,7 +94,20 @@ const LeadList = ({
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedLeads(leads.map(lead => lead.ID));
+      setSelectAllLeads(false); // Uncheck "Apply on All" when selecting current page
     } else {
+      setSelectedLeads([]);
+      setSelectAllLeads(false);
+    }
+  };
+
+  const handleSelectAllLeads = (e) => {
+    if (e.target.checked) {
+      setSelectAllLeads(true);
+      // Select all on current page as well
+      setSelectedLeads(leads.map(lead => lead.ID));
+    } else {
+      setSelectAllLeads(false);
       setSelectedLeads([]);
     }
   };
@@ -260,7 +274,39 @@ const LeadList = ({
         {/* Mass Operation Buttons */}
         {selectedLeads.length > 0 && (
           <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-sm text-gray-600">{selectedLeads.length + 1 } selected</span>
+            <div className="bg-blue-50 border border-blue-200 rounded px-3 py-1.5 text-sm text-gray-700 flex items-center gap-2">
+              {selectAllLeads ? (
+                <span className="font-semibold">All {totalRecord} leads selected</span>
+              ) : (
+                <span>{selectedLeads.length} of {totalRecord} {selectedLeads.length === 1 ? 'lead' : 'leads'} selected</span>
+              )}
+            </div>
+            {/* Show "Apply on all" checkbox when current page is fully selected and there are more records */}
+            {selectedLeads.length === leads.length && totalRecord > leads.length && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded px-3 py-1.5 text-sm text-gray-700 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={selectAllLeads}
+                  onChange={handleSelectAllLeads}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                />
+                <label 
+                  className="cursor-pointer select-none text-xs"
+                  onClick={() => handleSelectAllLeads({ target: { checked: !selectAllLeads } })}
+                >
+                  Apply on all <span className="font-semibold">{totalRecord}</span> leads
+                </label>
+              </div>
+            )}
+            <button
+              onClick={() => {
+                setSelectedLeads([]);
+                setSelectAllLeads(false);
+              }}
+              className="px-3 py-1.5 text-xs font-medium text-red-600 bg-white border border-red-300 rounded hover:bg-red-50 transition"
+            >
+              Clear
+            </button>
             <button
               onClick={() => setIsMassAddFollowupModal(true)}
               className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition"
