@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Play, RefreshCw, Clock } from 'lucide-react';
+import { Phone, Play, RefreshCw, Clock, Timer, PhoneCall, UserCircle } from 'lucide-react';
+import { MdDialerSip } from "react-icons/md";
 
 const DialerWidget = ({ isActive, onStart, onRefresh }) => {
     const [dialerTime, setDialerTime] = useState(0);
@@ -49,20 +50,20 @@ const DialerWidget = ({ isActive, onStart, onRefresh }) => {
 
                     {/* Time Stats */}
                     <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                            <Clock className="w-4 h-4 text-gray-600" />
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200" title="Dial Time">
+                            <MdDialerSip className="cursor-pointer w-4 h-4 text-blue-600" />
                             <span className="text-sm font-mono font-semibold text-gray-900">{formatTime(dialerTime)}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                            <Clock className="w-4 h-4 text-gray-600" />
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200" title="Talk Time">
+                            <UserCircle className="cursor-pointer w-4 h-4 text-gray-600" />
                             <span className="text-sm font-mono font-semibold text-gray-900">{formatTime(waitTime)}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                            <Clock className="w-4 h-4 text-gray-600" />
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200" title="ACW Time">
+                            <PhoneCall className="cursor-pointer w-4 h-4 text-green-600" />
                             <span className="text-sm font-mono font-semibold text-gray-900">{formatTime(ringTime)}</span>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                            <Clock className="w-4 h-4 text-gray-600" />
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200" title="IDLE Time">
+                            <Timer className="cursor-pointer w-4 h-4 text-orange-600" />
                             <span className="text-sm font-mono font-semibold text-gray-900">{formatTime(talkTime)}</span>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search, ChevronLeft, ChevronRight, X, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, ChevronLeft, ChevronRight, X, Plus, Check } from 'lucide-react';
 
 const CallListSidebar = ({ 
     menuItems, 
@@ -11,6 +11,32 @@ const CallListSidebar = ({
     isCollapsed,
     onToggleCollapse 
 }) => {
+    const [showAddTabForm, setShowAddTabForm] = useState(false);
+    const [newTabName, setNewTabName] = useState('');
+    const [newTabDescription, setNewTabDescription] = useState('');
+    const [makeDefault, setMakeDefault] = useState(false);
+
+    const handleAddTab = () => {
+        if (newTabName.trim()) {
+            onAddTab({
+                name: newTabName,
+                description: newTabDescription,
+                makeDefault: makeDefault
+            });
+            setNewTabName('');
+            setNewTabDescription('');
+            setMakeDefault(false);
+            setShowAddTabForm(false);
+        }
+    };
+
+    const handleCancelAddTab = () => {
+        setNewTabName('');
+        setNewTabDescription('');
+        setMakeDefault(false);
+        setShowAddTabForm(false);
+    };
+
     if (isCollapsed) {
         return (
             <div className="w-12 bg-white border-r border-gray-200 flex flex-col items-center py-4">
@@ -101,18 +127,85 @@ const CallListSidebar = ({
                         </div>
                     ))}
                 </div>
-            </div>
-
-            {/* Add New Tab Button */}
-            <div className="px-4 py-3 border-t border-gray-200">
-                <button
-                    onClick={onAddTab}
+                {!showAddTabForm && (<button
+                    onClick={() => setShowAddTabForm(!showAddTabForm)}
                     className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-sm transition-colors"
                 >
                     <Plus className="w-4 h-4" />
                     Add New Tab
-                </button>
+                </button>)}
+
+                {/* Add New Tab Form */}
+                {showAddTabForm && (
+                    <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-sm font-semibold text-gray-700">Add New Tab</h3>
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={handleCancelAddTab}
+                                    className="p-1 rounded hover:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors"
+                                    title="Cancel"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={handleAddTab}
+                                    className="p-1 rounded hover:bg-gray-200 text-gray-500 hover:text-green-600 transition-colors"
+                                    title="Save"
+                                >
+                                    <Check className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Name
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter Name"
+                                    value={newTabName}
+                                    onChange={(e) => setNewTabName(e.target.value)}
+                                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-xs font-medium text-gray-600 mb-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    placeholder="Enter Description"
+                                    value={newTabDescription}
+                                    onChange={(e) => setNewTabDescription(e.target.value)}
+                                    rows={3}
+                                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                />
+                            </div>
+                            
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="checkbox"
+                                    id="makeDefault"
+                                    checked={makeDefault}
+                                    onChange={(e) => setMakeDefault(e.target.checked)}
+                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                />
+                                <label htmlFor="makeDefault" className="text-sm text-gray-600 cursor-pointer">
+                                    Make Default
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
+
+            {/* Add New Tab Button */}
+            {/* <div className="px-4 py-3 border-t border-gray-200">
+                
+            </div> */}
         </div>
     );
 };

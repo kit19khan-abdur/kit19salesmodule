@@ -93,14 +93,16 @@ const CallList = () => {
     };
 
     // Handle add tab
-    const handleAddTab = () => {
+    const handleAddTab = (tabData) => {
         const newTab = {
             id: `tab${Date.now()}`,
-            label: `New Tab ${customTabs.length + 1}`,
+            label: tabData.name,
+            description: tabData.description,
+            isDefault: tabData.makeDefault,
             removable: true
         };
         setCustomTabs([...customTabs, newTab]);
-        toast.success('New tab added');
+        toast.success(`Tab "${tabData.name}" added successfully`);
     };
 
     // Handle remove tab
