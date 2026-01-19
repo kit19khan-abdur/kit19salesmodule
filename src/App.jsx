@@ -19,7 +19,6 @@ import MergeDuplicate from './pages/MergeDuplicate/MergeDuplicate';
 import Conversion from './pages/Conversion/Conversion';
 import FollowUpPage from './pages/FollowUpPage/FollowUpPage'
 import Segmentation from './pages/Segmentation/Segmentation';
-import CallList from './pages/CallList/CallList';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -73,7 +72,7 @@ const AppRoutes = () => {
         <Route path="/conversions" element={<Conversion />} />
         <Route path="/segments" element={<Segmentation />} />
         <Route path="/tasks" element={<Task />} />
-        <Route path="/call-list" element={<CallList />} />
+        <Route path="/appointments" element={<div className="text-2xl font-bold">Appointments</div>} />
         <Route path="/physical-appointments" element={<div className="text-2xl font-bold">Physical Appointments</div>} />
         <Route path="/activities" element={<div className="text-2xl font-bold">Lead Activities</div>} />
         <Route path="/custom-events" element={<div className="text-2xl font-bold">Custom Events</div>} />

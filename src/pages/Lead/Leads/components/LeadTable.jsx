@@ -69,7 +69,6 @@ const LeadTable = ({
     const [selectedLeadForDrawer, setSelectedLeadForDrawer] = useState(null);
     const [showMoreActions, setShowMoreActions] = useState(false);
     const [showPagePopup, setShowPagePopup] = useState(null);
-    const [selectAllLeads, setSelectAllLeads] = useState(false);
     const rowMenuAnchorRefs = useRef({});
     const moreActionsRef = useRef(null);
     const ellipsisRefs = useRef([]);
@@ -222,21 +221,8 @@ const LeadTable = ({
     const handleSelectAll = () => {
         if (selectedLeads.length === leads.length) {
             setSelectedLeads([]);
-            setSelectAllLeads(false);
         } else {
             setSelectedLeads(leads.map(l => l.ID));
-            setSelectAllLeads(false); // Uncheck "Apply on All" when selecting current page
-        }
-    };
-
-    const handleSelectAllLeads = (e) => {
-        if (e.target.checked) {
-            setSelectAllLeads(true);
-            // Select all on current page as well
-            setSelectedLeads(leads.map(l => l.ID));
-        } else {
-            setSelectAllLeads(false);
-            setSelectedLeads([]);
         }
     };
 
@@ -721,30 +707,12 @@ const LeadTable = ({
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded px-3 py-2 text-sm text-gray-700 flex items-center gap-2">
-                            {selectAllLeads ? (
-                                <span className="font-semibold">All {totalRecord} leads selected</span>
-                            ) : (
-                                <span>{selectedLeads.length} of {totalRecord} {selectedLeads.length === 1 ? 'lead' : 'leads'} selected</span>
-                            )}
-                        </div>
-                        {/* Show "Apply on all" checkbox when current page is fully selected and there are more records */}
-                        {selectedLeads.length === leads.length && totalRecord > leads.length && (
-                            <div className="bg-yellow-50 border border-yellow-200 rounded px-3 py-2 text-sm text-gray-700 flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={selectAllLeads}
-                                    onChange={handleSelectAllLeads}
-                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                                />
-                                <label 
-                                    className="cursor-pointer select-none"
-                                    onClick={() => handleSelectAllLeads({ target: { checked: !selectAllLeads } })}
-                                >
-                                    Apply on all <span className="font-semibold">{totalRecord}</span> leads
-                                </label>
-                            </div>
-                        )}
+                        <span className="text-sm text-gray-600">
+                            {selectedLeads.length} of {totalRecord}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900">
+                            {selectedLeads.length} leads selected.
+                        </span>
                         <button
                             onClick={() => setDeleteMassConfirmModal({ show: true, leadId: null })}
                             className="text-red-600 hover:text-red-700 transition flex items-center gap-2"
@@ -754,10 +722,7 @@ const LeadTable = ({
                             Delete
                         </button>
                         <button
-                            onClick={() => {
-                                setSelectedLeads([]);
-                                setSelectAllLeads(false);
-                            }}
+                            onClick={() => setSelectedLeads([])}
                             className="p-1 hover:bg-gray-100 rounded transition"
                             title="Clear Selection"
                         >

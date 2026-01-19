@@ -144,7 +144,7 @@ const MergeDuplicate = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
       <PageHeader isLoading={isLoading} onRefresh={fetchDuplicates} />
       
-      {/* <StatsSection stats={stats} /> */}
+      <StatsSection stats={stats} />
       
       <FilterBar
         filterType={filterType}

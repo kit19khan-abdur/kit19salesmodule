@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import RichTextEditor from '../../../components/common/RichTextEditor';
 import { Send } from 'lucide-react';
-import TrackSMSModal from './TrackSMSModal';
 
 const SendMassSMS = ({ selectedCount = 0 }) => {
     const [formData, setFormData] = useState({
@@ -15,11 +14,8 @@ const SendMassSMS = ({ selectedCount = 0 }) => {
         isUnicode: false,
         trackUrl: false,
         trackSMS: false,
-        onSchedule: false,
-        schedule: ''
+        onSchedule: false
     });
-
-    const [isTrackSMSModalOpen, setIsTrackSMSModalOpen] = useState(false);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -27,11 +23,6 @@ const SendMassSMS = ({ selectedCount = 0 }) => {
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
-
-        // Open modal when Track URL is checked and then Track SMS is checked
-        if (name === 'trackSMS' && checked && formData.trackUrl) {
-            setIsTrackSMSModalOpen(true);
-        }
     };
 
     return (
@@ -119,7 +110,7 @@ const SendMassSMS = ({ selectedCount = 0 }) => {
             {/* Message Textarea */}
             <div className="mb-4">
                 <textarea
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
@@ -158,10 +149,9 @@ const SendMassSMS = ({ selectedCount = 0 }) => {
                     <input
                         type="checkbox"
                         name="trackSMS"
-                        disabled={!formData.trackUrl}
                         checked={formData.trackSMS}
                         onChange={handleChange}
-                        className={`w-4 h-4 rounded ${!formData.trackUrl ? 'cursor-not-allowed' : 'cursor-pointer'} border-gray-300 text-blue-600 focus:ring-blue-500`}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <span className="ml-2 text-sm text-blue-600 flex items-center gap-1">
                         <Send className="w-4 h-4" />
@@ -171,7 +161,7 @@ const SendMassSMS = ({ selectedCount = 0 }) => {
             </div>
 
             {/* On Schedule Date And Time */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between">
                 <label className="flex items-center">
                     <input
                         type="checkbox"
@@ -182,23 +172,7 @@ const SendMassSMS = ({ selectedCount = 0 }) => {
                     />
                     <span className="ml-2 text-sm text-gray-700">On Schedule Date And Time</span>
                 </label>
-                {formData.onSchedule && (<div className='flex flex-col items-center'><label className="">
-                    SendSMS on Schedule Date and Time<span className='text-[#f00]'>*</span>
-                    <input
-                        type="datetime-local"
-                        name="schedule"
-                        onChange={handleChange}
-                        value={formData.schedule}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                </label></div>)}
             </div>
-
-            {/* Track SMS Modal */}
-            <TrackSMSModal
-                isOpen={isTrackSMSModalOpen}
-                onClose={() => setIsTrackSMSModalOpen(false)}
-            />
         </div>
     );
 };

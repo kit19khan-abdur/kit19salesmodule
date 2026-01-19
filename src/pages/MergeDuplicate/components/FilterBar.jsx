@@ -14,7 +14,7 @@ const FilterBar = ({
   resultCount,
   totalCount 
 }) => (
-  <div className="pb-4 mt-2">
+  <div className="px-8 pb-4">
     <div className="flex items-center justify-between bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
       <div className="flex items-center gap-4">
         <ToggleSwitch
