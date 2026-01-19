@@ -112,7 +112,7 @@ const Conversion = () => {
                 />
 
                 {/* Stats Cards - Optional */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -197,7 +197,7 @@ const Conversion = () => {
                             </div>
                         </div>
                     </motion.div>
-                </div>
+                </div> */}
 
                 {/* Table */}
                 <ConversionTable

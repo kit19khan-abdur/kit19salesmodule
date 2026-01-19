@@ -1,19 +1,19 @@
-import { AlertTriangle, Timer, Calendar, XCircle, BellRing } from 'lucide-react';
+import { PiCalendarCheckThin } from "react-icons/pi";
 
 // Status Configuration
 export const statusConfig = {
     overdue: { 
         label: 'Overdue', 
-        icon: AlertTriangle, 
+        icon: PiCalendarCheckThin, 
         gradient: 'from-rose-300 to-pink-400', 
         bg: 'bg-rose-400', 
         light: 'bg-rose-50', 
-        text: 'text-rose-500', 
+        text: 'text-[#f00]', 
         ring: 'ring-rose-400' 
     },
     dueToday: { 
         label: 'Due Today', 
-        icon: Timer, 
+        icon: PiCalendarCheckThin, 
         gradient: 'from-amber-300 to-orange-400', 
         bg: 'bg-amber-400', 
         light: 'bg-amber-50', 
@@ -22,7 +22,7 @@ export const statusConfig = {
     },
     scheduled: { 
         label: 'Scheduled', 
-        icon: Calendar, 
+        icon: PiCalendarCheckThin, 
         gradient: 'from-emerald-300 to-teal-400', 
         bg: 'bg-emerald-400', 
         light: 'bg-emerald-50', 
@@ -31,7 +31,7 @@ export const statusConfig = {
     },
     noFollowup: { 
         label: 'No Follow-up', 
-        icon: BellRing, 
+        icon: PiCalendarCheckThin, 
         gradient: 'from-slate-300 to-gray-400', 
         bg: 'bg-slate-400', 
         light: 'bg-slate-50', 

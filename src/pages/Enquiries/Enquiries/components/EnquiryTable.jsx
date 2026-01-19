@@ -58,6 +58,7 @@ const EnquiryTable = ({
     const [showMassOperation, setShowMassOperation] = useState(false);
     const [selectedOperation, setSelectedOperation] = useState('');
     const [currentPage, setCurrentPage] = useState(externalCurrentPage || 1);
+    const [selectAllEnquiries, setSelectAllEnquiries] = useState(false);
     const [showColumnSearch, setShowColumnSearch] = useState(false);
     const [showFunnelFilter, setShowFunnelFilter] = useState(false);
     const [headerMenu, setHeaderMenu] = useState({ show: false, col: null });
@@ -198,7 +199,20 @@ const EnquiryTable = ({
     const handleSelectAll = (e) => {
         if (e.target.checked) {
             setSelectedEnquiries(enquiries.map(enq => enq.EnquiryId));
+            setSelectAllEnquiries(false); // Uncheck "Apply on All" when selecting current page
         } else {
+            setSelectedEnquiries([]);
+            setSelectAllEnquiries(false);
+        }
+    };
+
+    const handleSelectAllEnquiries = (e) => {
+        if (e.target.checked) {
+            setSelectAllEnquiries(true);
+            // Select all on current page as well
+            setSelectedEnquiries(enquiries.map(enq => enq.EnquiryId));
+        } else {
+            setSelectAllEnquiries(false);
             setSelectedEnquiries([]);
         }
     };
@@ -642,9 +656,18 @@ const EnquiryTable = ({
                         {/* Show selection count and delete when items are selected */}
                         {selectedEnquiries.length > 0 ? (
                             <>
-                                <div className="bg-blue-50 border border-blue-200 rounded px-3 py-2 text-sm text-gray-700">
-                                    {selectedEnquiries.length} {selectedEnquiries.length === 1 ? 'enquiry' : 'enquiries'} selected.
-                                </div>
+                                
+                                    <div className="bg-yellow-50 border border-yellow-200 rounded px-3 py-2 text-sm text-gray-700 flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectAllEnquiries}
+                                            onChange={handleSelectAllEnquiries}
+                                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                                        />
+                                        <label className="cursor-pointer select-none">
+                                            Apply on all <span className="font-semibold">{totalRecord}</span> enquiries
+                                        </label>
+                                    </div>
                                 <button
                                     onClick={() => alert('Mass Delete action triggered')}
                                     className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded hover:bg-red-50 transition"
@@ -654,7 +677,10 @@ const EnquiryTable = ({
                                     Delete
                                 </button>
                                 <button
-                                    onClick={() => setSelectedEnquiries([])}
+                                    onClick={() => {
+                                        setSelectedEnquiries([]);
+                                        setSelectAllEnquiries(false);
+                                    }}
                                     className="p-2 hover:bg-gray-100 rounded transition"
                                     title="Cancel selection"
                                 >

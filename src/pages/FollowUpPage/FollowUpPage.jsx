@@ -88,17 +88,30 @@ const FollowUpPage = () => {
 
                 {/* Content */}
                 <main className="py-6">
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-4 gap-5 mb-8">
-                        {Object.entries(statusConfig).map(([key, config]) => (
-                            <StatCard
-                                key={key}
-                                config={config}
-                                count={stats[key]}
-                                isActive={activeFilters.includes(key)}
-                                onClick={() => handleFilterClick(key)}
-                            />
-                        ))}
+                    {/* Filter Checkboxes */}
+                    <div className="flex items-center gap-6 mb-6 px-6">
+                        {Object.entries(statusConfig).map(([key, config]) => {
+                            const IconComponent = config.icon;
+                            return (
+                                <label
+                                    key={key}
+                                    className="flex items-center gap-2 cursor-pointer group"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={activeFilters.includes(key)}
+                                        onChange={() => handleFilterClick(key)}
+                                        className="w-5 h-5 rounded border-2 border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer transition-all"
+                                    />
+                                    <span className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                                        activeFilters.includes(key) ? 'text-gray-900' : 'text-gray-500'
+                                    }`}>
+                                        <IconComponent className={`w-6 h-6 ${config.text}`} />
+                                        {config.label}
+                                    </span>
+                                </label>
+                            );
+                        })}
                     </div>
 
                     {/* Toolbar */}
