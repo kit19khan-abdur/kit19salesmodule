@@ -74,9 +74,9 @@ const FollowUpPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc]">
+        <div className="min-h-screen bg-gray-50">
             {/* Sidebar Accent */}
-            <div className="fixed left-0 -top-[4px] bottom-0 w-1 bg-gradient-to-b from-violet-600 via-purple-600 to-fuchsia-600" />
+            <div className="fixed left-0 -top-[4px] bottom-0 w-1 bg-gray-300" />
 
             {/* Main Container */}
             <div className="">
@@ -101,7 +101,7 @@ const FollowUpPage = () => {
                                         type="checkbox"
                                         checked={activeFilters.includes(key)}
                                         onChange={() => handleFilterClick(key)}
-                                        className="w-5 h-5 rounded border-2 border-gray-300 text-purple-600 focus:ring-2 focus:ring-purple-500 focus:ring-offset-0 cursor-pointer transition-all"
+                                        className="w-5 h-5 rounded border-2 border-gray-300 text-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-0 cursor-pointer transition-all"
                                     />
                                     <span className={`flex items-center gap-1 text-sm font-medium transition-colors ${
                                         activeFilters.includes(key) ? 'text-gray-900' : 'text-gray-500'
@@ -129,8 +129,8 @@ const FollowUpPage = () => {
                     {/* Cards Grid */}
                     {activeFilters.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-20">
-                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center mb-6">
-                                <svg className="w-12 h-12 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-6">
+                                <svg className="w-12 h-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                                 </svg>
                             </div>
@@ -138,7 +138,7 @@ const FollowUpPage = () => {
                             <p className="text-gray-500 mb-6">Please select at least one filter to view follow-ups</p>
                             <button
                                 onClick={handleAllFiltersClick}
-                                className="px-6 py-3 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-violet-500/30 transition-all"
+                                className="px-6 py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-all"
                             >
                                 Show All Follow-ups
                             </button>

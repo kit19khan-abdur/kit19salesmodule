@@ -41,7 +41,7 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
                     {/* Left Side */}
                     <div className="flex items-center gap-6">
                         <div>
-                            <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                            <h1 className="text-2xl font-bold text-gray-900">
                                 Follow-Ups
                             </h1>
                             <p className="text-sm text-gray-500 mt-0.5">
@@ -60,7 +60,7 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
                                 placeholder="Search follow-ups..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-72 pl-12 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 outline-none transition-all"
+                                className="w-72 pl-12 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all"
                             />
                         </div>
 
@@ -115,7 +115,7 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
                             onClick={() => setShowSettingsMenu(!showSettingsMenu)}
                             className={`p-3 relative rounded-2xl transition-all ${showSettingsMenu
                                     ? 'bg-gray-200 text-gray-700'
-                                    : 'bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:shadow-lg hover:shadow-violet-500/30'
+                                    : 'bg-teal-600 text-white hover:bg-teal-700'
                                 }`}
                         >
                             <Settings className={`w-5 h-5 ${showSettingsMenu ? '' : 'animate-spin'}`} style={{ animationDuration: '3s' }} />

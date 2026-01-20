@@ -11,10 +11,9 @@ const FollowupPagination = ({ currentPage, setCurrentPage, totalPages }) => {
                     <button
                         onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95"
+                        className="px-4 py-2 rounded-lg border-1 border-dashed font-medium transition-all uppercase tracking-wider text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:border-gray-300 disabled:text-gray-400 bg-white text-[#00BFA6] border-[#00BFA6] hover:bg-[#00BFA6] hover:text-white shadow-md"
                     >
-                        <ChevronLeft className="w-4 h-4" />
-                        <span className="font-medium">Previous</span>
+                        Previous
                     </button>
 
                     {/* Page Numbers */}
@@ -23,9 +22,9 @@ const FollowupPagination = ({ currentPage, setCurrentPage, totalPages }) => {
                             <button
                                 key={page}
                                 onClick={() => setCurrentPage(page)}
-                                className={`w-10 h-10 rounded-xl font-semibold transition-all hover:scale-110 active:scale-95 ${currentPage === page
-                                        ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg shadow-violet-500/40'
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                className={`px-4 py-2 rounded-lg border-2 border-dashed font-medium transition-all uppercase tracking-wider text-sm shadow-md ${currentPage === page
+                                        ? 'bg-white text-[#00BFA6] border-[#00BFA6]'
+                                        : 'bg-[#00BFA6] text-white border-[#00BFA6] hover:bg-white hover:text-[#00BFA6]'
                                     }`}
                             >
                                 {page}
@@ -34,7 +33,7 @@ const FollowupPagination = ({ currentPage, setCurrentPage, totalPages }) => {
                         <span className="px-1 text-gray-400 font-medium">•••</span>
                         <button
                             onClick={() => setCurrentPage(totalPages)}
-                            className="min-w-[3.5rem] h-10 px-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold transition-all hover:scale-105 active:scale-95"
+                            className="min-w-[3.5rem] px-4 py-2 rounded-lg border-2 border-dashed font-medium transition-all uppercase tracking-wider text-sm shadow-md bg-[#00BFA6] text-white border-[#00BFA6] hover:bg-white hover:text-[#00BFA6]"
                         >
                             {totalPages.toLocaleString()}
                         </button>
@@ -44,16 +43,15 @@ const FollowupPagination = ({ currentPage, setCurrentPage, totalPages }) => {
                     <button
                         onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
-                        className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white hover:shadow-lg hover:shadow-violet-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-105 active:scale-95"
+                        className="px-4 py-2 rounded-lg border-2 border-dashed font-medium transition-all uppercase tracking-wider text-sm disabled:opacity-40 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:border-gray-300 disabled:text-gray-400 bg-white text-[#00BFA6] border-[#00BFA6] hover:bg-[#00BFA6] hover:text-white shadow-md"
                     >
-                        <span className="font-medium">Next</span>
-                        <ChevronRight className="w-4 h-4" />
+                        Next
                     </button>
 
                     {/* Page Info Badge */}
                     <div className="ml-2 px-3 py-1.5 bg-gray-100 rounded-lg">
                         <span className="text-xs font-medium text-gray-500">
-                            Page <span className="text-violet-600 font-bold">{currentPage}</span> / {totalPages.toLocaleString()}
+                            Page <span className="text-[#00BFA6] font-bold">{currentPage}</span> / {totalPages.toLocaleString()}
                         </span>
                     </div>
                 </div>

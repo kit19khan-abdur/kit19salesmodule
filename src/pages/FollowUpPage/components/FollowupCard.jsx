@@ -21,7 +21,7 @@ const iconMap = {
 const quickActions = [
     { id: 'followup', icon: CheckCircle2, label: 'Add Followup', color: 'text-emerald-500 hover:bg-emerald-50' },
     { id: 'mail', icon: Mail, label: 'Send Mail', color: 'text-blue-500 hover:bg-blue-50' },
-    { id: 'sms', icon: MessageSquare, label: 'Send SMS', color: 'text-purple-500 hover:bg-purple-50' },
+    { id: 'sms', icon: MessageSquare, label: 'Send SMS', color: 'text-teal-500 hover:bg-teal-50' },
     { id: 'voice', icon: Phone, label: 'Send Voice', color: 'text-orange-500 hover:bg-orange-50' },
     { id: 'notes', icon: FileText, label: 'Add Notes', color: 'text-cyan-500 hover:bg-cyan-50' },
     { id: 'upload', icon: Upload, label: 'Upload Doc', color: 'text-pink-500 hover:bg-pink-50' },
@@ -118,7 +118,7 @@ const FollowupListRow = ({ followup, onAction }) => {
 
                 {/* Contact Info */}
                 <div className="flex items-center gap-3 min-w-[220px]">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-sm">
                         <img src="https://kit19.com/assets/custom/img/img_avatar.png" className='rounded-full' alt="person" />
                     </div>
                     <div>
@@ -146,7 +146,7 @@ const FollowupListRow = ({ followup, onAction }) => {
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                    <button
+                    {/* <button
                         onClick={() => onAction('followup', followup)}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-600 transition-colors"
                     >
@@ -157,7 +157,7 @@ const FollowupListRow = ({ followup, onAction }) => {
                         className="p-2 rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                     >
                         <Eye className="w-4 h-4" />
-                    </button>
+                    </button> */}
                     <div className="relative" ref={actionsRef}>
                         <button
                             onClick={() => setShowActions(!showActions)}
@@ -254,7 +254,7 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
                 {/* Contact Info */}
                 <div className="space-y-3 mb-4">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-slate-50">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                        <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-sm">
                             <img src="https://kit19.com/assets/custom/img/img_avatar.png" className='rounded-full' alt="person" />
                         </div>
                         <div className="flex-1">
@@ -279,7 +279,7 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
                 </div>
 
                 {/* Quick Actions Bar */}
-                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
+                {/* <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
                     <button
                         onClick={() => onAction('followup', followup)}
                         className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-500 text-white font-medium text-sm hover:bg-emerald-600 transition-colors"
@@ -292,7 +292,7 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
                     >
                         <Eye className="w-4 h-4" />
                     </button>
-                </div>
+                </div> */}
             </div>
         </motion.div>
     );

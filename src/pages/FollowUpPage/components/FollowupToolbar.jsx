@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpDown } from 'lucide-react';
+import FormalButton from '../../../components/FormalButton';
 
 const FollowupToolbar = ({
     activeFilters = [],
@@ -14,29 +15,30 @@ const FollowupToolbar = ({
     return (
         <div className="px-2 flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
-                <button
+                {/* <button
                     onClick={onAllFiltersClick}
                     className={`px-5 py-2.5 rounded-xl font-medium transition-all ${allFiltersActive
                         ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/30'
                         : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                         }`}
                 >
-                    {allFiltersActive ? 'Remove All' : 'Select All'}
-                </button>
+                    {allFiltersActive ? 'Remove All' : 'Select All'} 
+                </button> */}
+                <FormalButton onAllFiltersClick={onAllFiltersClick} label={allFiltersActive ? 'Remove All' : 'Select All'} />
                 <span className="text-sm text-gray-500">
                     Showing <strong className="text-gray-900">{filteredCount}</strong> of <strong className="text-gray-900">{totalRecords.toLocaleString()}</strong>
                 </span>
             </div>
 
             <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                {/* <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
                     <ArrowUpDown className="w-4 h-4" />
                     Sort
-                </button>
+                </button> */}
                 <div className="flex items-center bg-white rounded-xl border border-gray-200 p-1">
                     <button
                         onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-violet-100 text-violet-600' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-teal-100 text-teal-600' : 'text-gray-400 hover:text-gray-600'}`}
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <rect x="3" y="3" width="7" height="7" rx="1" strokeWidth="2" />
@@ -47,7 +49,7 @@ const FollowupToolbar = ({
                     </button>
                     <button
                         onClick={() => setViewMode('list')}
-                        className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-violet-100 text-violet-600' : 'text-gray-400 hover:text-gray-600'}`}
+                        className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-teal-100 text-teal-600' : 'text-gray-400 hover:text-gray-600'}`}
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
