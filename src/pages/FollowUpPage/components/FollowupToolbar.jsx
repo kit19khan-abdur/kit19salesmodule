@@ -13,7 +13,7 @@ const FollowupToolbar = ({
     totalRecords
 }) => {
     return (
-        <div className="px-2 flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
             <div className="flex items-center gap-4">
                 {/* <button
                     onClick={onAllFiltersClick}
@@ -24,37 +24,37 @@ const FollowupToolbar = ({
                 >
                     {allFiltersActive ? 'Remove All' : 'Select All'} 
                 </button> */}
-                <FormalButton onAllFiltersClick={onAllFiltersClick} label={allFiltersActive ? 'Remove All' : 'Select All'} />
+                {/* <FormalButton onAllFiltersClick={onAllFiltersClick} label={allFiltersActive ? 'Remove All' : 'Select All'} />
                 <span className="text-sm text-gray-500">
                     Showing <strong className="text-gray-900">{filteredCount}</strong> of <strong className="text-gray-900">{totalRecords.toLocaleString()}</strong>
-                </span>
-            </div>
+                </span> */}
 
-            <div className="flex items-center gap-3">
-                {/* <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-3">
+                    {/* <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
                     <ArrowUpDown className="w-4 h-4" />
                     Sort
                 </button> */}
-                <div className="flex items-center bg-white rounded-xl border border-gray-200 p-1">
-                    <button
-                        onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-teal-100 text-teal-600' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <rect x="3" y="3" width="7" height="7" rx="1" strokeWidth="2" />
-                            <rect x="14" y="3" width="7" height="7" rx="1" strokeWidth="2" />
-                            <rect x="3" y="14" width="7" height="7" rx="1" strokeWidth="2" />
-                            <rect x="14" y="14" width="7" height="7" rx="1" strokeWidth="2" />
-                        </svg>
-                    </button>
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-teal-100 text-teal-600' : 'text-gray-400 hover:text-gray-600'}`}
-                    >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
+                    <div className="flex items-center bg-white rounded-xl border border-gray-200 p-1">
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-teal-50 text-teal-500' : 'text-gray-400 hover:text-gray-600'}`}
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <rect x="3" y="3" width="7" height="7" rx="1" strokeWidth="2" />
+                                <rect x="14" y="3" width="7" height="7" rx="1" strokeWidth="2" />
+                                <rect x="3" y="14" width="7" height="7" rx="1" strokeWidth="2" />
+                                <rect x="14" y="14" width="7" height="7" rx="1" strokeWidth="2" />
+                            </svg>
+                        </button>
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`p-2 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-teal-50 text-teal-500' : 'text-gray-400 hover:text-gray-600'}`}
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

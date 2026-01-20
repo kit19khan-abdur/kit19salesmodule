@@ -35,7 +35,7 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
     };
 
     return (
-        <header className="sticky -top-[4px] z-40 bg-white/70 backdrop-blur-xl border-b border-gray-200/50">
+        <header className="sticky -top-[4px] z-40 bg-white/90 backdrop-blur-xl border-b border-gray-100">
             <div className="px-8 py-4">
                 <div className="flex items-center justify-between">
                     {/* Left Side */}
@@ -60,7 +60,7 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
                                 placeholder="Search follow-ups..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-72 pl-12 pr-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all"
+                                className="w-72 pl-12 pr-4 py-3 rounded-2xl border border-gray-200 bg-white focus:bg-white focus:border-teal-400 focus:ring-4 focus:ring-teal-400/10 outline-none transition-all"
                             />
                         </div>
 
@@ -114,8 +114,8 @@ const FollowupHeader = ({ searchQuery, setSearchQuery }) => {
                         <button
                             onClick={() => setShowSettingsMenu(!showSettingsMenu)}
                             className={`p-3 relative rounded-2xl transition-all ${showSettingsMenu
-                                    ? 'bg-gray-200 text-gray-700'
-                                    : 'bg-teal-600 text-white hover:bg-teal-700'
+                                    ? 'bg-gray-100 text-gray-700'
+                                    : 'bg-teal-500 text-white hover:bg-teal-600 shadow-sm'
                                 }`}
                         >
                             <Settings className={`w-5 h-5 ${showSettingsMenu ? '' : 'animate-spin'}`} style={{ animationDuration: '3s' }} />

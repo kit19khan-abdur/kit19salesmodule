@@ -49,7 +49,7 @@ const ComparisonView = ({
             </div>
           </div>
 
-          <div className="p-6 space-y-4 max-h-[calc(100vh-420px)] overflow-y-auto">
+          <div className="p-6 space-y-4 max-h-[calc(100vh-320px)] overflow-y-auto">
             {/* Primary Record */}
             <ComparisonRecord
               record={primaryRecord || selectedRecord}

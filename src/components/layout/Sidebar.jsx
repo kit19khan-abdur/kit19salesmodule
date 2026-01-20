@@ -51,7 +51,7 @@ const Sidebar = ({ isOpen, setIsOpen, collapsed = false, setCollapsed = null, is
         { name: 'Webhook Events', href: '/custom-events/webhook', icon: ListFilterPlus }
       ]
     },
-    { name: 'Pipeline Deal', href: '/pipeline', icon: FiTrello },
+    { name: 'Pipeline Deal', href: '/pipeline-deal', icon: FiTrello },
     { name: 'Pipeline History', href: '/pipeline-history', icon: FiClock },
     { name: 'Quotations', href: '/quotations', icon: FiFileText },
     { name: 'Invoices', href: '/invoices', icon: FiFileText },

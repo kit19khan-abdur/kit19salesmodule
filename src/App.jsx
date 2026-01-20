@@ -11,7 +11,7 @@ import Task from './pages/Task/Task';
 import MainLayout from './components/layout/MainLayout';
 
 // Pages
-import {Enquiries, Login} from './pages';
+import { Enquiries, Login } from './pages';
 import Dashboard from './pages/Dashboard';
 import PipelinePage from './pages/PipelinePage';
 import Leads from './pages/Lead/Leads/Leads';
@@ -20,6 +20,7 @@ import Conversion from './pages/Conversion/Conversion';
 import FollowUpPage from './pages/FollowUpPage/FollowUpPage'
 import Segmentation from './pages/Segmentation/Segmentation';
 import CallList from './pages/CallList/CallList';
+import Pipeline from './pages/Pipeline/Pipeline';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -60,7 +61,7 @@ const AppRoutes = () => {
       {/* Protected Routes */}
       <Route
         element={
-           <ProtectedRoute>
+          <ProtectedRoute>
             <MainLayout />
           </ProtectedRoute>
         }
@@ -74,7 +75,7 @@ const AppRoutes = () => {
         <Route path="/segments" element={<Segmentation />} />
         <Route path="/tasks" element={<Task />} />
         <Route path="/call-list" element={<CallList />} />
-        <Route path="/physical-appointments" element={<div className="text-2xl font-bold">Physical Appointments</div>} />
+        <Route path="/pipeline-deal" element={<Pipeline />} />
         <Route path="/activities" element={<div className="text-2xl font-bold">Lead Activities</div>} />
         <Route path="/custom-events" element={<div className="text-2xl font-bold">Custom Events</div>} />
         <Route path="/pipeline" element={<PipelinePage />} />

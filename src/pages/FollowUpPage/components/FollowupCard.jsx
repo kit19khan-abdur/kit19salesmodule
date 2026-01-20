@@ -95,7 +95,7 @@ const FollowupListRow = ({ followup, onAction }) => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-white rounded-2xl border border-gray-100 hover:shadow-lg transition-all duration-300 group relative"
+            className="bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 group relative"
         >
             {/* Status Bar */}
             <div className={`h-1 bg-gradient-to-r ${config.gradient} rounded-t-2xl`} />
@@ -118,7 +118,7 @@ const FollowupListRow = ({ followup, onAction }) => {
 
                 {/* Contact Info */}
                 <div className="flex items-center gap-3 min-w-[220px]">
-                    <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-teal-400 flex items-center justify-center text-white font-bold text-sm">
                         <img src="https://kit19.com/assets/custom/img/img_avatar.png" className='rounded-full' alt="person" />
                     </div>
                     <div>
@@ -210,10 +210,10 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 group relative"
+            className="bg-white overflow-hidden cursor-pointer rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 group relative"
         >
             {/* Status Bar */}
-            <div className={`h-1.5 bg-gradient-to-r ${config.gradient} rounded-t-2xl`} />
+            <div className={`h-0.5 bg-gradient-to-r ${config.gradient} rounded-t-2xl`} />
 
             {/* Card Content */}
             <div className="p-5">
@@ -254,7 +254,7 @@ const FollowupCard = ({ followup, onAction, viewMode = 'grid' }) => {
                 {/* Contact Info */}
                 <div className="space-y-3 mb-4">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-gray-50 to-slate-50">
-                        <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center text-white font-bold text-sm">
+                        <div className="w-10 h-10 rounded-full bg-teal-400 flex items-center justify-center text-white font-bold text-sm">
                             <img src="https://kit19.com/assets/custom/img/img_avatar.png" className='rounded-full' alt="person" />
                         </div>
                         <div className="flex-1">

@@ -21,7 +21,7 @@ const DuplicateList = ({
         <p className="text-xs text-gray-500 mt-0.5">Select a group to view and merge</p>
       </div>
       
-      <div className="divide-y divide-gray-100 max-h-[calc(100vh-420px)] overflow-y-auto">
+      <div className="divide-y divide-gray-100 max-h-[calc(100vh-320px)] overflow-y-auto">
         {duplicates.map(record => (
           <DuplicateCard
             key={record.id}

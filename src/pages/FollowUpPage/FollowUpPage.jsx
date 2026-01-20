@@ -20,8 +20,8 @@ const FollowUpPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [viewMode, setViewMode] = useState('grid');
     
-    const itemsPerPage = 8;
-    const totalRecords = 57;
+    const itemsPerPage = 10;
+    const totalRecords = 50;
     const totalPages = Math.ceil(totalRecords / itemsPerPage);
 
     // Calculate stats
@@ -76,7 +76,7 @@ const FollowUpPage = () => {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Sidebar Accent */}
-            <div className="fixed left-0 -top-[4px] bottom-0 w-1 bg-gray-300" />
+            <div className="fixed left-0 -top-[4px] bottom-0 w-1 bg-teal-200" />
 
             {/* Main Container */}
             <div className="">
@@ -88,43 +88,46 @@ const FollowUpPage = () => {
 
                 {/* Content */}
                 <main className="py-6">
-                    {/* Filter Checkboxes */}
-                    <div className="flex items-center gap-6 mb-6 px-6">
-                        {Object.entries(statusConfig).map(([key, config]) => {
-                            const IconComponent = config.icon;
-                            return (
-                                <label
-                                    key={key}
-                                    className="flex items-center gap-2 cursor-pointer group"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={activeFilters.includes(key)}
-                                        onChange={() => handleFilterClick(key)}
-                                        className="w-5 h-5 rounded border-2 border-gray-300 text-teal-600 focus:ring-2 focus:ring-teal-500 focus:ring-offset-0 cursor-pointer transition-all"
-                                    />
-                                    <span className={`flex items-center gap-1 text-sm font-medium transition-colors ${
-                                        activeFilters.includes(key) ? 'text-gray-900' : 'text-gray-500'
-                                    }`}>
-                                        <IconComponent className={`w-6 h-6 ${config.text}`} />
-                                        {config.label}
-                                    </span>
-                                </label>
-                            );
-                        })}
-                    </div>
+                    {/* Combined Filter Checkboxes and Toolbar */}
+                    <div className="flex items-center justify-between mb-6 px-6">
+                        {/* Left side - Filter Checkboxes */}
+                        <div className="flex items-center gap-6">
+                            {Object.entries(statusConfig).map(([key, config]) => {
+                                const IconComponent = config.icon;
+                                return (
+                                    <label
+                                        key={key}
+                                        className="flex items-center gap-2 cursor-pointer group"
+                                    >
+                                        <input
+                                            type="checkbox"
+                                            checked={activeFilters.includes(key)}
+                                            onChange={() => handleFilterClick(key)}
+                                            className="w-5 h-5 rounded border-2 border-gray-300 text-teal-500 focus:ring-2 focus:ring-teal-400/30 focus:ring-offset-0 cursor-pointer transition-all"
+                                        />
+                                        <span className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                                            activeFilters.includes(key) ? 'text-gray-900' : 'text-gray-500'
+                                        }`}>
+                                            <IconComponent className={`w-6 h-6 ${config.text}`} />
+                                            {config.label}
+                                        </span>
+                                    </label>
+                                );
+                            })}
+                        </div>
 
-                    {/* Toolbar */}
-                    <FollowupToolbar
-                        activeFilters={activeFilters}
-                        setActiveFilters={setActiveFilters}
-                        allFiltersActive={allFiltersActive}
-                        onAllFiltersClick={handleAllFiltersClick}
-                        viewMode={viewMode}
-                        setViewMode={setViewMode}
-                        filteredCount={filteredFollowups.length}
-                        totalRecords={totalRecords}
-                    />
+                        {/* Right side - Toolbar */}
+                        <FollowupToolbar
+                            activeFilters={activeFilters}
+                            setActiveFilters={setActiveFilters}
+                            allFiltersActive={allFiltersActive}
+                            onAllFiltersClick={handleAllFiltersClick}
+                            viewMode={viewMode}
+                            setViewMode={setViewMode}
+                            filteredCount={filteredFollowups.length}
+                            totalRecords={totalRecords}
+                        />
+                    </div>
 
                     {/* Cards Grid */}
                     {activeFilters.length === 0 ? (
@@ -138,7 +141,7 @@ const FollowUpPage = () => {
                             <p className="text-gray-500 mb-6">Please select at least one filter to view follow-ups</p>
                             <button
                                 onClick={handleAllFiltersClick}
-                                className="px-6 py-3 bg-teal-600 text-white rounded-xl font-medium hover:bg-teal-700 transition-all"
+                                className="px-6 py-3 bg-teal-500 text-white rounded-xl font-medium hover:bg-teal-600 transition-all shadow-sm"
                             >
                                 Show All Follow-ups
                             </button>
