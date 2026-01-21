@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Plus, TrendingUp } from 'lucide-react';
 import OpportunityCard from './OpportunityCard';
 
-const StageColumn = ({ stage, opportunities, onAddOpportunity, onDropOpportunity }) => {
+const StageColumn = ({ stage, opportunities, onAddOpportunity, onDropOpportunity, onDragStart, onDragEnd }) => {
   const stageOpportunities = opportunities.filter(opp => opp.stage === stage.id);
   const totalValue = stageOpportunities.reduce((sum, opp) => sum + opp.amount, 0);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -29,11 +29,14 @@ const StageColumn = ({ stage, opportunities, onAddOpportunity, onDropOpportunity
     if (currentStage !== stage.id) {
       onDropOpportunity(opportunityId, stage.id);
     }
+    
+    // Close the modal after dropping
+    if (onDragEnd) onDragEnd();
   };
 
   return (
     <div 
-      className={`bg-white rounded-lg border-2 min-h-[600px] flex flex-col transition-all ${
+      className={`bg-white overflow-hidden rounded-lg border-2 min-h-[600px] flex flex-col transition-all ${
         isDragOver 
           ? `border-dashed ${stage.color.replace('bg-', 'border-')} bg-opacity-5 ${stage.lightColor}` 
           : 'border-gray-200 border-solid'
@@ -74,6 +77,8 @@ const StageColumn = ({ stage, opportunities, onAddOpportunity, onDropOpportunity
               <OpportunityCard 
                 key={opp.id} 
                 opportunity={opp}
+                onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
               />
             ))}
           </AnimatePresence>

@@ -11,7 +11,7 @@ const OpportunityCard = ({ opportunity, onDragStart, onDragEnd }) => {
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('opportunityId', opportunity.id);
     e.dataTransfer.setData('currentStage', opportunity.stage);
-    if (onDragStart) onDragStart(opportunity);
+    if (onDragStart) onDragStart(opportunity.id);
   };
 
   const handleDragEnd = (e) => {
