@@ -12,17 +12,24 @@ import SendSMSForm from '../../../components/EnquiriesForms/SendSMSForm';
 import SendVoice from '../Forms/SendVoice';
 import AddNotes from '../../../components/LeadForm/AddNotes';
 import UploadData from '../../../components/LeadForm/UploadData';
+import AddTask from '../Forms/AddTask';
 
 const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => {
     const [openMenuId, setOpenMenuId] = useState(null);
     const [openMoreMenuId, setOpenMoreMenuId] = useState(null);
     const [hoveredProfileId, setHoveredProfileId] = useState(null);
+
+    // ------------AllForms---------
     const [showFollowupForm, setShowFollowupForm] = useState(false);
     const [showMailForm, setShowMailForm] = useState(false);
     const [showSMSForm, setShowSMSForm] = useState(false);
     const [showVoiceForm, setShowVoiceForm] = useState(false);
     const [showAddNoteForm, setShowAddNoteForm] = useState(false);
     const [showUploadDataForm, setShowUploadDataForm] = useState(false);
+    const [showAddTaskForm, setShowAddTaskForm] = useState(false);
+
+
+
     const moreMenuRef = useRef(null);
 
     useEffect(() => {
@@ -318,6 +325,8 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                     setShowAddNoteForm(true)
                                                                 } else if (action === 'upload') {
                                                                     setShowUploadDataForm(true) 
+                                                                } else if (action === 'addtask') {
+                                                                    setShowAddTaskForm(true) 
                                                                 }
                                                             }}
                                                         />
@@ -481,6 +490,31 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                 }
             >
                 <UploadData />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={showAddTaskForm}
+                onClose={() => setShowAddTaskForm(false)}
+                title="Add task"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowAddTaskForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='Upload'
+                            onClick={() => setShowAddTaskForm(false)}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddTask />
             </PopUpModal>
 
         </div>

@@ -44,7 +44,8 @@ export const sampleTasks = [
         completedTime: '16:40:38',
         outcome: 'pending',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     },
@@ -59,7 +60,8 @@ export const sampleTasks = [
         completedTime: '16:57:51',
         outcome: 'pending',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema, Rajesh Singh',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     },
@@ -74,7 +76,8 @@ export const sampleTasks = [
         completedTime: '10:00:00',
         outcome: 'pending',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     },
@@ -89,7 +92,8 @@ export const sampleTasks = [
         completedTime: '09:00:00',
         outcome: 'pending',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     },
@@ -104,7 +108,8 @@ export const sampleTasks = [
         completedTime: '14:30:00',
         outcome: 'pending',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     },
@@ -119,7 +124,8 @@ export const sampleTasks = [
         completedTime: '11:20:00',
         outcome: 'success',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema, Rajesh Singh',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     },
@@ -134,7 +140,8 @@ export const sampleTasks = [
         completedTime: '17:00:00',
         outcome: 'pending',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     },
@@ -149,7 +156,8 @@ export const sampleTasks = [
         completedTime: '15:00:00',
         outcome: 'pending',
         relatedTo: 'testing432',
-        owner: 'Mukesh Kumar (kmukesh343)',
+        owner: 'Mukesh Kumar',
+        collaborators: 'Mohit Cheema',
         avatar: 'https://kit19.com/assets/custom/img/img_avatar.png',
         badge: 0
     }

@@ -3,7 +3,8 @@ import {
     CheckCircle2, Mail, MessageSquare, Phone, 
     FileText, Upload, 
     BadgePercent,
-    MessageCircle
+    MessageCircle,
+    Mic2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { BsClipboard2Check } from "react-icons/bs";
@@ -27,7 +28,7 @@ const TaskActionMenu = ({ task, onClose, onAction }) => {
         { id: 'followup', icon: CheckCircle2, label: 'Add Followup', color: 'text-emerald-500 hover:bg-emerald-50' },
         { id: 'mail', icon: Mail, label: 'Send Mail', color: 'text-blue-500 hover:bg-blue-50' },
         { id: 'sms', icon: MessageCircle, label: 'Send SMS', color: 'text-blue-500 hover:bg-blue-50' },
-        { id: 'voice', icon: Phone, label: 'Send Voice', color: 'text-orange-500 hover:bg-orange-50' },
+        { id: 'voice', icon: Mic2, label: 'Send Voice', color: 'text-orange-500 hover:bg-orange-50' },
         { id: 'notes', icon: FileText, label: 'Add Notes', color: 'text-cyan-500 hover:bg-cyan-50' },
         { id: 'upload', icon: Upload, label: 'Upload Document', color: 'text-pink-500 hover:bg-pink-50' },
         { id: 'addtask', icon: BsClipboard2Check, label: 'Add Task', color: 'text-blue-700 hover:bg-blue-50' },

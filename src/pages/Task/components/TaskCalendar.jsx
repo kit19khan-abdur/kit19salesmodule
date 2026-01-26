@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight, Calendar, Mail, Phone, MessageSquare, Trash2, MoreVertical, Edit, Mic, Users, UserPlus, Eye, CheckCircle2, MessageCircle, Mic2, Notebook, Upload, ClipboardCheck, CalendarCheck, PercentCircle } from 'lucide-react';
+import { FaWhatsapp } from 'react-icons/fa';
 import { taskStatusConfig } from '../constants';
 import TaskDetailModal from './TaskDetailModal';
+import { TfiLayoutAccordionList } from "react-icons/tfi";
 
 // Get day view (hourly breakdown)
 const getDayView = (date) => {
@@ -286,8 +288,195 @@ const WeekView = ({ data, tasks, getTasksForHour, onTaskClick }) => {
     );
 };
 
+// Task Item with Hover Menu for Day View
+const TaskItemWithMenu = ({ task, onTaskClick, hoveredTaskId, setHoveredTaskId, showActionMenu, setShowActionMenu }) => {
+    const statusConfig = taskStatusConfig[task.status] || taskStatusConfig.open;
+    const menuRef = React.useRef(null);
+
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setShowActionMenu(null);
+            }
+        };
+
+        if (showActionMenu === task.id) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [showActionMenu, task.id, setShowActionMenu]);
+
+    return (
+        <div
+            className="relative group"
+            onMouseEnter={() => setHoveredTaskId(task.id)}
+            onMouseLeave={() => setHoveredTaskId(null)}
+        >
+            <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => onTaskClick && onTaskClick(task)}
+                className={`p-3 rounded-lg border-l-3 ${statusConfig.border} bg-white hover:shadow-lg transition-all cursor-pointer`}
+            >
+                <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 flex-1">
+                        <statusConfig.icon className={`w-5 h-5 ${statusConfig.color} mt-0.5 flex-shrink-0`} />
+                        <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-gray-900 text-sm mb-1">{task.title}</h4>
+                            <p className="text-xs text-gray-600 line-clamp-1 mb-2">{task.description}</p>
+                            <div className="flex items-center gap-3 mb-2">
+                                <span className="text-xs text-gray-500">{task.relatedTo}</span>
+                                {task.dueTime && (
+                                    <span className="text-xs font-medium text-blue-600">{task.dueTime}</span>
+                                )}
+                            </div>
+                            <div className="flex items-center justify-between gap-2">
+                                <div className="flex flex-col gap-0.5 text-xs text-gray-600">
+                                    <span>Owner: <span className="font-medium text-gray-700">{task.owner}</span></span>
+                                    {task.collaborators && (
+                                        <span>Collaborators: <span className="font-medium text-gray-700">{task.collaborators}</span></span>
+                                    )}
+                                </div>
+                                {/* <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        console.log('Add comment to task:', task.id);
+                                    }}
+                                    className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                                    title="Add Comment"
+                                >
+                                    <MessageCircle className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                                </button> */}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* Hover Action Icons */}
+            {hoveredTaskId === task.id && (
+                <div className="absolute top-2 right-2 flex items-center gap-1 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg shadow-lg border border-gray-200 z-10">
+                    <button
+                        title="View"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Send email to', task.relatedTo);
+                        }}
+                    >
+                        <Eye className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Add Followup"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Call', task.relatedTo);
+                        }}
+                    >
+                        <CheckCircle2 className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Send Mail"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Send WhatsApp to', task.relatedTo);
+                        }}
+                    >
+                        <Mail className="w-4 h-4 text-gray-400 hover:text-[#2545d3]" />
+                    </button>
+                    <button
+                        title="Send SMS"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Send SMS to', task.relatedTo);
+                        }}
+                    >
+                        <MessageCircle className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Send Voice"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Delete task', task.title);
+                        }}
+                    >
+                        <Mic2 className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Add Note"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Delete task', task.title);
+                        }}
+                    >
+                        <Notebook className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Upload Document"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Delete task', task.title);
+                        }}
+                    >
+                        <Upload className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Add Task"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Delete task', task.title);
+                        }}
+                    >
+                        <ClipboardCheck className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Add Appointment"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Delete task', task.title);
+                        }}
+                    >
+                        <CalendarCheck className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Add Deal"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Delete task', task.title);
+                        }}
+                    >
+                        <PercentCircle className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                    <button
+                        title="Add Webform"
+                        className="p-1.5 hover:bg-blue-50 rounded transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Delete task', task.title);
+                        }}
+                    >
+                        <TfiLayoutAccordionList className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                    </button>
+                </div>
+            )}
+        </div>
+    );
+};
+
 // Day View Component
 const DayView = ({ data, tasks, getTasksForHour, onTaskClick }) => {
+    const [hoveredTaskId, setHoveredTaskId] = useState(null);
+    const [showActionMenu, setShowActionMenu] = useState(null);
+    
     return (
         <div className="space-y-px bg-gray-200">
             {data.hours.map((hour) => {
@@ -301,7 +490,15 @@ const DayView = ({ data, tasks, getTasksForHour, onTaskClick }) => {
                         <div className="flex-1 p-3 min-h-[80px]">
                             <div className="space-y-2">
                                 {hourTasks.map((task, idx) => (
-                                    <TaskItem key={idx} task={task} onTaskClick={onTaskClick} />
+                                    <TaskItemWithMenu 
+                                        key={idx} 
+                                        task={task} 
+                                        onTaskClick={onTaskClick}
+                                        hoveredTaskId={hoveredTaskId}
+                                        setHoveredTaskId={setHoveredTaskId}
+                                        showActionMenu={showActionMenu}
+                                        setShowActionMenu={setShowActionMenu}
+                                    />
                                 ))}
                             </div>
                         </div>
@@ -487,7 +684,7 @@ const YearView = ({ data, tasks, getTasksForDate, onTaskClick }) => {
                                         >
                                             {day.getDate()}
                                             {dayTaskCount > 0 && isCurrentMonth && (
-                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-white text-[8px] flex items-center justify-center font-bold">
+                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full text-white text-[8px] flex items-center justify-center font-bold">
                                                     {dayTaskCount}
                                                 </div>
                                             )}
@@ -538,9 +735,23 @@ const TaskItem = ({ task, onTaskClick, compact = false, mini = false }) => {
         return (
             <div
                 onClick={() => onTaskClick && onTaskClick(task)}
-                className={`text-xs px-2 py-1 rounded cursor-pointer ${statusConfig.light} ${statusConfig.text} truncate hover:opacity-80 transition-opacity`}
+                className={`text-xs px-2 py-1 rounded cursor-pointer ${statusConfig.light} ${statusConfig.text} hover:opacity-80 transition-opacity`}
             >
-                {task.title}
+                <div className="truncate font-semibold">{task.title}</div>
+                <div className="flex items-center justify-between mt-1">
+                    <span className="text-[10px] text-gray-600 truncate">Owner: {task.owner}</span>
+                    <MessageCircle className="w-3 h-3 text-gray-400 hover:text-blue-600 cursor-pointer flex-shrink-0" 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Add comment');
+                        }}
+                    />
+                </div>
+                {task.collaborators && (
+                    <div className="text-[10px] text-gray-500 truncate mt-0.5">
+                        Collab: {task.collaborators}
+                    </div>
+                )}
             </div>
         );
     }
@@ -549,9 +760,9 @@ const TaskItem = ({ task, onTaskClick, compact = false, mini = false }) => {
         return (
             <div
                 onClick={() => onTaskClick && onTaskClick(task)}
-                className={`px-2 py-1.5 rounded-lg cursor-pointer border-l-2 ${statusConfig.border} bg-white hover:shadow-md transition-all`}
+                className={`px-3 py-2 rounded-lg cursor-pointer border-l-2 ${statusConfig.border} bg-white hover:shadow-md transition-all`}
             >
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-start justify-between gap-2 mb-1">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
                         <statusConfig.icon className={`w-3.5 h-3.5 ${statusConfig.color} flex-shrink-0`} />
                         <span className="text-xs font-semibold text-gray-900 truncate">{task.title}</span>
@@ -559,6 +770,24 @@ const TaskItem = ({ task, onTaskClick, compact = false, mini = false }) => {
                     {task.dueTime && (
                         <span className="text-xs text-gray-500 flex-shrink-0">{task.dueTime}</span>
                     )}
+                </div>
+                <div className="flex items-center justify-between gap-2 ml-5">
+                    <div className="flex flex-col gap-0.5 text-[10px] text-gray-600 flex-1 min-w-0">
+                        <span className="truncate">Owner: {task.owner}</span>
+                        {task.collaborators && (
+                            <span className="truncate">Collaborators: {task.collaborators}</span>
+                        )}
+                    </div>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            console.log('Add comment to task:', task.id);
+                        }}
+                        className="p-1 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
+                        title="Add Comment"
+                    >
+                        <MessageCircle className="w-3.5 h-3.5 text-gray-400 hover:text-blue-600" />
+                    </button>
                 </div>
             </div>
         );
@@ -576,12 +805,30 @@ const TaskItem = ({ task, onTaskClick, compact = false, mini = false }) => {
                     <statusConfig.icon className={`w-5 h-5 ${statusConfig.color} mt-0.5 flex-shrink-0`} />
                     <div className="flex-1 min-w-0">
                         <h4 className="font-semibold text-gray-900 text-sm mb-1">{task.title}</h4>
-                        <p className="text-xs text-gray-600 line-clamp-1">{task.description}</p>
-                        <div className="flex items-center gap-3 mt-2">
+                        <p className="text-xs text-gray-600 line-clamp-1 mb-2">{task.description}</p>
+                        <div className="flex items-center gap-3 mb-2">
                             <span className="text-xs text-gray-500">{task.relatedTo}</span>
                             {task.dueTime && (
                                 <span className="text-xs font-medium text-blue-600">{task.dueTime}</span>
                             )}
+                        </div>
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="flex flex-col gap-0.5 text-xs text-gray-600">
+                                <span>Owner: <span className="font-medium text-gray-700">{task.owner}</span></span>
+                                {task.collaborators && (
+                                    <span>Collaborators: <span className="font-medium text-gray-700">{task.collaborators}</span></span>
+                                )}
+                            </div>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log('Add comment to task:', task.id);
+                                }}
+                                className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+                                title="Add Comment"
+                            >
+                                <MessageCircle className="w-4 h-4 text-gray-400 hover:text-blue-600" />
+                            </button>
                         </div>
                     </div>
                 </div>
