@@ -47,7 +47,7 @@ const SendSMS = ({ onClose = () => {}, onSend = (data) => {} , initialRecipients
 
   return (
     <div className=" w-full max-w-2xl">
-      <div className="mb-3 text-sm text-blue-700 bg-blue-50 p-3 rounded">Info! You are about to perform a mass action on {selectedCount} record(s)</div>
+      {selectedCount >1 && (<div className="mb-3 text-sm text-blue-700 bg-blue-50 p-3 rounded">Info! You are about to perform a mass action on {selectedCount} record(s)</div>)}
 
       <div className="mb-4">
         <label className="inline-flex items-center mr-4">

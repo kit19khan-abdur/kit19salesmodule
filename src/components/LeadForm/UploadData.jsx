@@ -85,13 +85,6 @@ const UploadData = ({ onUpload }) => {
             <div className="mt-3">
                 <button
                     type="button"
-                    onClick={handleUpload}
-                    className="px-3 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                >
-                    Upload
-                </button>
-                <button
-                    type="button"
                     onClick={clearSelection}
                     className="ml-2 px-3 py-2 bg-white border border-gray-300 rounded text-sm hover:bg-gray-50"
                 >

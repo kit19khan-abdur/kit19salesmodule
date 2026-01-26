@@ -95,7 +95,7 @@ const FollowupListRow = ({ followup, onAction }) => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 group relative"
+            className="bg-white overflow-hidden rounded-2xl border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 group relative"
         >
             {/* Status Bar */}
             <div className={`h-1 bg-gradient-to-r ${config.gradient} rounded-t-2xl`} />

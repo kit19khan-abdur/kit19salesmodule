@@ -1215,7 +1215,7 @@ const LeadTable = ({
                                                         <MoreVertical className="w-6 h-6 text-gray-600 hover:text-gray-800" />
                                                     </span>
                                                 </div>
-                                                {/* Row action menu dropdown */}
+                                                {/* Row action menu dropdown */} 
                                                 <RowActionMenu
                                                     show={rowMenu.show && rowMenu.rowId === lead.ID}
                                                     anchorRef={{ current: rowMenuAnchorRefs.current[lead.ID] }}

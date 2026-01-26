@@ -421,7 +421,7 @@ const Lead = () => {
                                 <div>
                                     <h1 className="text-2xl font-bold text-gray-900 mb-2">{currentLead?.PersonName}</h1>
                                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                                        <div 
+                                        <div
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setShowCallWidget(true);
@@ -460,7 +460,7 @@ const Lead = () => {
                                     <div className="grid grid-cols-2 gap-6">
                                         <div>
                                             <label className="text-xs text-gray-500 uppercase tracking-wide">Phone Number</label>
-                                            <p 
+                                            <p
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     setShowCallWidget(true);
@@ -560,7 +560,7 @@ const Lead = () => {
                             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Contact Options</h3>
                                 <div className="space-y-3">
-                                    <button 
+                                    <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setShowCallWidget(true);

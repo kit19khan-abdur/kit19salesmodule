@@ -25,7 +25,7 @@ const OpportunityCard = ({ opportunity, onDragStart, onDragEnd }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      draggable
+      draggable={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       className={`bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all cursor-move group ${
@@ -38,6 +38,7 @@ const OpportunityCard = ({ opportunity, onDragStart, onDragEnd }) => {
           <h3 className="font-semibold text-gray-900 text-sm line-clamp-1">{opportunity.title}</h3>
           <button
             onClick={() => setShowMenu(!showMenu)}
+            onMouseDown={(e) => e.stopPropagation()}
             className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded transition-all"
           >
             <MoreVertical className="w-4 h-4 text-gray-400" />

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { TaskHeader, TaskFilters, TaskTable, TaskPagination } from './components';
+import { Table, Calendar } from 'lucide-react';
+import { TaskHeader, TaskFilters, TaskTable, TaskPagination, TaskCalendar, TaskDetailModal } from './components';
 import { sampleTasks, ITEMS_PER_PAGE } from './constants';
 
 const Task = () => {
@@ -11,6 +12,9 @@ const Task = () => {
     });
     const [selectedTasks, setSelectedTasks] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
+    const [viewMode, setViewMode] = useState('table'); // 'table' or 'calendar'
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
     // Filter and search tasks
     const filteredTasks = useMemo(() => {
@@ -53,7 +57,12 @@ const Task = () => {
     // Handle task actions
     const handleTaskAction = (actionId, task) => {
         console.log('Action:', actionId, 'Task:', task);
-        // Implement your action logic here
+        
+        if (actionId === 'view') {
+            setSelectedTask(task);
+            setShowDetailModal(true);
+        }
+        // Implement other action logic here
         // e.g., open modal for followup, send mail, etc.
     };
 
@@ -68,30 +77,77 @@ const Task = () => {
                     totalTasks={filteredTasks.length}
                 />
 
-                {/* Filters */}
-                <TaskFilters 
-                    filters={filters}
-                    setFilters={setFilters}
-                />
+                {/* Filters and View Toggle Combined */}
+                <div className="px-8 py-4 bg-white border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                        {/* Left: Filters */}
+                        <div className="flex items-center gap-2">
+                            <TaskFilters 
+                                filters={filters}
+                                setFilters={setFilters}
+                            />
+                        </div>
+
+                        {/* Right: View Toggle and Task Count */}
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => setViewMode('table')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                                    viewMode === 'table'
+                                        ? 'bg-blue-500 text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                <Table className="w-4 h-4" />
+                                Table View
+                            </button>
+                            <button
+                                onClick={() => setViewMode('calendar')}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                                    viewMode === 'calendar'
+                                        ? 'bg-blue-500 text-white shadow-md'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                }`}
+                            >
+                                <Calendar className="w-4 h-4" />
+                                Calendar View
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Task Table */}
-                <TaskTable 
-                    tasks={paginatedTasks}
-                    selectedTasks={selectedTasks}
-                    setSelectedTasks={setSelectedTasks}
-                    onTaskAction={handleTaskAction}
-                />
+                {viewMode === 'table' && (
+                    <>
+                        <TaskTable 
+                            tasks={paginatedTasks}
+                            selectedTasks={selectedTasks}
+                            setSelectedTasks={setSelectedTasks}
+                            onTaskAction={handleTaskAction}
+                        />
 
-                {/* Pagination */}
-                {filteredTasks.length > 0 && (
-                    <TaskPagination 
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        onPageChange={handlePageChange}
-                        totalEntries={filteredTasks.length}
-                        startEntry={startEntry}
-                        endEntry={endEntry}
-                    />
+                        {/* Pagination */}
+                        {filteredTasks.length > 0 && (
+                            <TaskPagination 
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                                totalEntries={filteredTasks.length}
+                                startEntry={startEntry}
+                                endEntry={endEntry}
+                            />
+                        )}
+                    </>
+                )}
+
+                {/* Calendar View */}
+                {viewMode === 'calendar' && (
+                    <div className="p-8">
+                        <TaskCalendar 
+                            tasks={filteredTasks}
+                            onTaskAction={handleTaskAction}
+                        />
+                    </div>
                 )}
 
                 {/* Empty State */}
@@ -106,6 +162,16 @@ const Task = () => {
                         <p className="text-gray-500">Try adjusting your search or filter criteria</p>
                     </div>
                 )}
+
+                {/* Task Detail Modal */}
+                <TaskDetailModal 
+                    task={selectedTask}
+                    isOpen={showDetailModal}
+                    onClose={() => {
+                        setShowDetailModal(false);
+                        setSelectedTask(null);
+                    }}
+                />
             </div>
         </div>
     );
