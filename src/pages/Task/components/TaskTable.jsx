@@ -13,6 +13,10 @@ import SendVoice from '../Forms/SendVoice';
 import AddNotes from '../../../components/LeadForm/AddNotes';
 import UploadData from '../../../components/LeadForm/UploadData';
 import AddTask from '../Forms/AddTask';
+import AddAppointment from '../Forms/AddAppointment';
+import AddDeal from '../Forms/AddDeal';
+import WebForm from '../../../components/LeadForm/WebForm';
+import MassUpdate from '../Forms/MassUpdate';
 
 const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => {
     const [openMenuId, setOpenMenuId] = useState(null);
@@ -27,6 +31,12 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
     const [showAddNoteForm, setShowAddNoteForm] = useState(false);
     const [showUploadDataForm, setShowUploadDataForm] = useState(false);
     const [showAddTaskForm, setShowAddTaskForm] = useState(false);
+    const [showAddAppointmentForm, setShowAddAppointmentForm] = useState(false);
+    const [showAddDealForm, setShowAddDealForm] = useState(false);
+    const [showWebForm, setShowWebForm] = useState(false);
+
+// ------------------------------Mass Forms-------------------------------
+    const [showMassUpdateForm, setShowMassUpdateForm] = useState(false);
 
 
 
@@ -62,6 +72,53 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
 
     return (
         <div className="px-8 py-6">
+            {/* Mass Update Button - Shows when tasks are selected */}
+            <AnimatePresence>
+                {selectedTasks.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.2 }}
+                        className="mb-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 shadow-sm"
+                    >
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg font-semibold">
+                                    {selectedTasks.length}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-900">
+                                        {selectedTasks.length === 1 ? '1 task selected' : `${selectedTasks.length} tasks selected`}
+                                    </p>
+                                    <p className="text-xs text-gray-600">
+                                        Update multiple tasks at once
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => setSelectedTasks([])}
+                                    className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                >
+                                    Clear Selection
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        // Handle mass update
+                                        setShowMassUpdateForm(true) //selectedTasks
+                                        setSelectedTasks([])
+                                    }}
+                                    className="px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all transform hover:scale-105"
+                                >
+                                    Mass Update
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
@@ -327,6 +384,12 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                     setShowUploadDataForm(true) 
                                                                 } else if (action === 'addtask') {
                                                                     setShowAddTaskForm(true) 
+                                                                } else if (action === 'addappointment') {
+                                                                    setShowAddAppointmentForm(true) 
+                                                                } else if (action === 'adddeal') {
+                                                                    setShowAddDealForm(true) 
+                                                                } else if (action === 'fillWebform') {
+                                                                    setShowWebForm(true) 
                                                                 }
                                                             }}
                                                         />
@@ -356,7 +419,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                             Cancel
                         </Button>
                         <Button
-                            variant='primary'
+                            variant='success'
                             onClick={() => setShowFollowupForm(false)}
                         >
                             Save
@@ -381,7 +444,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                             Cancel
                         </Button>
                         <Button
-                            variant='primary'
+                            variant='success'
                             onClick={() => setShowMailForm(false)}
                         >
                             Save
@@ -406,7 +469,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                             Cancel
                         </Button>
                         <Button
-                            variant='primary'
+                            variant='success'
                             onClick={() => setShowSMSForm(false)}
                         >
                             Save
@@ -431,7 +494,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                             Cancel
                         </Button>
                         <Button
-                            variant='primary'
+                            variant='success'
                             onClick={() => setShowVoiceForm(false)}
                         >
                             Save
@@ -445,7 +508,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
             <PopUpModal
                 isOpen={showAddNoteForm}
                 onClose={() => setShowAddNoteForm(false)}
-                title="Send Voice"
+                title="Add Comments/Notes"
                 size="lg"
                 footer={
                     <div className="flex justify-between w-full">
@@ -456,7 +519,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                             Cancel
                         </Button>
                         <Button
-                            variant='primary'
+                            variant='success'
                             onClick={() => setShowAddNoteForm(false)}
                         >
                             Save
@@ -481,7 +544,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                             Cancel
                         </Button>
                         <Button
-                            variant='Upload'
+                            variant='success'
                             onClick={() => setShowUploadDataForm(false)}
                         >
                             Save
@@ -506,7 +569,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                             Cancel
                         </Button>
                         <Button
-                            variant='Upload'
+                            variant='success'
                             onClick={() => setShowAddTaskForm(false)}
                         >
                             Save
@@ -515,6 +578,106 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                 }
             >
                 <AddTask />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={showAddAppointmentForm}
+                onClose={() => setShowAddAppointmentForm(false)}
+                title="Add Appointment"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowAddAppointmentForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='success'
+                            onClick={() => setShowAddAppointmentForm(false)}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddAppointment />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={showAddDealForm}
+                onClose={() => setShowAddDealForm(false)}
+                title="Add Deal"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowAddDealForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='success'
+                            onClick={() => setShowAddDealForm(false)}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <AddDeal />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={showWebForm}
+                onClose={() => setShowWebForm(false)}
+                title="Fill Webform"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowWebForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='success'
+                            onClick={() => setShowWebForm(false)}
+                        >
+                            open
+                        </Button>
+                    </div>
+                }
+            >
+                <WebForm />
+            </PopUpModal>
+
+            <PopUpModal
+                isOpen={showMassUpdateForm}
+                onClose={() => setShowMassUpdateForm(false)}
+                title="Mass Update Task"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowMassUpdateForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='success'
+                            onClick={() => setShowMassUpdateForm(false)}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <MassUpdate />
             </PopUpModal>
 
         </div>

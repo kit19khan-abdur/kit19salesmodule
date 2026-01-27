@@ -1,25 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Clock, User, FileText, Tag, CheckCircle, MapPin } from 'lucide-react';
+import { X, Calendar, Clock, User, FileText, Tag, CheckCircle, MapPin, Mail, MessageCircle, Mic2, Notebook, Upload, ClipboardCheck, CalendarCheck, PercentCircle } from 'lucide-react';
+import { TfiLayoutAccordionList } from "react-icons/tfi";
 import { taskStatusConfig } from '../constants';
 
 const TaskDetailModal = ({ task, isOpen, onClose }) => {
+    // Form states
+
     if (!task) return null;
 
     const statusConfig = taskStatusConfig[task.status];
 
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-                    {/* Backdrop */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-                    />
+        <>
+            <AnimatePresence>
+                {isOpen && (
+                    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                        {/* Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={onClose}
+                            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                        />
 
                     {/* Modal */}
                     <motion.div
@@ -124,28 +128,23 @@ const TaskDetailModal = ({ task, isOpen, onClose }) => {
 
                         {/* Footer */}
                         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-                            <div className="flex items-center justify-end gap-3">
-                                <button
-                                    onClick={onClose}
-                                    className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-colors"
-                                >
-                                    Close
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        // Handle edit action
-                                        onClose();
-                                    }}
-                                    className="px-5 py-2.5 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600 transition-colors"
-                                >
-                                    Edit Task
-                                </button>
+                            <div className="flex flex-col gap-3">
+                                <div className="flex justify-end">
+                                    <button
+                                        onClick={onClose}
+                                        className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
                 </div>
             )}
-        </AnimatePresence>
+            </AnimatePresence>
+
+        </>
     );
 };
 
