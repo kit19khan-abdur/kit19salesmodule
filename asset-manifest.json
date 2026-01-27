@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/kit19salesmodule/static/css/main.4bc2355a.css",
+    "main.js": "/kit19salesmodule/static/js/main.8e39b35b.js",
+    "static/media/nodata.gif": "/kit19salesmodule/static/media/nodata.c7bbe0eb57af2be5ce99.gif",
+    "static/media/salesfunnel.jpg": "/kit19salesmodule/static/media/salesfunnel.3196fa2abe727ecf5a39.jpg",
+    "static/media/moneybag.svg": "/kit19salesmodule/static/media/moneybag.5eb222375c122ece92c1ce105d8134f9.svg",
+    "index.html": "/kit19salesmodule/index.html",
+    "main.4bc2355a.css.map": "/kit19salesmodule/static/css/main.4bc2355a.css.map",
+    "main.8e39b35b.js.map": "/kit19salesmodule/static/js/main.8e39b35b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4bc2355a.css",
+    "static/js/main.8e39b35b.js"
+  ]
+}
