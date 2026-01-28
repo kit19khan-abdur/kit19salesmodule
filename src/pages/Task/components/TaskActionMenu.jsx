@@ -43,7 +43,7 @@ const TaskActionMenu = ({ task, onClose, onAction }) => {
             initial={{ opacity: 0, scale: 0.9, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -10 }}
-            className="absolute right-0 top-full mt-2 bg-white  max-h-[200px] overflow-y-auto rounded-xl shadow-2xl border border-gray-100 p-2 z-50 min-w-[200px]"
+            className="absolute left-0 top-full mt-2 bg-white  max-h-[200px] overflow-y-auto rounded-xl shadow-2xl border border-gray-100 p-2 z-50 min-w-[200px]"
         >
             {actions.map((action) => (
                 <button
@@ -52,7 +52,7 @@ const TaskActionMenu = ({ task, onClose, onAction }) => {
                         onAction(action.id);
                         onClose();
                     }}
-                    className={`w-full flex items-center gap-3  px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${action.color}`}
+                    className={`w-full flex items-center gap-3  px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#929191]`}
                 >
                     <action.icon className="w-4 h-4" />
                     {action.label}

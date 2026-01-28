@@ -55,7 +55,7 @@ const Appointment = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Sidebar Accent */}
-      <div className="fixed left-0 -top-[4px] bottom-0 w-1 bg-purple-200" />
+      <div className="fixed left-0 -top-[4px] bottom-0 w-1 bg-blue-200" />
 
       {/* Main Container */}
       <div className="">
@@ -82,7 +82,7 @@ const Appointment = () => {
                       type="checkbox"
                       checked={activeFilters.includes(key)}
                       onChange={() => handleFilterClick(key)}
-                      className="w-5 h-5 rounded border-2 border-gray-300 text-purple-500 focus:ring-2 focus:ring-purple-400/30 focus:ring-offset-0 cursor-pointer transition-all"
+                      className="w-5 h-5 rounded border-2 border-gray-300 text-blue-500 focus:ring-2 focus:ring-blue-400/30 focus:ring-offset-0 cursor-pointer transition-all"
                     />
                     <span className={`flex items-center gap-1 text-sm font-medium transition-colors ${
                       activeFilters.includes(key) ? 'text-gray-900' : 'text-gray-500'
@@ -123,7 +123,7 @@ const Appointment = () => {
               <p className="text-gray-500 mb-6">Please select at least one filter to view appointments</p>
               <button
                 onClick={handleShowAllClick}
-                className="px-6 py-3 bg-purple-500 text-white rounded-xl font-medium hover:bg-purple-600 transition-all shadow-sm"
+                className="px-6 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-all shadow-sm"
               >
                 Show All Appointments
               </button>

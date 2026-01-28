@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MoreHorizontal, Settings, ExternalLink, Eye, Edit, CheckCircle, MessageSquare, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Settings, ExternalLink, Eye, Edit, CheckCircle, MessageSquare, Trash2, EllipsisVertical, Plus, CheckSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ImPlus } from "react-icons/im";
 import TaskActionMenu from './TaskActionMenu';
 import { taskStatusConfig } from '../constants';
 import PopUpModal from '../../../components/PopUpModal/PopUpModal';
@@ -132,6 +133,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                         className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                     />
                                 </th>
+                                <th className="px-2 py-4 text-left text-sm font-semibold text-gray-900"></th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Task</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Related to</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Action</th>
@@ -150,26 +152,65 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                             />
                                         </td>
+                                        <td className="px-2 py-4">
+                                            <div className="relative">
+                                                <button
+                                                    onClick={() => setOpenMenuId(openMenuId === task.id ? null : task.id)}
+                                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                                >
+                                                    <EllipsisVertical className="w-5 h-5 text-gray-400" />
+                                                </button>
+                                                {openMenuId === task.id && (
+                                                    <TaskActionMenu
+                                                        task={task}
+                                                        onClose={() => setOpenMenuId(null)}
+                                                        onAction={action => {
+                                                            if (action === 'followup') {
+                                                                setShowFollowupForm(true)
+                                                            }else if (action === 'mail') {
+                                                                setShowMailForm(true)
+                                                            }else if (action === 'sms') {
+                                                                setShowSMSForm(true)
+                                                            }else if (action === 'voice') {
+                                                                setShowVoiceForm(true)
+                                                            }else if (action === 'notes') {
+                                                                setShowAddNoteForm(true)
+                                                            } else if (action === 'upload') {
+                                                                setShowUploadDataForm(true) 
+                                                            } else if (action === 'addtask') {
+                                                                setShowAddTaskForm(true) 
+                                                            } else if (action === 'addappointment') {
+                                                                setShowAddAppointmentForm(true) 
+                                                            } else if (action === 'adddeal') {
+                                                                setShowAddDealForm(true) 
+                                                            } else if (action === 'fillWebform') {
+                                                                setShowWebForm(true) 
+                                                            }
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+                                        </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-start gap-3">
+                                            <div className={`flex items-start gap-3 ${task.status === 'completed' ? 'line-through opacity-60' : ''}`}>
                                                 <div className={`p-2 rounded-lg ${statusConfig.bg} mt-1`}>
                                                     <statusConfig.icon className={`w-5 h-5 ${statusConfig.color}`} />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
+                                                    <h3 className={`font-semibold text-gray-900 mb-1 line-clamp-1 ${task.status === 'completed' ? 'line-through' : ''}`}>
                                                         {task.title}
                                                     </h3>
-                                                    <p className="text-sm text-gray-500 mb-2 line-clamp-2">
+                                                    <p className={`text-sm text-gray-500 mb-2 line-clamp-2 ${task.status === 'completed' ? 'line-through' : ''}`}>
                                                         {task.description}
                                                     </p>
-                                                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                    <div className={`flex items-center gap-4 text-xs text-gray-500 ${task.status === 'completed' ? 'line-through' : ''}`}>
                                                         <span className="font-medium">
                                                             Completed: <span className="text-gray-700">{task.completedDate}</span>
                                                         </span>
                                                         <span>{task.completedTime}</span>
                                                     </div>
                                                     <div className="mt-1">
-                                                        <span className="text-xs font-medium text-green-600">
+                                                        <span className={`text-xs font-medium text-green-600 ${task.status === 'completed' ? 'line-through' : ''}`}>
                                                             Outcome: {task.outcome}
                                                         </span>
                                                     </div>
@@ -310,6 +351,9 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                     <p className="text-xs text-gray-500">
                                                         Owner: <span className="text-gray-700">{task.owner}</span>
                                                     </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        Collaborator: <span className="text-gray-700">{task.collaborator || 'processdemo'}</span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </td>
@@ -320,7 +364,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                         onClick={() => setOpenMoreMenuId(openMoreMenuId === task.id ? null : task.id)}
                                                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                                     >
-                                                        <MoreHorizontal className="w-5 h-5 text-gray-400" />
+                                                        <Settings className="w-5 h-5 text-gray-400" />
                                                     </button>
                                                     <AnimatePresence>
                                                         {openMoreMenuId === task.id && (
@@ -329,7 +373,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                                                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
                                                                 transition={{ duration: 0.2 }}
-                                                                className="absolute right-0 top-40% mt-2 w-56 bg-white rounded-xl shadow-2xl  overflow-hidden z-50"
+                                                                className="absolute -right-[50%] top-40% mt-2 w-56 bg-white rounded-xl shadow-2xl  overflow-hidden z-50"
                                                             >
                                                                 {/* Menu Items */}
                                                                 <div className="py-2">
@@ -338,11 +382,45 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                             onTaskAction('view', task);
                                                                             setOpenMoreMenuId(null);
                                                                         }}
-                                                                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-blue-50 transition-colors text-left"
+                                                                        className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
                                                                     >
-                                                                        <Eye className="w-5 h-5 text-blue-700" />
-                                                                        <span className="font-medium text-blue-700">View</span>
+                                                                        <Eye className="w-5 h-5 text-[#929191]" />
+                                                                        <span className="font-medium text-[#929191]">View</span>
                                                                     </button>
+                                                                    {task.status !== 'completed' && (
+                                                                        <>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    onTaskAction('edit', task);
+                                                                                    setOpenMoreMenuId(null);
+                                                                                }}
+                                                                                className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
+                                                                            >
+                                                                                <Edit className="w-5 h-5 text-[#929191]" />
+                                                                                <span className="font-medium text-[#929191]">Edit</span>
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    onTaskAction('markCompleted', task);
+                                                                                    setOpenMoreMenuId(null);
+                                                                                }}
+                                                                                className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
+                                                                            >
+                                                                                <CheckSquare className="w-5 h-5 text-[#929191]" />
+                                                                                <span className="font-medium text-[#929191]">Mark As Completed</span>
+                                                                            </button>
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    onTaskAction('comment', task);
+                                                                                    setOpenMoreMenuId(null);
+                                                                                }}
+                                                                                className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
+                                                                            >
+                                                                                <MessageSquare className="w-5 h-5 text-[#929191]" />
+                                                                                <span className="font-medium text-[#929191]">Comment</span>
+                                                                            </button>
+                                                                        </>
+                                                                    )}
                                                                     <button
                                                                         onClick={() => {
                                                                             onTaskAction('remove', task);
@@ -357,43 +435,6 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                             </motion.div>
                                                         )}
                                                     </AnimatePresence>
-                                                </div>
-                                                <div className="relative">
-                                                    <button
-                                                        onClick={() => setOpenMenuId(openMenuId === task.id ? null : task.id)}
-                                                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                                    >
-                                                        <Settings className="w-5 h-5 text-gray-400" />
-                                                    </button>
-                                                    {openMenuId === task.id && (
-                                                        <TaskActionMenu
-                                                            task={task}
-                                                            onClose={() => setOpenMenuId(null)}
-                                                            onAction={action => {
-                                                                if (action === 'followup') {
-                                                                    setShowFollowupForm(true)
-                                                                }else if (action === 'mail') {
-                                                                    setShowMailForm(true)
-                                                                }else if (action === 'sms') {
-                                                                    setShowSMSForm(true)
-                                                                }else if (action === 'voice') {
-                                                                    setShowVoiceForm(true)
-                                                                }else if (action === 'notes') {
-                                                                    setShowAddNoteForm(true)
-                                                                } else if (action === 'upload') {
-                                                                    setShowUploadDataForm(true) 
-                                                                } else if (action === 'addtask') {
-                                                                    setShowAddTaskForm(true) 
-                                                                } else if (action === 'addappointment') {
-                                                                    setShowAddAppointmentForm(true) 
-                                                                } else if (action === 'adddeal') {
-                                                                    setShowAddDealForm(true) 
-                                                                } else if (action === 'fillWebform') {
-                                                                    setShowWebForm(true) 
-                                                                }
-                                                            }}
-                                                        />
-                                                    )}
                                                 </div>
                                             </div>
                                         </td>

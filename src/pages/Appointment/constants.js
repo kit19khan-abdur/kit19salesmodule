@@ -50,8 +50,8 @@ export const APPOINTMENT_TYPES = {
     key: 'virtual',
     label: 'Virtual',
     icon: Video,
-    color: 'text-purple-600',
-    bg: 'bg-purple-50'
+    color: 'text-blue-600',
+    bg: 'bg-blue-50'
   },
   physical: {
     key: 'physical',

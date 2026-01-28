@@ -226,7 +226,7 @@ const TaskCalendar = ({ tasks, onTaskAction }) => {
             </div>
 
             {/* Calendar Body */}
-            <div className="p-6 max-h-[40vh] overflow-y-auto">
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
                 {calendarView === 'week' && (
                     <WeekView
                         data={calendarData}

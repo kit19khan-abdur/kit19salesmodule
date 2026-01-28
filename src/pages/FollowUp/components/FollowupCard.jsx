@@ -54,7 +54,8 @@ const ActionMenu = ({ show, onClose, onAction, followup }) => {
             initial={{ opacity: 0, scale: 0.9, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -10 }}
-            className="absolute max-h-[270px] overflow-y-auto right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 z-50 min-w-[180px]"
+            className="absolute max-h-[450px] overflow-y-auto top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 z-[100] min-w-[200px] right-0"
+            style={{ width: 'max-content', maxWidth: '280px' }}
         >
             {quickActions.map((action) => (
                 <button
@@ -63,7 +64,7 @@ const ActionMenu = ({ show, onClose, onAction, followup }) => {
                         onAction(action.id, followup);
                         onClose();
                     }}
-                    className={`w-full text-nowrap flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${action.color}`}
+                    className={`w-full text-left whitespace-nowrap flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${action.color}`}
                 >
                     <action.icon className="w-4 h-4" />
                     {action.label}

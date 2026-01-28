@@ -40,7 +40,7 @@ const TaskHeader = ({ searchQuery, setSearchQuery, totalTasks }) => {
                     <div className="flex items-center gap-6">
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">
-                                Tasks/Days
+                                Tasks
                             </h1>
                             <p className="text-sm text-gray-500 mt-0.5">
                                 Manage and track all your tasks
@@ -99,7 +99,7 @@ const TaskHeader = ({ searchQuery, setSearchQuery, totalTasks }) => {
 
                                         {/* Action Buttons */}
                                         <div className="p-4">
-                                            <div className="grid grid-cols-5 gap-3">
+                                            <div className="grid grid-cols-6 gap-3">
                                                 {/* FunnelPlus - Filter Panel */}
                                                 <motion.button
                                                     whileHover={{ scale: 1.05 }}

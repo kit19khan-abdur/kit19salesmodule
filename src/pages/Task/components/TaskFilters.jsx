@@ -73,7 +73,7 @@ const TaskFilters = ({ filters, setFilters, totalCounts }) => {
                 onClick={handleShowAll}
                 className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
             >
-                Show All
+                {(filters.open && filters.overdue && filters.completed) ? 'Hide All' : 'Show All'}
             </button>
         </div>
     );
