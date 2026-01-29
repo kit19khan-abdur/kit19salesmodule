@@ -9,6 +9,9 @@ import Button from '../../components/common/Button';
 import FilterSearch from './Forms/FilterSearch';
 import AddNewTask from './Forms/AddNewTask';
 import CustomSearch from './Forms/CustomSearch';
+import EditTask from './Forms/EditTask';
+import Outcome from './Forms/Outcome';
+import Comment from './Forms/Comment';
 
 const Task = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -29,6 +32,9 @@ const Task = () => {
     const [showAddTaskForm, setShowAddTaskForm] = useState(false);
     const [showCustomDownloadForm, setShowCustomDownloadForm] = useState(false);
     const [showFilterPanel, setShowFilterPanel] = useState(false);
+    const [showEditTaskForm, setShowEditTaskForm] = useState(false);
+    const [showOutcomesForm, setShowOutcomesForm] = useState(false);
+    const [showCommentForm, setShowCommentForm] = useState(false);
     // Close menu when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -143,6 +149,15 @@ const Task = () => {
         if (actionId === 'view') {
             setSelectedTask(task);
             setShowDetailModal(true);
+        }else if (actionId === 'edit') {
+            setSelectedTask(task);
+            setShowEditTaskForm(true);
+        } else if (actionId === 'markCompleted') {
+            setSelectedTask(task);
+            setShowOutcomesForm(true);
+        } else if (actionId === 'comment') {
+            setSelectedTask(task);
+            setShowCommentForm(true);
         }
         // Implement other action logic here
         // e.g., open modal for followup, send mail, etc.
@@ -395,6 +410,81 @@ const Task = () => {
                 }
             >
                 <AddNewTask />
+            </PopUpModal>
+            {/* Edit Task Modal */}
+            <PopUpModal
+                isOpen={showEditTaskForm}
+                onClose={() => setShowEditTaskForm(false)}
+                title="Edit Task"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowEditTaskForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='success'
+                            onClick={() => setShowEditTaskForm(false)}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <EditTask />
+            </PopUpModal>
+            {/* OutCome Task Modal */}
+            <PopUpModal
+                isOpen={showOutcomesForm}
+                onClose={() => setShowOutcomesForm(false)}
+                title="Edit Task"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowOutcomesForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='success'
+                            onClick={() => setShowOutcomesForm(false)}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <Outcome />
+            </PopUpModal>
+            {/* Comment Task Modal */}
+            <PopUpModal
+                isOpen={showCommentForm}
+                onClose={() => setShowCommentForm(false)}
+                title="Add Comment"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">
+                        <Button
+                            variant="secondary"
+                            onClick={() => setShowCommentForm(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant='success'
+                            onClick={() => setShowCommentForm(false)}
+                        >
+                            Save
+                        </Button>
+                    </div>
+                }
+            >
+                <Comment />
             </PopUpModal>
 
             {/* Custom Download Modal */}

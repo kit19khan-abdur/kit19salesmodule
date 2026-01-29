@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MoreHorizontal, Settings, ExternalLink, Eye, Edit, CheckCircle, MessageSquare, Trash2, EllipsisVertical, Plus, CheckSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImPlus } from "react-icons/im";
+import { FaCommentDots } from "react-icons/fa";
 import TaskActionMenu from './TaskActionMenu';
 import { taskStatusConfig } from '../constants';
 import PopUpModal from '../../../components/PopUpModal/PopUpModal';
@@ -416,7 +417,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                                 }}
                                                                                 className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
                                                                             >
-                                                                                <MessageSquare className="w-5 h-5 text-[#929191]" />
+                                                                                <FaCommentDots className="w-5 h-5 text-[#929191]" />
                                                                                 <span className="font-medium text-[#929191]">Comment</span>
                                                                             </button>
                                                                         </>
