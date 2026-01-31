@@ -3,24 +3,24 @@ import { MoreHorizontal, Settings, ExternalLink, Eye, Edit, CheckCircle, Message
 import { motion, AnimatePresence } from 'framer-motion';
 import { ImPlus } from "react-icons/im";
 import { FaCommentDots } from "react-icons/fa";
-import TaskActionMenu from './TaskActionMenu';
-import { taskStatusConfig } from '../constants';
+import AppointmentActionMenu from './AppointmentActionMenu';
+import { appointmentStatusConfig } from '../constants';
 import PopUpModal from '../../../components/PopUpModal/PopUpModal';
 import Button from '../../../components/common/Button';
-import AddFollowupForm from '../Forms/AddFollowupForm';
-import SendMailForm from '../Forms/SendMailForm';
+import AddFollowupForm from '../../Task/Forms/AddFollowupForm';
+import SendMailForm from '../../Task/Forms/SendMailForm';
 import SendSMS from '../../../components/LeadMass/SendSMS';
 import SendSMSForm from '../../../components/EnquiriesForms/SendSMSForm';
-import SendVoice from '../Forms/SendVoice';
+import SendVoice from '../../Task/Forms/SendVoice';
 import AddNotes from '../../../components/LeadForm/AddNotes';
 import UploadData from '../../../components/LeadForm/UploadData';
-import AddTask from '../Forms/AddTask';
-import AddAppointment from '../Forms/AddAppointment';
-import AddDeal from '../Forms/AddDeal';
+import AddTask from '../../Task/Forms/AddTask';
+import AddAppointment from '../../Task/Forms/AddAppointment';
+import AddDeal from '../../Task/Forms/AddDeal';
 import WebForm from '../../../components/LeadForm/WebForm';
-import MassUpdate from '../Forms/MassUpdate';
+import MassUpdate from '../../Task/Forms/MassUpdate';
 
-const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => {
+const AppointmentTable = ({ appointments, selectedAppointments, setSelectedAppointments, onAppointmentAction }) => {
     const [openMenuId, setOpenMenuId] = useState(null);
     const [openMoreMenuId, setOpenMoreMenuId] = useState(null);
     const [hoveredProfileId, setHoveredProfileId] = useState(null);
@@ -54,29 +54,29 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleSelectTask = (taskId) => {
-        setSelectedTasks(prev => {
-            if (prev.includes(taskId)) {
-                return prev.filter(id => id !== taskId);
+    const handleSelectAppointment = (appointmentId) => {
+        setSelectedAppointments(prev => {
+            if (prev.includes(appointmentId)) {
+                return prev.filter(id => id !== appointmentId);
             } else {
-                return [...prev, taskId];
+                return [...prev, appointmentId];
             }
         });
     };
 
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            setSelectedTasks(tasks.map(task => task.id));
+            setSelectedAppointments(appointments.map(appointment => appointment.id));
         } else {
-            setSelectedTasks([]);
+            setSelectedAppointments([]);
         }
     };
 
     return (
         <div className="px-8 py-6">
-            {/* Mass Update Button - Shows when tasks are selected */}
+            {/* Mass Update Button - Shows when appointments are selected */}
             <AnimatePresence>
-                {selectedTasks.length > 0 && (
+                {selectedAppointments.length > 0 && (
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -87,20 +87,20 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-lg font-semibold">
-                                    {selectedTasks.length}
+                                    {selectedAppointments.length}
                                 </div>
                                 <div>
                                     <p className="text-sm font-semibold text-gray-900">
-                                        {selectedTasks.length === 1 ? '1 task selected' : `${selectedTasks.length} tasks selected`}
+                                        {selectedAppointments.length === 1 ? '1 appointment selected' : `${selectedAppointments.length} appointments selected`}
                                     </p>
                                     <p className="text-xs text-gray-600">
-                                        Update multiple tasks at once
+                                        Update multiple appointments at once
                                     </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <button
-                                    onClick={() => setSelectedTasks([])}
+                                    onClick={() => setSelectedAppointments([])}
                                     className="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                                 >
                                     Clear Selection
@@ -108,8 +108,8 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                 <button
                                     onClick={() => {
                                         // Handle mass update
-                                        setShowMassUpdateForm(true) //selectedTasks
-                                        setSelectedTasks([])
+                                        setShowMassUpdateForm(true) //selectedAppointments
+                                        setSelectedAppointments([])
                                     }}
                                     className="px-6 py-2 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-md hover:shadow-lg transition-all transform hover:scale-105"
                                 >
@@ -129,41 +129,41 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                 <th className="px-6 py-4 text-left">
                                     <input
                                         type="checkbox"
-                                        checked={selectedTasks.length === tasks.length && tasks.length > 0}
+                                        checked={selectedAppointments.length === appointments.length && appointments.length > 0}
                                         onChange={handleSelectAll}
                                         className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                     />
                                 </th>
                                 <th className="px-2 py-4 text-left text-sm font-semibold text-gray-900"></th>
-                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Task</th>
+                                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Appointment</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Related to</th>
                                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {tasks.map((task) => {
-                                const statusConfig = taskStatusConfig[task.status];
+                            {appointments.map((appointment) => {
+                                const statusConfig = appointmentStatusConfig[appointment.status];
                                 return (
-                                    <tr key={task.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={appointment.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <input
                                                 type="checkbox"
-                                                checked={selectedTasks.includes(task.id)}
-                                                onChange={() => handleSelectTask(task.id)}
+                                                checked={selectedAppointments.includes(appointment.id)}
+                                                onChange={() => handleSelectAppointment(appointment.id)}
                                                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                             />
                                         </td>
                                         <td className="px-2 py-4">
                                             <div className="relative">
                                                 <button
-                                                    onClick={() => setOpenMenuId(openMenuId === task.id ? null : task.id)}
+                                                    onClick={() => setOpenMenuId(openMenuId === appointment.id ? null : appointment.id)}
                                                     className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                                 >
                                                     <EllipsisVertical className="w-5 h-5 text-gray-400" />
                                                 </button>
-                                                {openMenuId === task.id && (
-                                                    <TaskActionMenu
-                                                        task={task}
+                                                {openMenuId === appointment.id && (
+                                                    <AppointmentActionMenu
+                                                        appointment={appointment}
                                                         onClose={() => setOpenMenuId(null)}
                                                         onAction={action => {
                                                             if (action === 'followup') {
@@ -193,26 +193,26 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className={`flex items-start gap-3 ${task.status === 'completed' ? 'opacity-60' : ''}`}>
+                                            <div className={`flex items-start gap-3 ${appointment.status === 'completed' ? 'line-through opacity-60' : ''}`}>
                                                 <div className={`p-2 rounded-lg ${statusConfig.bg} mt-1`}>
                                                     <statusConfig.icon className={`w-5 h-5 ${statusConfig.color}`} />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className={`font-semibold text-gray-900 mb-1 line-clamp-1 ${task.status === 'completed' ? 'line-through' : ''}`}>
-                                                        {task.title}
+                                                    <h3 className={`font-semibold text-gray-900 mb-1 line-clamp-1 ${appointment.status === 'completed' ? 'line-through' : ''}`}>
+                                                        {appointment.title}
                                                     </h3>
-                                                    <p className={`text-sm text-gray-500 mb-2 line-clamp-2 ${task.status === 'completed' ? 'line-through' : ''}`}>
-                                                        {task.description}
+                                                    <p className={`text-sm text-gray-500 mb-2 line-clamp-2 ${appointment.status === 'completed' ? 'line-through' : ''}`}>
+                                                        {appointment.description}
                                                     </p>
-                                                    <div className={`flex items-center gap-4 text-xs text-gray-500`}>
+                                                    <div className={`flex items-center gap-4 text-xs text-gray-500 ${appointment.status === 'completed' ? 'line-through' : ''}`}>
                                                         <span className="font-medium">
-                                                            Completed: <span className="text-gray-700">{task.completedDate}</span>
+                                                            Completed: <span className="text-gray-700">{appointment.completedDate}</span>
                                                         </span>
-                                                        <span>{task.completedTime}</span>
+                                                        <span>{appointment.completedTime}</span>
                                                     </div>
                                                     <div className="mt-1">
-                                                        <span className={`text-xs font-medium text-green-600`}>
-                                                            Outcome: {task.outcome}
+                                                        <span className={`text-xs font-medium text-green-600 ${appointment.status === 'completed' ? 'line-through' : ''}`}>
+                                                            Outcome: {appointment.outcome}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -222,25 +222,25 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                             <div className="flex items-center gap-3">
                                                 <div
                                                     className="relative"
-                                                    onMouseEnter={() => setHoveredProfileId(task.id)}
+                                                    onMouseEnter={() => setHoveredProfileId(appointment.id)}
                                                     onMouseLeave={() => setHoveredProfileId(null)}
                                                 >
                                                     <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden cursor-pointer">
                                                         <img
-                                                            src={task.avatar}
-                                                            alt={task.relatedTo}
+                                                            src={appointment.avatar}
+                                                            alt={appointment.relatedTo}
                                                             className="w-full h-full object-cover"
                                                         />
                                                     </div>
-                                                    {task.badge !== undefined && (
+                                                    {appointment.badge !== undefined && (
                                                         <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                                                            {task.badge}
+                                                            {appointment.badge}
                                                         </span>
                                                     )}
 
                                                     {/* Profile Detail Popup */}
                                                     <AnimatePresence>
-                                                        {hoveredProfileId === task.id && (
+                                                        {hoveredProfileId === appointment.id && (
                                                             <motion.div
                                                                 initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -254,20 +254,20 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                         <div className="relative">
                                                                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden ring-2 ring-white">
                                                                                 <img
-                                                                                    src={task.avatar}
-                                                                                    alt={task.relatedTo}
+                                                                                    src={appointment.avatar}
+                                                                                    alt={appointment.relatedTo}
                                                                                     className="w-full h-full object-cover"
                                                                                 />
                                                                             </div>
-                                                                            {task.badge !== undefined && (
+                                                                            {appointment.badge !== undefined && (
                                                                                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center justify-center ring-2 ring-white">
-                                                                                    {task.badge}
+                                                                                    {appointment.badge}
                                                                                 </span>
                                                                             )}
                                                                         </div>
                                                                         <div className="flex-1">
                                                                             <div className="flex items-center gap-2">
-                                                                                <h4 className="font-bold text-blue-600 text-sm">{task.relatedTo}</h4>
+                                                                                <h4 className="font-bold text-blue-600 text-sm">{appointment.relatedTo}</h4>
                                                                                 <ExternalLink className="w-3 h-3 text-gray-400 hover:text-blue-600 cursor-pointer" />
                                                                             </div>
                                                                             <p className="text-xs text-gray-500">tklrtk</p>
@@ -290,7 +290,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                     <div className="space-y-3">
                                                                         <div className="flex gap-3">
                                                                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                                                <span className="text-blue-600 font-bold text-xs">{task.badge || 0}</span>
+                                                                                <span className="text-blue-600 font-bold text-xs">{appointment.badge || 0}</span>
                                                                             </div>
                                                                             <div className="flex-1">
                                                                                 <p className="text-xs text-gray-700">
@@ -300,7 +300,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                         </div>
                                                                         <div className="flex gap-3">
                                                                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                                                <span className="text-blue-600 font-bold text-xs">{task.badge || 0}</span>
+                                                                                <span className="text-blue-600 font-bold text-xs">{appointment.badge || 0}</span>
                                                                             </div>
                                                                             <div className="flex-1">
                                                                                 <p className="text-xs text-gray-700">
@@ -310,7 +310,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                         </div>
                                                                         <div className="flex gap-3">
                                                                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                                                <span className="text-blue-600 font-bold text-xs">{task.badge || 0}</span>
+                                                                                <span className="text-blue-600 font-bold text-xs">{appointment.badge || 0}</span>
                                                                             </div>
                                                                             <div className="flex-1">
                                                                                 <p className="text-xs text-gray-700">
@@ -326,17 +326,17 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                     <div className="flex items-center gap-3">
                                                                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center overflow-hidden ring-2 ring-white">
                                                                             <img
-                                                                                src={task.avatar}
-                                                                                alt={task.relatedTo}
+                                                                                src={appointment.avatar}
+                                                                                alt={appointment.relatedTo}
                                                                                 className="w-full h-full object-cover"
                                                                             />
                                                                         </div>
                                                                         <div className="flex-1">
                                                                             <div className="flex items-center gap-2">
-                                                                                <h5 className="font-semibold text-gray-900 text-xs">{task.relatedTo}</h5>
+                                                                                <h5 className="font-semibold text-gray-900 text-xs">{appointment.relatedTo}</h5>
                                                                                 <ExternalLink className="w-3 h-3 text-gray-400 hover:text-blue-600 cursor-pointer" />
                                                                             </div>
-                                                                            <p className="text-xs text-gray-500">Owner: {task.owner}</p>
+                                                                            <p className="text-xs text-gray-500">Owner: {appointment.owner}</p>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -346,29 +346,29 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-semibold text-gray-900">{task.relatedTo}</span>
-                                                        <ExternalLink className="w-4 h-4 text-gray-400 hover:text-blue-600 cursor-pointer" />
+                                                        <span className="font-semibold text-gray-900">{appointment.relatedTo}</span>
+                                                        {/* <ExternalLink className="w-4 h-4 text-gray-400 hover:text-blue-600 cursor-pointer" /> */}
                                                     </div>
                                                     <p className="text-xs text-gray-500">
-                                                        Owner: <span className="text-gray-700">{task.owner}</span>
+                                                        Owner: <span className="text-gray-700">{appointment.owner}</span>
                                                     </p>
                                                     <p className="text-xs text-gray-500">
-                                                        Collaborator: <span className="text-gray-700">{task.collaborator || 'processdemo'}</span>
+                                                        Collaborator: <span className="text-gray-700">{appointment.collaborator || 'processdemo'}</span>
                                                     </p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <div className="relative" ref={openMoreMenuId === task.id ? moreMenuRef : null}>
+                                                <div className="relative" ref={openMoreMenuId === appointment.id ? moreMenuRef : null}>
                                                     <button
-                                                        onClick={() => setOpenMoreMenuId(openMoreMenuId === task.id ? null : task.id)}
+                                                        onClick={() => setOpenMoreMenuId(openMoreMenuId === appointment.id ? null : appointment.id)}
                                                         className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                                                     >
                                                         <Settings className="w-5 h-5 text-gray-400" />
                                                     </button>
                                                     <AnimatePresence>
-                                                        {openMoreMenuId === task.id && (
+                                                        {openMoreMenuId === appointment.id && (
                                                             <motion.div
                                                                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                                                                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -380,7 +380,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                 <div className="py-2">
                                                                     <button
                                                                         onClick={() => {
-                                                                            onTaskAction('view', task);
+                                                                            onAppointmentAction('view', appointment);
                                                                             setOpenMoreMenuId(null);
                                                                         }}
                                                                         className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
@@ -388,11 +388,11 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                         <Eye className="w-5 h-5 text-[#929191]" />
                                                                         <span className="font-medium text-[#929191]">View</span>
                                                                     </button>
-                                                                    {task.status !== 'completed' && (
+                                                                    {appointment.status !== 'completed' && (
                                                                         <>
                                                                             <button
                                                                                 onClick={() => {
-                                                                                    onTaskAction('edit', task);
+                                                                                    onAppointmentAction('edit', appointment);
                                                                                     setOpenMoreMenuId(null);
                                                                                 }}
                                                                                 className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
@@ -402,7 +402,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                             </button>
                                                                             <button
                                                                                 onClick={() => {
-                                                                                    onTaskAction('markCompleted', task);
+                                                                                    onAppointmentAction('markCompleted', appointment);
                                                                                     setOpenMoreMenuId(null);
                                                                                 }}
                                                                                 className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
@@ -412,7 +412,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                             </button>
                                                                             <button
                                                                                 onClick={() => {
-                                                                                    onTaskAction('comment', task);
+                                                                                    onAppointmentAction('comment', appointment);
                                                                                     setOpenMoreMenuId(null);
                                                                                 }}
                                                                                 className="w-full px-4 py-3 flex items-center gap-3 transition-colors text-left"
@@ -424,7 +424,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
                                                                     )}
                                                                     <button
                                                                         onClick={() => {
-                                                                            onTaskAction('remove', task);
+                                                                            onAppointmentAction('remove', appointment);
                                                                             setOpenMoreMenuId(null);
                                                                         }}
                                                                         className="w-full px-4 py-3 flex items-center gap-3 hover:bg-red-50 transition-colors text-left"
@@ -700,7 +700,7 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
             <PopUpModal
                 isOpen={showMassUpdateForm}
                 onClose={() => setShowMassUpdateForm(false)}
-                title="Mass Update Task"
+                title="Mass Update Appointment"
                 size="lg"
                 footer={
                     <div className="flex justify-between w-full">
@@ -726,4 +726,4 @@ const TaskTable = ({ tasks, selectedTasks, setSelectedTasks, onTaskAction }) => 
     );
 };
 
-export default TaskTable;
+export default AppointmentTable;

@@ -66,7 +66,7 @@ const MainLayout = () => {
           sidebarLocked={sidebarLocked}
         />
 
-        <main className="flex-1 overflow-y-auto pt-1 pl-1 lg:pl-1 lg:pt-1">
+        <main className="flex-1 overflow-y-auto pl-1 lg:pl-1">
           <Outlet />
         </main>
       </div>

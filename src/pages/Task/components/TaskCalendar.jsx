@@ -959,6 +959,22 @@ const MonthView = ({ data, tasks, getTasksForDate, onTaskClick, onOpenFollowup, 
                         const dayTasks = getTasksForDate(day);
                         const isSelected = selectedDate?.toDateString() === day.toDateString();
 
+                        // Get status counts for the day
+                        const statusCounts = dayTasks.reduce((acc, task) => {
+                            acc[task.status] = (acc[task.status] || 0) + 1;
+                            return acc;
+                        }, {});
+
+                        // Determine badge color based on priority: overdue > open > completed
+                        let badgeColor = 'bg-blue-500';
+                        if (statusCounts.overdue > 0) {
+                            badgeColor = 'bg-red-500';
+                        } else if (statusCounts.open > 0) {
+                            badgeColor = 'bg-orange-500';
+                        } else if (statusCounts.completed > 0) {
+                            badgeColor = 'bg-green-500';
+                        }
+
                         return (
                             <div
                                 key={idx}
@@ -973,7 +989,7 @@ const MonthView = ({ data, tasks, getTasksForDate, onTaskClick, onOpenFollowup, 
                                         {day.getDate()}
                                     </div>
                                     {dayTasks.length > 0 && (
-                                        <div className="w-5 h-5 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-bold">
+                                        <div className={`w-5 h-5 rounded-full ${badgeColor} text-white text-xs flex items-center justify-center font-bold`}>
                                             {dayTasks.length}
                                         </div>
                                     )}
@@ -1069,6 +1085,22 @@ const YearView = ({ data, tasks, getTasksForDate, onTaskClick, onOpenFollowup, o
                         return taskDate.getMonth() === monthNum && taskDate.getFullYear() === year;
                     });
 
+                    // Get status counts for the month
+                    const statusCounts = monthTasks.reduce((acc, task) => {
+                        acc[task.status] = (acc[task.status] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    // Determine badge color based on priority: overdue > open > completed
+                    let monthBadgeColor = 'bg-blue-500';
+                    if (statusCounts.overdue > 0) {
+                        monthBadgeColor = 'bg-red-500';
+                    } else if (statusCounts.open > 0) {
+                        monthBadgeColor = 'bg-orange-500';
+                    } else if (statusCounts.completed > 0) {
+                        monthBadgeColor = 'bg-green-500';
+                    }
+
                     const isSelected = selectedMonth === monthIdx;
 
                     return (
@@ -1081,7 +1113,7 @@ const YearView = ({ data, tasks, getTasksForDate, onTaskClick, onOpenFollowup, o
                             <div className="flex items-center justify-between mb-3">
                                 <h3 className="text-sm font-bold text-gray-900">{monthNames[monthIdx].slice(0, 3)}</h3>
                                 {monthTasks.length > 0 && (
-                                    <div className="px-2 py-1 bg-blue-500 text-white text-xs rounded-full font-bold">
+                                    <div className={`px-2 py-1 ${monthBadgeColor} text-white text-xs rounded-full font-bold`}>
                                         {monthTasks.length}
                                     </div>
                                 )}
@@ -1097,7 +1129,24 @@ const YearView = ({ data, tasks, getTasksForDate, onTaskClick, onOpenFollowup, o
                                 {days.map((day, dayIdx) => {
                                     const isCurrentMonth = day.getMonth() === monthNum;
                                     const isToday = day.toDateString() === new Date().toDateString();
-                                    const dayTaskCount = getTasksForDate(day).length;
+                                    const dayTasks = getTasksForDate(day);
+                                    const dayTaskCount = dayTasks.length;
+
+                                    // Get status counts for the day
+                                    const dayStatusCounts = dayTasks.reduce((acc, task) => {
+                                        acc[task.status] = (acc[task.status] || 0) + 1;
+                                        return acc;
+                                    }, {});
+
+                                    // Determine badge color
+                                    let dayBadgeColor = 'bg-blue-500';
+                                    if (dayStatusCounts.overdue > 0) {
+                                        dayBadgeColor = 'bg-red-500';
+                                    } else if (dayStatusCounts.open > 0) {
+                                        dayBadgeColor = 'bg-orange-500';
+                                    } else if (dayStatusCounts.completed > 0) {
+                                        dayBadgeColor = 'bg-green-500';
+                                    }
 
                                     return (
                                         <div
@@ -1110,7 +1159,7 @@ const YearView = ({ data, tasks, getTasksForDate, onTaskClick, onOpenFollowup, o
                                         >
                                             {day.getDate()}
                                             {dayTaskCount > 0 && isCurrentMonth && (
-                                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full text-white text-[8px] flex items-center justify-center font-bold">
+                                                <div className={`absolute -top-1 -right-1 w-3 h-3 ${dayBadgeColor} rounded-full text-white text-[8px] flex items-center justify-center font-bold`}>
                                                     {dayTaskCount}
                                                 </div>
                                             )}

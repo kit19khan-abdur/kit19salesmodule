@@ -122,10 +122,42 @@ const AddDeal = ({ onClose, onSubmit }) => {
                     <input
                         type="text"
                         value={formData.probability}
-                        onChange={(e) => handleChange('probability', e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+
+                            // allow only digits
+                            if (!/^\d*$/.test(value)) return;
+
+                            // empty is allowed (so user can delete)
+                            if (value === "") {
+                                handleChange("probability", "");
+                                return;
+                            }
+
+                            const num = Number(value);
+
+                            // block values greater than 100
+                            if (num > 100) return;
+
+                            handleChange("probability", value);
+                        }}
+                        onKeyDown={(e) => {
+                            if (
+                                !/[0-9]/.test(e.key) &&
+                                e.key !== "Backspace" &&
+                                e.key !== "Delete" &&
+                                e.key !== "ArrowLeft" &&
+                                e.key !== "ArrowRight" &&
+                                e.key !== "Tab"
+                            ) {
+                                e.preventDefault();
+                            }
+                        }}
                         placeholder="Enter Probability"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                     />
+
+
                 </div>
 
                 {/* Sales owner */}

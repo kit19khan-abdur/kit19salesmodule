@@ -1,10 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import RichTextEditor from '../common/RichTextEditor'
 import RichTextEditorArea from '../common/RichTextEditorArea';
 
-const AddNotes = () => {
+const AddNotes = ({ reset }) => {
     const [noteText, setNoteText] = useState('');
 
+    useEffect(() => {
+        if (reset) {
+            setNoteText('');
+        }
+    }, [reset]);
 
     return (
         <div>

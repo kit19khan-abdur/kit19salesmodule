@@ -97,17 +97,12 @@ const AddFollowupForm = ({ onClose, onSubmit }) => {
         {/* Date Time Picker */}
         <div className="relative">
           <input
-            type="text"
+            type="datetime-local"
             value={formData.dateTime}
             onChange={(e) => handleChange('dateTime', e.target.value)}
-            className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-2 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Select date and time"
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-            <div className="w-9 h-9 flex items-center justify-center bg-gray-200 rounded">
-              <Calendar className="w-5 h-5 text-gray-600" />
-            </div>
-          </div>
         </div>
 
         {/* Remarks Textarea */}

@@ -1,5 +1,6 @@
-export { default as StatCard } from './StatCard';
-export { default as FollowupCard } from './FollowupCard';
-export { default as FollowupHeader } from './FollowupHeader';
-export { default as FollowupToolbar } from './FollowupToolbar';
-export { default as FollowupPagination } from './FollowupPagination';
+export { default as FollowUpFilters } from './FollowUpFilters';
+export { default as FollowUpTable } from './FollowUpTable';
+export { default as FollowUpPagination } from './FollowUpPagination';
+export { default as FollowUpActionMenu } from './FollowUpActionMenu';
+export { default as FollowUpCalendar } from './FollowUpCalendar';
+export { default as FollowUpDetailModal } from './FollowUpDetailModal';

@@ -139,17 +139,17 @@ const AddTask = ({ onClose, onSubmit }) => {
                     </label>
                     <div className="relative">
                         <input
-                            type="text"
+                            type="datetime-local"
                             value={formData.dueDateTime}
                             onChange={(e) => handleChange('dueDateTime', e.target.value)}
                             placeholder="27 Jan 2026 23:01"
                             className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        {/* <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                             <div className="w-9 h-9 flex items-center justify-center bg-gray-200 rounded">
                                 <Calendar className="w-5 h-5 text-gray-600" />
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
