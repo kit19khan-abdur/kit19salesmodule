@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import Button from '../../../components/common/Button';
+import { serviceInstance } from '../../../axiosinstance';
+import { getSession } from '../../../getSession';
+import toast from 'react-hot-toast';
 
 const AddImportTemplate = ({ isOpen, onClose, onSubmit }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -8,6 +10,90 @@ const AddImportTemplate = ({ isOpen, onClose, onSubmit }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadedFields, setUploadedFields] = useState([]);
   const [fieldMappings, setFieldMappings] = useState({});
+  // mapping options for predefined import templates
+  const [mappingOptions, setMappingOptions] = useState([]);
+  const [isLoadingMappings, setIsLoadingMappings] = useState(false);
+  const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
+
+  // Fetch predefined mappings for this modal
+  useEffect(() => {
+    const fetchMappings = async () => {
+      try {
+        setIsLoadingMappings(true);
+        const session = getSession();
+
+        const requestData = {
+          Token: session.token,
+          Details: JSON.stringify({ ParentId: session.parentId })
+        };
+         //"http://localhost:62194/UserCRM/GetEnquiryPredefinedMappings" ;
+  const response = await serviceInstance.post('http://localhost:62194/UserCRM/GetEnquiryPredefinedMappings', requestData);
+        if (response?.data?.Status === 1) {
+          const details = response.data.Details || [];
+          const mapped = details.map((m) => ({
+            id: m.MappingId || m.Id || m.Code,
+            name: m.MappingName || m.Text || m.Name,
+          }));
+          setMappingOptions(mapped);
+        } else {
+          console.error('Failed to fetch mappings for AddImportTemplate:', response?.data?.Message);
+        }
+      } catch (err) {
+        console.error('Error fetching mappings for AddImportTemplate:', err);
+      } finally {
+        setIsLoadingMappings(false);
+      }
+    };
+
+    fetchMappings();
+  }, []);
+
+  // Download import template (calls backend GET download-import-template/{parentId})
+  const handleDownloadTemplate = async () => {
+    try {
+      setIsDownloadingTemplate(true);
+      const session = getSession();
+      if (!session?.parentId) {
+        console.error('No parentId available in session for downloading template');
+        toast.error('Unable to download template: missing session info');
+        setIsDownloadingTemplate(false);
+        return;
+      }
+
+      // Use serviceInstance which is configured to the services base URL
+      const response = await serviceInstance.get(`http://localhost:62194/UserCRM/DownloadImportTemplate/${session.parentId}`, {
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], { type: response.data.type || 'application/octet-stream' });
+
+      // Try to parse filename from content-disposition header
+      let filename = 'import_template.xlsx';
+      const contentDisposition = response.headers && (response.headers['content-disposition'] || response.headers['Content-Disposition']);
+      if (contentDisposition) {
+        const match = /filename\*=UTF-8''(.+)$/.exec(contentDisposition) || /filename="?([^";]+)"?/.exec(contentDisposition);
+        if (match && match[1]) {
+          filename = decodeURIComponent(match[1]);
+        }
+      }
+
+      // Create a link and trigger download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('Template download started');
+    } catch (err) {
+      console.error('Error downloading import template:', err);
+      toast.error('Failed to download template');
+    } finally {
+      setIsDownloadingTemplate(false);
+    }
+  };
 
   const existingFields = [
     { id: 'sno', label: 'Sno', required: true },
@@ -97,8 +183,10 @@ const AddImportTemplate = ({ isOpen, onClose, onSubmit }) => {
                     : 'bg-gray-200 text-gray-500'
                 }`}
               >
-                1
+                
               </div>
+
+              
               <span
                 className={`text-sm font-medium ${
                   currentStep === 1 ? 'text-blue-500' : 'text-gray-600'
@@ -161,14 +249,54 @@ const AddImportTemplate = ({ isOpen, onClose, onSubmit }) => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Template Name
                 </label>
-                <input
+                {/* <input
                   type="text"
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
                   placeholder="Enter Template name"
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                /> */}
+  
+            <div className="mb-6">
+               <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Import Template (Predefined)
+                </label>
+                 <select
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isLoadingMappings}
+                  >
+                  <option value="">{isLoadingMappings ? 'Loading mappings...' : 'Select a predefined mapping (optional)'}</option>
+                  {mappingOptions.map((m) => (
+                    <option key={m.id} value={m.name}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>  
+              </div>  
+
+
               </div>
+
+              {/* <div className="mb-6">
+               <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Import Template (Predefined)
+                </label>
+                 <select
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isLoadingMappings}
+                >
+                  <option value="">{isLoadingMappings ? 'Loading mappings...' : 'Select a predefined mapping (optional)'}</option>
+                  {mappingOptions.map((m) => (
+                    <option key={m.id} value={m.name}>
+                      {m.name}
+                    </option>npm start
+                  ))}
+                </select>  
+              </div> */}
 
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -181,6 +309,16 @@ const AddImportTemplate = ({ isOpen, onClose, onSubmit }) => {
                     accept=".xlsx,.xls,.csv"
                     className="flex-1 text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded file:border file:border-gray-300 file:text-sm file:font-medium file:bg-white file:text-gray-700 hover:file:bg-gray-50"
                   />
+                  <button
+                    id="lnkImportTemplate"
+                    onClick={handleDownloadTemplate}
+                    disabled={isDownloadingTemplate}
+                    type="button"
+                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isDownloadingTemplate ? 'Downloading...' : 'Download Template'}
+                  </button>
+
                   <button className="px-6 py-2 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 transition">
                     Upload
                   </button>

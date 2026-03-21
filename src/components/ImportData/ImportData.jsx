@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { Plus, RefreshCw, Download, X, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, RefreshCw, Download, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import AddImportTemplate from '../../pages/Enquiries/Forms/AddImportTemplate';
+import { serviceInstance } from '../../axiosinstance';
+import { getSession } from '../../getSession';
+import { readExcelFromFile } from '../../pages/Enquiries/Enquiries/ReadExcel';
+import toast from 'react-hot-toast';
 
-const ImportData = ({ isOpen, onClose }) => {
+const ImportData = ({ isOpen, onClose, onSubmit }) => {
   const [importMode, setImportMode] = useState('bulk-import');
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
@@ -12,10 +16,54 @@ const ImportData = ({ isOpen, onClose }) => {
   const [isAddTemplateModalOpen, setIsAddTemplateModalOpen] = useState(false);
   const [isInstructionCollapsed, setIsInstructionCollapsed] = useState(false);
 
-  const templates = [
+  const [mappingOptions, setMappingOptions] = useState([]);
+  const [isLoadingMappings, setIsLoadingMappings] = useState(false);
+  const [isDownloadingTemplate, setIsDownloadingTemplate] = useState(false);
+
+  // fallback templates if API returns nothing
+  const templatesFallback = [
     { value: 'predefined', label: 'PredefinedField' },
     { value: 'custom', label: 'Custom Template' },
   ];
+
+  // Fetch predefined mappings for import templates
+  useEffect(() => {
+    const fetchMappings = async () => {
+      try {
+        setIsLoadingMappings(true);
+        const session = getSession();
+
+        const requestData = {
+          Token: session.token,
+          Details: JSON.stringify({ ParentId: session.parentId })
+        };
+
+        const response = await serviceInstance.post('http://localhost:62194/UserCRM/GetEnquiryPredefinedMappings', requestData);
+
+        if (response?.data?.Status === 1) {
+          const details = response.data.Details || [];
+          console.log('Enquiry predefined mappings response:', details);
+          // map to { value, label }
+          const mapped = details.map((m) => ({
+            value: m.MappingId || m.Id || m.Code || m.MappingID,
+            label: m.MappingName || m.Text || m.Name || m.Mapping_Name || 'Unknown',
+          }));
+
+          setMappingOptions(mapped);
+        } else if (response?.data?.Status === -1) {
+          console.error('Invalid token while fetching mappings');
+        } else {
+          console.error('Failed to fetch mappings:', response?.data?.Message);
+        }
+      } catch (err) {
+        console.error('Error fetching mappings:', err);
+      } finally {
+        setIsLoadingMappings(false);
+      }
+    };
+
+    fetchMappings();
+  }, []);
 
   const bulkUpdateFields = [
     { value: 'PersonName', label: 'PersonName' },
@@ -44,14 +92,94 @@ const ImportData = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleUpload = () => {
-    console.log('Upload file:', selectedFile);
-    // Implement upload logic
+  const handleUpload = async () => {
+    try {
+      if (!selectedFile) {
+        toast.error('Please select a file first');
+        return;
+      }
+
+      const session = getSession();
+
+      // Parse the file using the shared utility
+      const rows = await readExcelFromFile(selectedFile);
+      console.log('Parsed rows from Excel:', rows);
+
+      // Build EnquiryImportBO
+      const importBo = {
+        JsonImportData: JSON.stringify(rows || []),
+        UserId: session.userId || 0,
+        RowCount: (rows && rows.length) || 0,
+        FileName: selectedFile.name || '',
+        IsUpdate: false,
+        AutoLeadDistribution: false,
+        SelectedValue: parseInt(selectedTemplate, 10) || 0
+      };
+
+      const payload = {
+        Token: session.token,
+        Details: JSON.stringify(importBo)
+      };
+
+      const resp = await serviceInstance.post('http://localhost:62194/UserCRM/ImportEnquiry', payload);
+      console.log('ImportEnquiry response:', resp?.data);
+
+      if (resp?.data?.Status === 1) {
+        toast.success(resp.data.Message || 'Import started successfully');
+        // call parent submit handler if provided
+        if (typeof onSubmit === 'function') onSubmit(resp.data);
+        if (typeof onClose === 'function') onClose();
+      } else if (resp?.data?.Status === -1) {
+        toast.error('Invalid token. Please login again.');
+      } else {
+        toast.error(resp?.data?.Message || 'Import failed');
+      }
+    } catch (err) {
+      console.error('Error during import upload:', err);
+      toast.error('Failed to import the file');
+    }
   };
 
-  const handleDownloadTemplate = () => {
-    console.log('Download template');
-    // Implement download logic
+  const handleDownloadTemplate = async () => {
+    try {
+      setIsDownloadingTemplate(true);
+      const session = getSession();
+      if (!session?.parentId) {
+        toast.error('Unable to download template: missing session info');
+        setIsDownloadingTemplate(false);
+        return;
+      }
+
+      const response = await serviceInstance.get(`http://localhost:62194//UserCRM/DownloadImportTemplate/${session.parentId}`, {
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], { type: response.data.type || 'application/octet-stream' });
+
+      let filename = 'import_template.xlsx';
+      const contentDisposition = response.headers && (response.headers['content-disposition'] || response.headers['Content-Disposition']);
+      if (contentDisposition) {
+        const match = /filename\*=UTF-8''(.+)$/.exec(contentDisposition) || /filename="?([^";]+)"?/.exec(contentDisposition);
+        if (match && match[1]) {
+          filename = decodeURIComponent(match[1]);
+        }
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('Template download started');
+    } catch (err) {
+      console.error('Error downloading template:', err);
+      toast.error('Failed to download template');
+    } finally {
+      setIsDownloadingTemplate(false);
+    }
   };
 
   const handleTemplateSubmit = (templateData) => {
@@ -108,9 +236,12 @@ const ImportData = ({ isOpen, onClose }) => {
                 value={selectedTemplate}
                 onChange={(e) => setSelectedTemplate(e.target.value)}
                 className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={isLoadingMappings}
               >
-                <option value="">PredefinedField</option>
-                {templates.map((template) => (
+                <option value="">
+                  {isLoadingMappings ? 'Loading mappings...' : 'PredefinedField'}
+                </option>
+                {(mappingOptions.length > 0 ? mappingOptions : templatesFallback).map((template) => (
                   <option key={template.value} value={template.value}>
                     {template.label}
                   </option>
@@ -131,7 +262,8 @@ const ImportData = ({ isOpen, onClose }) => {
               </button>
               <button
                 onClick={handleDownloadTemplate}
-                className="p-2 border border-gray-300 rounded hover:bg-gray-50 transition"
+                disabled={isDownloadingTemplate}
+                className="p-2 border border-gray-300 rounded hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Download Template"
               >
                 <Download className="w-4 h-4 text-gray-600" />
@@ -191,9 +323,10 @@ const ImportData = ({ isOpen, onClose }) => {
             </div>
             <button
               onClick={handleDownloadTemplate}
-              className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 transition whitespace-nowrap"
+              disabled={isDownloadingTemplate}
+              className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded hover:bg-green-600 transition whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Download Template
+              {isDownloadingTemplate ? 'Downloading...' : 'Download Template'}
             </button>
           </div>
         )}
@@ -294,16 +427,14 @@ const ImportData = ({ isOpen, onClose }) => {
               </div>
               <div className="flex items-start gap-2">
                 <span className="text-orange-500 mt-1">☛</span>
-                <a
-                  href="#"
-                  className="text-blue-600 hover:underline font-medium"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDownloadTemplate();
-                  }}
+                <button
+                  id="lnkImportTemplate"
+                  type="button"
+                  className="text-blue-600 hover:underline font-medium bg-transparent p-0"
+                  onClick={() => handleDownloadTemplate()}
                 >
                   Download Import Template
-                </a>
+                </button>
               </div>
             </>
           ) : (

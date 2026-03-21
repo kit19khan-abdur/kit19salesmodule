@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Phone, Mail, FileText, Upload, Download, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowRight, List, Calendar, Copy, Trash2, UserMinus, UserX, Pin, ArrowUp, ArrowDown, MessageSquareMore, Plus } from 'lucide-react';
+import { Search, RefreshCw, Filter, MoreVertical, Table, LayoutGrid, Phone, Mail, FileText, Upload, Download, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ArrowRight, List, Calendar, Copy, Trash2, UserMinus, UserX, Pin, ArrowUp, ArrowDown, MessageSquareMore } from 'lucide-react';
 import ColumnHeaderMenu from './ColumnHeaderMenu';
 import { TfiLayoutColumn3 } from "react-icons/tfi";
 import RowActionMenu from '../../../../components/RowActionMenu';
@@ -29,11 +29,6 @@ import WhatsAppForm from '../../../../components/EnquiriesForms/WhatsAppForm';
 import { axiosinstance, serviceInstance } from '../../../../axiosinstance';
 import API_ENDPOINTS from '../../../../config/apiEndpoints';
 import { getSession } from '../../../../getSession';
-import MergeLead from '../../../../components/LeadForm/MergeLead';
-import EnquiryRowActionMenu from '../../../../components/EnquiryRowActionMenu';
-import EditEnquiryForm from '../../../../components/EnquiriesForms/EditEnquiryForm';
-import AddEnquiryForm from '../../../../components/EnquiriesForms/AddEnquiryForm';
-import ReadExcel, { readExcelFromFile } from '../ReadExcel';
 
 const EnquiryTable = ({
     enquiries,
@@ -51,10 +46,7 @@ const EnquiryTable = ({
     setItemsPerPage,
     setEnquiries,
     onPageChange,
-    currentPage: externalCurrentPage,   
-    fecthEnquiry,
-    setFilterExp,
-    setFilterExpSQLClause
+    currentPage: externalCurrentPage
 }) => {
     const [showToolbarMenu, setShowToolbarMenu] = useState(false);
     const [rowMenu, setRowMenu] = useState({ show: false, rowId: null });
@@ -113,33 +105,6 @@ const EnquiryTable = ({
     const [isAddPhysicalAppointmentModal, setIsAddPhysicalAppointmentModal] = useState(false);
     const [deleteConfirmModal, setDeleteConfirmModal] = useState({ show: false, enquiryId: null });
     const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
-    const [isMergeLeadOpen, setIsMergeLeadOpen] = useState(false);
-    const [isEditEnquiryModal, setIsEditEnquiryModal] = useState(false);
-    const [selectedEnquiryForEdit, setSelectedEnquiryForEdit] = useState(null);
-    const [isAddEnquiryModal, setIsAddEnquiryModal] = useState(false);
-    const fileInputRef = useRef(null);
-
-    const handleExcelFileChange = async (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (!file) return;
-        try {
-            const rows = await readExcelFromFile(file);
-            console.log('Parsed Excel rows:', rows);
-            // TODO: map rows to enquiries or import payload and call backend
-            if (rows && rows.length > 0) {
-                alert(`${rows.length} row(s) parsed from Excel. See console for data.`);
-            } else {
-                alert('No rows parsed from the selected Excel file.');
-            }
-        } catch (err) {
-            console.error('Error parsing Excel file:', err);
-            alert('Failed to parse Excel file. Check console for details.');
-        } finally {
-            // reset file input
-            if (e.target) e.target.value = null;
-        }
-    };
-    const internalSMSFormRef = useRef(null);
     const totalPages = Math.ceil(totalRecord / itemsPerPage);
 
     // Start/stop call timer when call widget is shown/hidden
@@ -220,6 +185,7 @@ const EnquiryTable = ({
                     ellipsis &&
                     !ellipsis.contains(event.target)
                 ) {
+                    
                     setShowPagePopup(null);
                 }
             }
@@ -234,8 +200,7 @@ const EnquiryTable = ({
 
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            // Select only the currently displayed/processed enquiries (respecting filters/sort)
-            setSelectedEnquiries((processedEnquiries || []).map(enq => enq?.EnquiryId).filter(Boolean));
+            setSelectedEnquiries(enquiries.map(enq => enq.EnquiryId));
         } else {
             setSelectedEnquiries([]);
         }
@@ -336,21 +301,19 @@ const EnquiryTable = ({
 
         // FILTER
         Object.keys(filters).forEach((key) => {
-            const filterVal = filters[key];
-            // skip undefined / null / empty-string filters
-            if (filterVal !== undefined && filterVal !== null && filterVal !== '') {
-                const searchLower = String(filterVal).toLowerCase();
+            if (filters[key]) {
                 data = data.filter(item => {
                     const value = item[key];
                     // Handle boolean values (like IsOpen)
                     if (typeof value === 'boolean') {
+                        const searchLower = filters[key].toLowerCase();
                         return (value && (searchLower.includes('open') || searchLower.includes('true'))) ||
                             (!value && (searchLower.includes('lead') || searchLower.includes('false')));
                     }
                     // Handle other values
                     return String(value ?? '')
                         .toLowerCase()
-                        .includes(searchLower);
+                        .includes(filters[key].toLowerCase());
                 });
             }
         });
@@ -462,59 +425,10 @@ const EnquiryTable = ({
         setIsInternationalSMSModal(false);
     }
 
-    const handleSendInternationalSMS = () => {
-        // Call the form's submit method which includes validation
-        if (internalSMSFormRef.current) {
-            internalSMSFormRef.current.submit();
-        }
-    }
-
-    const handleInternationalSMSSubmit = async (data) => {
-        try {
-            const session = getSession();
-            
-            // Get actual enquiry objects from selected IDs
-            const selectedEnquiryObjects = enquiries.filter(enq => selectedEnquiries.includes(enq.EnquiryId));
-            
-            // Extract mobile numbers from selected enquiries (up to 3)
-            const mobileNumbers = selectedEnquiryObjects.map(enq => enq.MobileNo || enq.Mobile || '').filter(Boolean);
-            
-            // Prepare NonIndianNo payload structure
-            const objSendSms_BO = {
-                SenderID: data.senderId,
-                MobileNo: mobileNumbers[0] || '', // First selected mobile
-                MobileNo1: mobileNumbers[1] || '', // Second selected mobile
-                MobileNo2: mobileNumbers[2] || '', // Third selected mobile
-                Message: data.message,
-                UrlTackText: data.urlInput || '',
-                Placeolder: '', // Placeholder if needed
-                IsUnicode: data.isUnicode,
-                Urltrack: data.urlTrack,
-                UserId: session.userId,
-                EnquiryLeadId: selectedEnquiries[0] || 0, // First selected enquiry ID
-                EntityType: 'Enquiry'
-            };
-
-            const requestData = {
-                Token: session.token,
-                Details: JSON.stringify({ objSendSms_BO })
-            };
-
-            const response = await serviceInstance.post('/UserCRM/SendInternationalSms', requestData);
-
-            if (response?.data?.Status === 1) {
-                alert('International SMS sent successfully!');
-                setIsInternationalSMSModal(false);
-                // Optionally refresh the enquiry list
-            } else if (response?.data?.Status === -1) {
-                alert('Invalid token. Please login again.');
-            } else {
-                alert(response?.data?.Message || 'Failed to send SMS. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error sending international SMS:', error);
-            alert('An error occurred while sending SMS. Please try again.');
-        }
+    const handleSendInternationalSMS = (data) => {
+        console.log('International SMS data:', data);
+        alert('International SMS sent successfully!');
+        setIsInternationalSMSModal(false);
     }
 
     const handleCancelCallListModal = () => {
@@ -638,7 +552,7 @@ const EnquiryTable = ({
 
             const sender = smsFormData?.senderId || smsFormData?.senderIdNonIndian || '';
 
-            const objSendSMS = {    
+            const objSendSMS = {
                 Account: session.parentId?.toString() || '0',
                 SenderId: sender,
                 MobileNo: mobileNo,
@@ -695,6 +609,8 @@ const EnquiryTable = ({
         // For now, just show success and close modal. When you provide the endpoint we can implement the request.
         alert('Voice message queued (mock): ' + (payloadData?.dniNumber || payloadData?.dni || '') );
         setIsSendVoiceModal(false);
+        setVoiceFormData(null);
+        setSelectedEnquiryForVoice(null);
     }
 
     // Helper for all page numbers
@@ -702,14 +618,6 @@ const EnquiryTable = ({
 
     return (
         <div className="relative flex flex-col bg-white h-full w-full">
-            {/* Hidden file input used for direct Excel import (triggered from toolbar) */}
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept=".xlsx,.xls"
-                style={{ display: 'none' }}
-                onChange={handleExcelFileChange}
-            />
             {/* Floating left filter icon (matches screenshot position) */}
             <button
                 id="enquiries-filter-toggle"
@@ -770,10 +678,8 @@ const EnquiryTable = ({
                                             onClick={() => setShowMassOperation(!showMassOperation)}
                                             className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition flex items-center gap-1"
                                         >
-                                            More actions
-                                            {showMassOperation ? (<ChevronUp className="w-4 h-4" />) : (
-                                                <ChevronDown className="w-4 h-4" />
-                                            )}
+                                            ⋯ More actions
+                                            <ChevronDown className="w-3 h-3" />
                                         </button>
                                         {showMassOperation && (
                                             <div className="absolute left-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 overflow-hidden">
@@ -813,7 +719,7 @@ const EnquiryTable = ({
                                 !isSearchCollapsed ? (
                                     <div className="w-[540px] relative flex items-center gap-2">
                                         <Search
-                                            className="absolute right-[2rem] cursor-pointer top-2.5 w-4 h-4 text-gray-400 z-40"
+                                            className="absolute right-12 cursor-pointer top-2.5 w-4 h-4 text-gray-400 z-40"
                                             onClick={() => onSearch()}
                                         />
                                         <input
@@ -826,7 +732,7 @@ const EnquiryTable = ({
                                         />
                                         <button
                                             onClick={() => setIsSearchCollapsed(true)}
-                                            className="px-1 py-[11px] hover:bg-gray-100 rounded-r transition"
+                                            className="p-2 hover:bg-gray-100 rounded transition"
                                             title="Collapse Search"
                                         >
                                             <ChevronLeft className="w-4 h-4 text-gray-600" />
@@ -872,16 +778,20 @@ const EnquiryTable = ({
                         ) : (
                             <div className="flex">
                                 {/* View Toggle */}
-                                <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
+                                <div className="flex border border-gray-300 rounded overflow-hidden">
                                     <button
                                         onClick={() => setViewMode('card')}
-                                        className={`p-1.5 rounded ${viewMode === 'card' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
+                                        className={`p-2 transition ${viewMode === 'card' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                                            }`}
+                                        title="Card View"
                                     >
                                         <LayoutGrid className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={() => setViewMode('table')}
-                                        className={`p-1.5 rounded ${viewMode === 'table' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:bg-gray-100'}`}
+                                        className={`p-2 transition ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
+                                            }`}
+                                        title="Table View"
                                     >
                                         <List className="w-4 h-4" />
                                     </button>
@@ -898,17 +808,6 @@ const EnquiryTable = ({
                                     >
                                         <RefreshCw className="w-4 h-4 text-gray-600" />
                                     </button>
-                                    <span title='Add Enquiry'>
-                                    <button
-                                        className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
-                                        onClick={() => {
-                                           setIsAddEnquiryModal(true);
-                                            setShowToolbarMenu(false);
-                                        }}
-                                    >
-                                        <Plus className="w-4 h-4 text-gray-600" />
-                                    </button>
-                                    </span>
                                     <button
                                         className="p-2 hover:bg-gray-100 rounded transition"
                                         title="More Options"
@@ -952,17 +851,6 @@ const EnquiryTable = ({
                                             >
                                                 <Upload className="w-4 h-4 text-gray-600" />
                                                 <span>Import</span>
-                                            </button>
-                                            <button
-                                                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700"
-                                                onClick={() => {
-                                                    setShowToolbarMenu(false);
-                                                    // trigger hidden file input to parse Excel directly
-                                                    if (fileInputRef.current) fileInputRef.current.click();
-                                                }}
-                                            >
-                                                <Upload className="w-4 h-4 text-gray-600" />
-                                                <span>Import (Excel)</span>
                                             </button>
                                             <button
                                                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700 border-t border-gray-100"
@@ -1119,12 +1007,11 @@ const EnquiryTable = ({
                 <table className="w-full border-collapse">
                     <thead className="bg-gray-50 sticky top-0 z-10">
                         <tr className="border-b border-gray-200">
-                                <th className="px-3 py-3 text-left">
+                            <th className="px-3 py-3 text-left">
                                 <input
                                     type="checkbox"
                                     className="w-4 h-4 rounded border-gray-300 cursor-pointer"
-                                    // consider the visible rows (processedEnquiries) for checked state
-                                    checked={processedEnquiries && processedEnquiries.length > 0 && selectedEnquiries.length === processedEnquiries.length}
+                                    checked={selectedEnquiries.length === enquiries.length && enquiries.length > 0}
                                     onChange={handleSelectAll}
                                 />
                             </th>
@@ -1359,13 +1246,7 @@ const EnquiryTable = ({
                                                 <span title="Add to Lead">
                                                     <GoGitBranch 
                                                         className="w-5 h-5 text-gray-400 cursor-pointer hover:text-[#840ab9]"
-                                                        onClick={() => {
-                                                            if (!enquiry.IsOpen) {
-                                                                setIsMergeLeadOpen(true);
-                                                            } else {
-                                                                setIsAddLeadModal(true)
-                                                            }
-                                                        }}
+                                                        onClick={() => setIsAddLeadModal(true)}
                                                     />
                                                 </span>
                                                 <span title="Send WhatsApp">
@@ -1411,17 +1292,17 @@ const EnquiryTable = ({
                                                 </span>
                                             </div>
                                             {/* Row action menu dropdown */}
-                                            <EnquiryRowActionMenu
+                                            <RowActionMenu
                                                 show={rowMenu.show && rowMenu.rowId === enquiry.EnquiryId}
                                                 anchorRef={{ current: rowMenuAnchorRefs.current[enquiry.EnquiryId] }}
                                                 onClose={() => setRowMenu({ show: false, rowId: null })}
                                                 menuId={`row-action-menu-${enquiry.EnquiryId}`}
                                                 onAction={action => {
                                                     setRowMenu({ show: false, rowId: null });
-                                                    if (action === 'edit') {
-                                                        setSelectedEnquiryForEdit(enquiry);
-                                                        setIsEditEnquiryModal(true);
-                                                    } else if (action === 'sendVoice') {
+                                                    if (action === 'sendVoice') {
+                                                        // set selected enquiry so the voice form can prefill numbers
+                                                        setSelectedEnquiryForVoice(enquiry);
+                                                        console.log('Opening Send Voice modal for enquiry:', enquiry?.EnquiryId);
                                                         setIsSendVoiceModal(true);
                                                     } else if (action === 'meeting') {
                                                         setIsCreateMeetingModal(true)
@@ -1489,15 +1370,9 @@ const EnquiryTable = ({
                             ))}
                         </tbody>
                     ) : (
-                        <tbody>
-                            <tr>
-                                <td colSpan="100%" className="p-0">
-                                    <div className="flex items-center justify-center h-[30vh] w-full bg-[#ffffff]">
-                                        <img src={nodata} alt="nodata" />
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
+                        <div className="flex items-center justify-center h-[30vh] w-full bg-[#ffffff]">
+                            <img src={nodata} alt="nodata" />
+                        </div>
                     )}
                 </table>
             </div>
@@ -1588,23 +1463,9 @@ const EnquiryTable = ({
                 show={showFunnelFilter}
                 onClose={() => setShowFunnelFilter(false)}
                 initialFilters={filters}
-                setFilterExpSQLClause={setFilterExpSQLClause}
                 onApply={(newFilters) => {
                     setFilters(newFilters);
                     setShowFunnelFilter(false);
-                    
-                    // Convert filters object to filterExp string format
-                    // Format: "field1:condition1:value1,field2:condition2:value2,..."
-                    const filterExpString = Object.keys(newFilters)
-                        .map(key => `${key}:${newFilters[key].condition}:${newFilters[key].value}`)
-                        .join(',');
-                    
-                    console.log('FilterExp string:', filterExpString);
-                    if (setFilterExp && typeof setFilterExp === 'function') {
-                        setFilterExp(filterExpString);
-                    }
-                    
-                    fecthEnquiry(false, 1);
                 }}
             />
 
@@ -1682,7 +1543,7 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <SendMassMailForm selectedCount={selectedEnquiries.length} selectedEnquiryIds={selectedEnquiries} />
+                <SendMassMailForm selectedCount={selectedEnquiries.length} />
             </PopUpModal>
 
             <PopUpModal
@@ -1741,11 +1602,7 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <InternalSMSForm 
-                    ref={internalSMSFormRef}
-                    onClose={handleCancelInternationalSMSModal} 
-                    onSubmit={handleInternationalSMSSubmit} 
-                />
+                <InternalSMSForm onClose={handleCancelInternationalSMSModal} onSubmit={handleSendInternationalSMS} />
             </PopUpModal>
 
             <PopUpModal
@@ -1851,7 +1708,7 @@ const EnquiryTable = ({
             <PopUpModal
                 isOpen={isSendIndividualMailModal}
                 onClose={handleCancelIndividualMail}
-                title="Send Mail" 
+                title="Send Mail"
                 size="lg"
                 footer={
                     <div className="flex justify-between w-full">
@@ -1870,7 +1727,10 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <SendMailForm />
+                <SendMailForm 
+                    selectedEnquiry={selectedEnquiryForMail} 
+                    onFormChange={setMailFormData}
+                />
             </PopUpModal>
 
             <PopUpModal
@@ -1895,7 +1755,10 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <SendSMSForm />
+                <SendSMSForm 
+                    selectedEnquiry={selectedEnquiryForSMS}
+                    onFormChange={setSmsFormData}
+                />
             </PopUpModal>
 
             <PopUpModal
@@ -1920,7 +1783,10 @@ const EnquiryTable = ({
                     </div>
                 }
             >
-                <SendVoiceForm />
+                <SendVoiceForm
+                    selectedEnquiry={selectedEnquiryForVoice}
+                    onFormChange={setVoiceFormData}
+                />
             </PopUpModal>
 
             <PopUpModal
@@ -1965,7 +1831,7 @@ const EnquiryTable = ({
                             variant='primary'
                             onClick={() => { }}
                         >
-                            Create Meeting
+                            Add Physical Appointment
                         </Button>
                     </div>
                 }
@@ -1997,49 +1863,6 @@ const EnquiryTable = ({
             >
                 <WhatsAppForm />
             </PopUpModal>
-
-                  {/* Add Enquiry Modal */}
-      <PopUpModal
-        isOpen={isAddEnquiryModal}
-        onClose={() => setIsAddEnquiryModal(false)}
-        title="Add Enquiry"
-        size="xl"
-        footer={
-          <div className="flex justify-between w-full">
-            <Button
-              variant="secondary"
-              onClick={() => setIsAddEnquiryModal(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                console.log('Save enquiry');
-                setIsAddEnquiryModal(false);
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        }
-      >
-        <AddEnquiryForm
-          onClose={() => setIsAddEnquiryModal(false)}
-          onSubmit={(data) => {
-            console.log('Enquiry data:', data);
-            setIsAddEnquiryModal(false);
-          }}
-        />
-      </PopUpModal>
-
-            <MergeLead
-                isOpen={isMergeLeadOpen}
-                onClose={() => setIsMergeLeadOpen(false)}
-                page={'enquiry'}
-                enquiryData={enquiries}
-                onMerged={() => { if (typeof fecthEnquiry === 'function') fecthEnquiry(true); }}
-            />
 
             {/* Call Widget Sticky Popup */}
             {showCallWidget && (
@@ -2169,50 +1992,6 @@ const EnquiryTable = ({
                     Are you sure you want to delete Enquiry Id: <strong>{deleteConfirmModal.enquiryId}</strong>?
                 </p>
             </Modal>
-
-            {/* Edit Enquiry Modal */}
-            <PopUpModal
-                isOpen={isEditEnquiryModal}
-                onClose={() => {
-                    setIsEditEnquiryModal(false);
-                    setSelectedEnquiryForEdit(null);
-                }}
-                title="Edit Details"
-                size="xl"
-                footer={
-                    <div className="flex justify-between w-full">
-                        <Button
-                            variant="secondary"
-                            onClick={() => setIsEditEnquiryModal(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="primary"
-                            onClick={() => {
-                                // Trigger the form's submit button
-                                const form = document.getElementById('editEnquiryForm');
-                                if (form) form.requestSubmit();
-                            }}
-                        >
-                            Update
-                        </Button>
-                    </div>
-                }
-            >
-                <EditEnquiryForm
-                    enquiry={selectedEnquiryForEdit}
-                    onClose={() => {
-                        setIsEditEnquiryModal(false);
-                        setSelectedEnquiryForEdit(null);
-                    }}
-                    onSubmit={(data) => {
-                        console.log('Updated data:', data);
-                        setIsEditEnquiryModal(false);
-                        setSelectedEnquiryForEdit(null);
-                    }}
-                />
-            </PopUpModal>
         </div>
     );
 };

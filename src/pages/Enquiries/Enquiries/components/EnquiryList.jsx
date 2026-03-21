@@ -6,6 +6,9 @@ import PopUpModal from '../../../../components/PopUpModal/PopUpModal';
 import Button from '../../../../components/common/Button';
 import ImportData from '../../../../components/ImportData/ImportData';
 import AddEnquiryForm from '../../../../components/EnquiriesForms/AddEnquiryForm';
+import { exportEnquiryData } from '../../../../utils/enquiry';
+import { getSession } from '../../../../getSession';
+import toast from 'react-hot-toast';
 
 
 const EnquiryList = ({
@@ -43,6 +46,52 @@ const EnquiryList = ({
     alert('Data imported successfully!');
     setIsImportDataModal(false);
   }
+
+  const handleExport = async () => {
+    const session = getSession();
+    if (!session || !session.userId || !session.TokenId) {
+      toast.error('Session expired. Please login again.');
+      return;
+    }
+
+    setShowToolbarMenu(false);
+    const exportToast = toast.loading('Exporting data...');
+
+    try {
+      const details = {
+        UserId: session.userId,
+        CustomSearchId: 0,
+        PredefinedSearchId: 0,
+        FilterText: searchText || '',
+        Start: 0,
+        Limit: 2147483647, // int.MaxValue
+        Mode: 'Enquiry'
+      };
+
+      const payload = {
+        Token: session.TokenId,
+        Message: '',
+        LoggedUserId: session.userId,
+        MAC_Address: '',
+        IP_Address: '102.16.32.189',
+        Details: JSON.stringify(details),
+        BroadcastName: ''
+      };
+
+      const response = await exportEnquiryData(payload);
+
+      if (response && response.Status === 1 && response.Details) {
+        // Open the CSV file URL in a new window/download
+        window.open(response.Details, '_blank');
+        toast.success('Export successful!', { id: exportToast });
+      } else {
+        toast.error(response?.Message || 'Export failed', { id: exportToast });
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error(error?.message || 'Failed to export data', { id: exportToast });
+    }
+  };
 
   // Infinite scroll handler
   useEffect(() => {
@@ -184,7 +233,7 @@ const EnquiryList = ({
                 </button>
                 <button
                   className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition text-sm text-gray-700 border-t border-gray-100"
-                  onClick={() => setShowToolbarMenu(false)}
+                  onClick={handleExport}
                 >
                   <Download className="w-4 h-4 text-gray-600" />
                   <span>Export</span>

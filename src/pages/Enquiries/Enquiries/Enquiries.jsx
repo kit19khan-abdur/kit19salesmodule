@@ -4,9 +4,10 @@ import EnquiryDetails from './EnquiryDetails';
 import EnquiryList from './components/EnquiryList';
 import EnquiryTable from './components/EnquiryTable';
 import EnquiryDetailPanel from './components/EnquiryDetailPanel';
-import { getEnquiryList, getEnquiryActivities } from '../../../utils/enquiry';
+import { getEnquiryList, getEnquiryActivities, getEnquiryList_WithPredefinedAndCustomFilter } from '../../../utils/enquiry';
 import { getSession } from '../../../getSession';
 import nodata from '../../../assets/nodata.gif';
+import ReadExcelOnEnquiryPage from './ReadExcel';
 
 const Enquiries = () => {
   const [selectedLead, setSelectedLead] = useState(0);
@@ -17,6 +18,8 @@ const Enquiries = () => {
   const { userId, TokenId } = getSession();
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [filterExp, setFilterExp] = useState('');
+  const [filterExpSQLClause, setFilterExpSQLClause] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState('card');
   const [isLeftCollapsed, setIsLeftCollapsed] = useState(false);
@@ -48,40 +51,98 @@ const Enquiries = () => {
   const fecthEnquiry = async (loadMore = false, page = 1) => {
     setIsLoading(true);
     // Calculate Start index: (page - 1) * itemsPerPage
-    const start = loadMore ? startIndex : (page - 1) * parseInt(itemsPerPage);
+    const start = loadMore ? startIndex : (page - 1) * parseInt(itemsPerPage, 10);
+    
+    // Determine whether a filter/search is applied
+    const isFilterApplied = (searchText && String(searchText).trim().length > 0) || 
+                            (filterExp && String(filterExp).trim().length > 0) ||
+                            (filterExpSQLClause && String(filterExpSQLClause).trim().length > 0);
+    
+    // Build Details object conditionally
+    const details = isFilterApplied
+      ? {
+          UserId: userId,
+          CustomSearchId: 0,
+          PredefinedSearchId: 0,
+          FilterText: searchText || '',
+          FilterExp: filterExpSQLClause || '', //filterExp || '',
+          Ordstr: '',
+          OffsetValue: start,
+          SortOrder: 'desc',
+          PageSize: parseInt(itemsPerPage, 10),
+          IsFilter: true,
+        }
+      : {
+          UserId: userId,
+          CustomSearchId: 0,
+          PredefinedSearchId: 0,
+          FilterText: '',
+          Start: start,
+          Limit: parseInt(itemsPerPage, 10),
+          IsFilter: false,
+        };
 
     const payload = {
       Token: TokenId,
-      Message: "",
+      Message: '',
       LoggedUserId: userId,
-      MAC_Address: "",
-      IP_Address: "102.16.32.189",
-      Details: {
-        UserId: userId,
-        CustomSearchId: 0,
-        PredefinedSearchId: 0,
-        FilterText: "",
-        Start: start,
-        Limit: parseInt(itemsPerPage)
-      },
-      BroadcastName: ""
+      MAC_Address: '',
+      IP_Address: '102.16.32.189',
+      Details: details,
+      BroadcastName: '',
     };
+
+    /*
+     	exec usp_mob_GetEnquiryListNewLatest @UserId=43422,
+       @CustomSearchId=0, @PredefindSearchId=0,
+       @FilterText=N'', @FilterExp=N'', @Ordstr=N''
+      ,@OffsetValue=0, @SortOrder=N'desc', @PageSize=100
+    */
+
+      //debugger;
+
     try {
-      const response = await getEnquiryList(payload);
-      setTotalRecord(response.Details.totalRecords);
+      // Choose API based on whether a filter/search is applied
+      let response;
+      
+        //setStartIndex(0);
+        //setCurrentPage(1);
+       // handlePageChange(1);      
+
+
+      if (isFilterApplied) {
+        // Switch to table view when filter is applied (before fetching data)
+        setViewMode('table');
+        setShowDetailPanel(false);
+        // setStartIndex(0);
+        // setCurrentPage(1);
+        // //handlePageChange(1);  
+        response = await getEnquiryList_WithPredefinedAndCustomFilter(payload);
+      
+      } else {
+        response = await getEnquiryList(payload);
+      }
+      //onPageChange(1);
+        
+      // Normalize and use the response
+      const details = response?.Details || { totalRecords: 0, data: [] };
+      setTotalRecord(details.totalRecords);
 
       if (loadMore) {
-        setEnquiries(prev => [...prev, ...response.Details.data]);
+        setEnquiries(prev => [...prev, ...details.data]);
       } else {
-        setEnquiries(response.Details.data);
-        if (response.Details.data && response.Details.data.length > 0 && !selectedEnquiry) {
-          setSelectedLead(response.Details.data[0].EnquiryId);
-          setSelectedEnquiry(response.Details.data[0]);
+        setEnquiries(details.data);
+        if (details.data && details.data.length > 0 && !selectedEnquiry) {
+          setSelectedLead(details.data[0].EnquiryId);
+          setSelectedEnquiry(details.data[0]);
         }
       }
-    } catch (error) {
+    } catch (error)
+    {
       console.error(error);
-    } finally {
+                // onPageChange(1); // Removed, use setCurrentPage(1) above
+               // onPageChange
+             //  handlePageChange(1);
       setIsLoading(false);
     }
   };
@@ -96,7 +157,7 @@ const Enquiries = () => {
     setSelectedLead(enquiry.EnquiryId);
     setSelectedEnquiry(enquiry);
     if (viewMode === 'table') {
-      setShowDetailPanel(true);
+      setShowDetailPanel(false);
     }
 
     // Fetch activities for the selected enquiry
@@ -117,8 +178,7 @@ const Enquiries = () => {
   const handlePageChange = (page) => {
     setCurrentPage(page);
     fecthEnquiry(false, page);
-  };
-
+  }
   useEffect(() => {
     fecthEnquiry();
   }, []);
@@ -127,8 +187,6 @@ const Enquiries = () => {
   useEffect(() => {
     if (currentPage !== 1) {
       setCurrentPage(1);
-      fecthEnquiry(false, 1);
-    } else {
       fecthEnquiry(false, 1);
     }
   }, [itemsPerPage]);
@@ -235,12 +293,21 @@ const Enquiries = () => {
           setEnquiries={setEnquiries}
           onPageChange={handlePageChange}
           currentPage={currentPage}
+          fecthEnquiry={fecthEnquiry}
+          setFilterExp={setFilterExp}
+          setFilterExpSQLClause={setFilterExpSQLClause}
         />
       ) : (
         /* Card View - Main Content */
         <div className={`flex-1 overflow-y-auto transition-all duration-300 ${isLeftCollapsed ? 'ml-0' : ''}`}>
+                 
+
           {selectedEnquiry ? (
-            <EnquiryDetails enquiry={selectedEnquiry} isLeftCollapsed={isLeftCollapsed} />
+            <EnquiryDetails
+              enquiry={selectedEnquiry}
+              isLeftCollapsed={isLeftCollapsed}
+              onMerged={() => fecthEnquiry(false, currentPage)}
+            />
           ) : (
             <div className="flex items-center justify-center h-full bg-[#ffffff]">
               <img src={nodata} alt="nodata" />
@@ -259,6 +326,5 @@ const Enquiries = () => {
       )}
     </div>
   );
-};
-
+}
 export default Enquiries;

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 
 const RemoveTag = ({ onClose, onSubmit }) => {
@@ -57,9 +57,80 @@ const RemoveTag = ({ onClose, onSubmit }) => {
 
   const handleCalendarIconClick = () => {
     if (dateTimeInputRef.current) {
-      dateTimeInputRef.current.showPicker();
+      if (typeof dateTimeInputRef.current.showPicker === 'function') {
+        dateTimeInputRef.current.showPicker();
+      } else {
+        dateTimeInputRef.current.click();
+      }
     }
   };
+
+  // Format datetime-local (yyyy-MM-ddTHH:mm) to dd-MMM-yyyy hh:MM:ss
+  const formatScheduledDate = (datetimeLocal) => {
+    if (!datetimeLocal) return '';
+    try {
+      const [datePart, timePart] = datetimeLocal.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = (timePart || '').split(':').map(Number);
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const dd = String(day).padStart(2, '0');
+      const MMM = months[(month || 1) - 1] || '';
+      const yyyy = String(year);
+      const hh = String(hour).padStart(2, '0');
+      const MM = String(minute).padStart(2, '0');
+      const ss = '00';
+      return `${dd}-${MMM}-${yyyy} ${hh}:${MM}:${ss}`;
+    } catch (e) {
+      return '';
+    }
+  };
+
+  // return current local datetime in 'yyyy-MM-ddTHH:mm' format for datetime-local inputs
+  const getLocalDateTimeLocal = () => {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const mm = pad(d.getMonth() + 1);
+    const dd = pad(d.getDate());
+    const HH = pad(d.getHours());
+    const MIN = pad(d.getMinutes());
+    return `${yyyy}-${mm}-${dd}T${HH}:${MIN}`;
+  };
+
+  // Parse formatted 'dd-MMM-yyyy hh:MM:ss' into datetime-local 'yyyy-MM-ddTHH:mm'
+  const parseFormattedToLocal = (formatted) => {
+    if (!formatted) return '';
+    try {
+      // expected format: 18-Jan-2026 14:30:00
+      const [datePart, timePart] = formatted.split(' ');
+      if (!datePart || !timePart) return '';
+      const [dd, MMM, yyyy] = datePart.split('-');
+      const [hh, MM, ss] = timePart.split(':');
+      const months = { Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06', Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12' };
+      const mm = months[MMM] || '01';
+      const day = String(dd).padStart(2, '0');
+      const hour = String(hh).padStart(2, '0');
+      const minute = String(MM).padStart(2, '0');
+      return `${yyyy}-${mm}-${day}T${hour}:${minute}`;
+    } catch (e) {
+      return '';
+    }
+  };
+
+  const handlePickerChange = (e) => {
+    const val = e.target.value; // datetime-local value
+    if (!val) return;
+    const formatted = formatScheduledDate(val);
+    setFormData(prev => ({ ...prev, scheduleDateTime: formatted }));
+  };
+
+  // When scheduling is enabled and no datetime is set, default to current local datetime (formatted)
+  useEffect(() => {
+    if (formData.onSchedule && !formData.scheduleDateTime) {
+      const formattedNow = formatScheduledDate(getLocalDateTimeLocal());
+      setFormData(prev => ({ ...prev, scheduleDateTime: formattedNow }));
+    }
+  }, [formData.onSchedule]);
 
   return (
     <div className="bg-white h-[40vh]">
@@ -120,17 +191,43 @@ const RemoveTag = ({ onClose, onSubmit }) => {
           </label>
           <div className="relative">
             <input
-              ref={dateTimeInputRef}
-              type="datetime-local"
+              type="text"
               name="scheduleDateTime"
               value={formData.scheduleDateTime}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-700 [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-0"
-              style={{ colorScheme: 'light' }}
+              onClick={() => {
+                if (dateTimeInputRef.current) {
+                  if (typeof dateTimeInputRef.current.showPicker === 'function') {
+                    dateTimeInputRef.current.showPicker();
+                  } else {
+                    dateTimeInputRef.current.click();
+                  }
+                }
+              }}
+              placeholder="18-Jan-2026 14:30:00"
+              className="w-full px-3 py-2 pr-10 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-700"
             />
-            <Calendar 
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" 
-              onClick={handleCalendarIconClick}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                handleCalendarIconClick();
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 bg-transparent"
+              title="Pick date & time"
+            >
+              <Calendar className="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" />
+            </button>
+
+            {/* Hidden native picker wired to dateTimeInputRef */}
+            <input
+              type="datetime-local"
+              ref={dateTimeInputRef}
+              onChange={handlePickerChange}
+              value={parseFormattedToLocal(formData.scheduleDateTime)}
+              min={getLocalDateTimeLocal()}
+              className="sr-only"
+              aria-hidden="true"
             />
           </div>
         </div>

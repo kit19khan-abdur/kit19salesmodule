@@ -3,7 +3,7 @@ import { Phone, Mail, MessageSquare, Calendar, ChevronDown, ChevronUp, Plus, Clo
 import { GoGitBranch } from "react-icons/go";
 import { FaWhatsapp } from "react-icons/fa";
 import nodata from '../../../assets/nodata.gif';
-import { getCallLogt, getEnquiryActivities, getPhysiscalAppointmentWidgetList } from '../../../utils/enquiry';
+import { getCallLogt, getEnquiryActivities, getPhysiscalAppointmentWidgetList, mergeEnquiryToLead } from '../../../utils/enquiry';
 import PopUpModal from '../../../components/PopUpModal/PopUpModal';
 import Button from '../../../components/common/Button';
 import MailForm from '../Forms/MailForm';
@@ -16,11 +16,12 @@ import AddAppointmentForm from '../../../components/EnquiriesForms/AddAppointmen
 import SendVoiceForm from '../../../components/EnquiriesForms/SendVoiceForm';
 import MergeLead from '../../../components/LeadForm/MergeLead';
 import EditEnquiryForm from '../../../components/EnquiriesForms/EditEnquiryForm';
+import SendPDFForm from '../../../components/EnquiriesForms/SendPDFForm';
 
-const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
+const EnquiryDetails = ({ enquiry, isLeftCollapsed, onMerged }) => {
     const [showMoreDetails, setShowMoreDetails] = useState(false);
     const [activeTab, setActiveTab] = useState('activities');
-    const [activities, setActivities] = useState([]);
+    const [activities, setActivities] = useState([]);   
     const [callLogs, setCallLogs] = useState([]);
     const [showAllTabs, setShowAllTabs] = useState(false);
     const [isSMSModalOpen, setIsSMSModalOpen] = useState(false);
@@ -43,6 +44,8 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     const [isEditEnquiryModal, setIsEditEnquiryModal] = useState(false);
     const [draggedTab, setDraggedTab] = useState(null);
 
+    const [isSendPdfModal, setIsSendPDFModal] = useState(false);
+
     // Initialize tabs order from localStorage or use default
     const defaultTabs = ['activities', 'calls', 'Whatsapp Chat Log', 'meetings', 'Physical Appointments', 'chat', 'webform'];
     const [tabsOrder, setTabsOrder] = useState(() => {
@@ -53,7 +56,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     // Start/stop call timer when call widget is shown/hidden
     useEffect(() => {
         if (showCallWidget) {
-            // reset and start
+            // reset and start     
             let seconds = 0;
             setCallTimer('00:00:00');
             if (callIntervalRef.current) {
@@ -171,12 +174,12 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     }
 
     useEffect(() => {
-        if (enquiry) {
+        if (enquiry && enquiry.EnquiryId) {
             fetchActivities();
             //  fetchCallLog()
             //  fetchPAWidgetList()
         }
-    }, [enquiry]);
+    }, [enquiry?.EnquiryId]); // Only depend on EnquiryId, not the entire object
 
     const handleSaveNote = () => {
 
@@ -191,6 +194,8 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     const handleCancelWhatsApp = () => {
         setIsWhatsAppModalOpen(false);
     };
+
+            
 
     // Fetch data when active tab changes
     useEffect(() => {
@@ -207,6 +212,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
     }, [activeTab, enquiry]);
 
     if (!enquiry) {
+
         return (
             <div className="flex items-center justify-center h-full bg-[#ffffff]">
                 <img src={nodata} alt="nodata" />
@@ -542,7 +548,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                     <FileText className="w-4 h-4" />
                                     Edit All Fields
                                 </button>
-                                <button
+                                <a
                                     onClick={() => {
                                         // Only open if status is "Lead" (IsOpen is false)
                                         if (!enquiry.IsOpen) {
@@ -554,7 +560,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
                                     <GoGitBranch className="w-4 h-4" />
                                     Add Or Merge Leads
-                                </button>
+                                </a>
                                 <button
                                     onClick={() => setIsCreateMeetingModal(true)}
                                     className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
@@ -573,6 +579,13 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                                     <Mic className="w-4 h-4" />
                                     Send Voice
                                 </button>
+                                <button
+                                    onClick={() => setIsSendPDFModal(true)}
+                                    className="w-full flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+                                    <Mic className="w-4 h-4" />
+                                      Info in PDF
+                                </button>
+
                             </div>
                         </div>
                     </div>
@@ -794,24 +807,26 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                 </div>
             )}
             <PopUpModal
-                isOpen={isAddLeadModal}
+                             
+               isOpen={isAddLeadModal}
                 onClose={() => setIsAddLeadModal(false)}
-                title="Add Lead"
+                title="Add Lead:"
                 size="lg"
-                footer={
-                    <div className="flex justify-between w-full">
-                        <Button
-                            variant="secondary"
+                 header= { <div><a href='#' className="text-gray-500 hover:text-gray-700 text-sm font-medium"
                             onClick={() => setIsAddLeadModal(false)}
                         >
                             Cancel
-                        </Button>
-                        <Button
+                        </a>
+                       </div>}            
+                footer={
+                    <div className="flex justify-between w-full">
+                        
+                        {/* <Button
                             variant='primary'
-                            onClick={() => { }}
+                            onClick={() => {}}
                         >
                             Save
-                        </Button>
+                        </Button> */}
                     </div>
                 }
             >
@@ -840,7 +855,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                     </div>
                 }
             >
-                <AddAppointmentForm />
+                <AddAppointmentForm/>
             </PopUpModal>
 
             <PopUpModal
@@ -865,7 +880,7 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                     </div>
                 }
             >
-                <SendVoiceForm />
+               <SendVoiceForm/>
             </PopUpModal>
 
             {/* Merge Lead Drawer */}
@@ -873,9 +888,10 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                 isOpen={isMergeLeadOpen}
                 onClose={() => setIsMergeLeadOpen(false)}
                 enquiryData={enquiry}
+                onMerged={() => { if (typeof onMerged === 'function') onMerged(); }}
             />
 
-            {/* Edit Enquiry Modal */}
+         {/* Edit Enquiry Modal */}
             <PopUpModal
                 isOpen={isEditEnquiryModal}
                 onClose={() => setIsEditEnquiryModal(false)}
@@ -892,15 +908,16 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                         <Button
                             variant="primary"
                             onClick={() => {
-                                console.log('Update enquiry');
-                                setIsEditEnquiryModal(false);
+                                // Trigger the form's submit button
+                                const form = document.getElementById('editEnquiryForm');
+                                if (form) form.requestSubmit();
                             }}
                         >
                             Update
                         </Button>
                     </div>
-                }
-            >
+                  }
+              >
                 <EditEnquiryForm
                     enquiry={enquiry}
                     onClose={() => setIsEditEnquiryModal(false)}
@@ -909,8 +926,31 @@ const EnquiryDetails = ({ enquiry, isLeftCollapsed }) => {
                         setIsEditEnquiryModal(false);
                     }}
                 />
-            </PopUpModal>
-
+       </PopUpModal>
+       <PopUpModal
+                isOpen={isSendPdfModal}
+                onClose={() => setIsSendPDFModal(false)}
+                title="Info in PDF"
+                size="lg"
+                footer={
+                    <div className="flex justify-between w-full">  
+                        <Button
+                              variant="secondary"
+                               onClick={() => setIsSendPDFModal(false)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                                variant='primary'
+                                onClick={() => { }}
+                            >
+                              PDF Info
+                            </Button>
+                        </div>
+                    }
+                >
+               <SendPDFForm enquiryId={enquiry.EnquiryId} />
+              </PopUpModal> 
         </div>
     );
 }
